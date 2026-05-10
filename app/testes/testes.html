@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conecta Barueri</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --azul-barueri: #162c53;
+            --azul-claro: #e1e9f4;
+            --bg-dark: #12141d;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Estilo do Menu Lateral (Sidebar) */
+        .sidebar {
+            width: 280px;
+            background-color: var(--azul-barueri);
+            height: 100vh;
+            position: fixed;
+            left: -280px; /* Escondido por padrão */
+            transition: 0.3s;
+            z-index: 1000;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        /* O "buraco" onde o conteúdo das outras páginas vai entrar */
+        .content-wrapper {
+            transition: 0.3s;
+        }
+    </style>
+</head>
+<body>
+
+    <button id="sidebarCollapse" class="btn btn-outline-light m-3 position-fixed top-0 start-0 z-3">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <nav class="sidebar p-4" id="sidebar">
+        <h4 class="mb-4">Conecta Barueri</h4>
+        <ul class="nav flex-column">
+            <li class="nav-item mb-2"><a href="/" class="nav-link text-white"><i class="fas fa-home me-2"></i> Início</a></li>
+            <li class="nav-item mb-2"><a href="#" class="nav-link text-white"><i class="fas fa-user me-2"></i> Login</a></li>
+        </ul>
+    </nav>
+
+    <div class="content-wrapper">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Lógica simples para abrir/fechar o menu
+        document.getElementById('sidebarCollapse').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+    </script>
+</body>
+</html>
