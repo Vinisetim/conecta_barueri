@@ -1,38 +1,125 @@
 :root {
-    --primary-dark: #0a1931;
-    --royal-blue: #4169e1;
-    --accent-blue: #60a5fa;
-    --white: #ffffff;
-    --text-muted: #cbd5e1;
-    --glass-bg: rgba(255, 255, 255, 0.05);
-    --glass-border: rgba(255, 255, 255, 0.1);
+    --primary: #0052ff;
+    --primary-hover: #0041cc;
+    --dark-slate: #0f172a;
+    --body-bg: #f8fafc;
+    --text-main: #334155;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --card-bg: #ffffff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
-    background-color: var(--primary-dark);
-    color: var(--white);
+    background-color: var(--body-bg);
+    color: var(--text-main);
     font-family: 'Inter', sans-serif;
-    margin: 0;
+    line-height: 1.6;
     overflow-x: hidden;
 }
 
-/* Utilitário para Título Gradiente */
-.gradient-text {
-    background: linear-gradient(90deg, var(--white), var(--accent-blue));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+/* Tipografia */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--dark-slate);
     font-weight: 700;
 }
 
-/* Efeito Glassmorphism */
-.glass-card {
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    border: 1px solid var(--glass-border);
-    border-radius: 16px;
-    transition: transform 0.3s ease;
+.text-primary {
+    color: var(--primary) !important;
 }
 
-.glass-card:hover {
-    transform: translateY(-5px);
+/* Navbar de Alta Fidelidade */
+.navbar {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 0;
+    transition: all 0.3s ease;
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    color: var(--dark-slate);
+}
+
+/* Botão Login Outline */
+.btn-outline-primary-custom {
+    border: 1px solid var(--border-color);
+    color: var(--dark-slate);
+    font-weight: 500;
+    padding: 0.5rem 1.5rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-outline-primary-custom:hover {
+    background-color: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+/* Botão Primário Arredondado (Padrão da Imagem) */
+.btn-primary-custom {
+    background-color: var(--primary);
+    color: #ffffff;
+    font-weight: 600;
+    padding: 0.75rem 2rem;
+    border-radius: 50px;
+    border: none;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-primary-custom:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 82, 255, 0.2);
+    color: #ffffff;
+}
+
+/* Linha de Destaque Centralizada nos Títulos */
+.section-title {
+    text-align: center;
+    margin-bottom: 3.5rem;
+    position: relative;
+    padding-bottom: 1rem;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 4px;
+    background-color: var(--primary);
+    border-radius: 2px;
+}
+
+/* Rodapé */
+footer {
+    background-color: #ffffff;
+    border-top: 1px solid var(--border-color);
+    padding: 3rem 0;
+    color: var(--text-muted);
+}
+
+.footer-icon {
+    color: var(--dark-slate);
+    font-size: 1.4rem;
+    transition: color 0.2s;
+}
+
+.footer-icon:hover {
+    color: var(--primary);
 }
