@@ -1,0 +1,103 @@
+{% extends "landing/base_site.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/landing/landing.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center min-vh-75">
+            <div class="col-lg-6 hero-text-col">
+                <h1 class="display-5 fw-bold mb-4">Administração de dados em <span class="text-primary">tempo real</span></h1>
+                <p class="lead text-muted mb-4">Gerencie, monitore e visualize dados em tempo real com segurança, eficiência e total transparência.</p>
+                <a href="#sobre" class="btn-primary-custom px-5 py-3 shadow-sm">Leia Mais</a>
+            </div>
+            <div class="col-lg-6 position-relative text-center">
+                <div class="hero-bg-curve"></div>
+                <img src="{{ url_for('static', filename='img/hero-dashboard.png') }}" class="img-fluid hero-img rounded-4 shadow-lg" alt="Dashboard Preview">
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="servicos" class="container py-5 section-padding">
+    <h2 class="section-title fw-bold">Serviços</h2>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="service-card p-4 h-100">
+                <div class="icon-wrapper mb-4">
+                    <i class="bi bi-file-earmark-text-fill"></i>
+                </div>
+                <h4 class="fw-bold mb-3">Gerenciamento de Conteúdo</h4>
+                <p class="text-muted small mb-0">Organiza, edita e publica informações de forma centralizada, facilitando a atualização constante da plataforma.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="service-card p-4 h-100">
+                <div class="icon-wrapper mb-4">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <h4 class="fw-bold mb-3">Histórico de alterações</h4>
+                <p class="text-muted small mb-0">Registra mudanças realizadas no sistema, garantindo mais controle, transparência e rastreabilidade das informações.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="service-card p-4 h-100">
+                <div class="icon-wrapper mb-4">
+                    <i class="bi bi-bar-chart-line-fill"></i>
+                </div>
+                <h4 class="fw-bold mb-3">Geração de Dados Analíticos</h4>
+                <p class="text-muted small mb-0">Converte informações de uso em gráficos, indicadores e relatórios que ajudam na análise e na tomada de decisão.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="sobre" class="container py-5 section-padding">
+    <h2 class="section-title fw-bold">Sobre o site</h2>
+
+    <div class="row align-items-center mb-5 pb-4">
+        <div class="col-lg-6 mb-4 mb-lg-0">
+            <img src="{{ url_for('static', filename='img/team-1.jpg') }}" class="img-fluid rounded-4 shadow-sm about-img" alt="Equipe de inovação">
+        </div>
+        <div class="col-lg-6 ps-lg-5">
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <div class="about-icon"><i class="bi bi-people-fill"></i></div>
+                <h3 class="fw-bold m-0 fs-4">Quem Somos</h3>
+            </div>
+            <p class="text-muted">Somos uma proposta de inovação digital voltada à criação de ambientes web mais inteligentes, acessíveis e orientados por dados. Acreditamos que plataformas digitais devem ir além da simples apresentação de informações, oferecendo também recursos de análise, gestão e evolução contínua.</p>
+        </div>
+    </div>
+
+    <div class="row align-items-center flex-column-reverse flex-lg-row">
+        <div class="col-lg-6 pe-lg-5">
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <div class="about-icon"><i class="bi bi-target"></i></div>
+                <h3 class="fw-bold m-0 fs-4">Nossa Missão</h3>
+            </div>
+            <p class="text-muted">Nossa missão é oferecer uma plataforma digital capaz de facilitar o acesso à informação, melhorar a experiência do usuário e fornecer dados estratégicos que apoiem a tomada de decisão, a organization institucional e a evolução contínua do ambiente digital.</p>
+        </div>
+        <div class="col-lg-6 mb-4 mb-lg-0">
+            <img src="{{ url_for('static', filename='img/team-2.jpg') }}" class="img-fluid rounded-4 shadow-sm about-img" alt="Colaboração e metas">
+        </div>
+    </div>
+</section>
+
+<section class="container my-5 py-4">
+    <div class="cta-card text-center p-5">
+        <div class="cta-lock-wrapper mb-3">
+            <i class="bi bi-lock-fill"></i>
+        </div>
+        <h2 class="fw-bold mb-3">Pronto para <span class="text-primary">começar?</span></h2>
+        <p class="text-muted mb-4">Explore todos os recursos de gestão e análise da nossa plataforma.</p>
+        
+        <div class="cta-alert-box mb-4">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            Acesso restrito: É necessário possuir login e senha.
+        </div>
+        <br>
+        <a href="{{ url_for('auth.login') if 'auth' in config else '#' }}" class="btn-primary-custom px-5 py-3 shadow">Ir para o Login</a>
+    </div>
+</section>
+{% endblock %}
