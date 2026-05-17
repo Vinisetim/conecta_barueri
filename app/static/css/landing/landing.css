@@ -1,0 +1,126 @@
+
+.section-padding {
+    padding-top: 4rem !important;
+    padding-bottom: 4rem !important;
+}
+
+/* Hero Elements */
+.hero-section {
+    position: relative;
+    padding: 4rem 0;
+}
+
+.hero-text-col h1 {
+    font-size: 3.25rem;
+    line-height: 1.2;
+    color: var(--dark-slate);
+}
+
+.hero-img {
+    z-index: 2;
+    position: relative;
+    border: 4px solid #ffffff;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Elipse azul de fundo vista no Hero da imagem */
+.hero-bg-curve {
+    position: absolute;
+    width: 140%;
+    height: 120%;
+    background: radial-gradient(circle, rgba(0,82,255,0.06) 0%, rgba(255,255,255,0) 70%);
+    top: -10%;
+    left: -20%;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Cards de Serviço Finos e Limpos */
+.service-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+}
+
+/* Wrappers Azuis Claros para os Ícones */
+.icon-wrapper {
+    width: 48px;
+    height: 48px;
+    background-color: #e6efff;
+    color: var(--primary);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+/* Imagens das Seções Institucionais */
+.about-img {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid var(--border-color);
+    width: 100%;
+    object-fit: cover;
+    height: 320px;
+}
+
+.about-icon {
+    font-size: 1.5rem;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+}
+
+/* Card Inferior (CTA) com Gradiente Suave */
+.cta-card {
+    background: linear-gradient(180deg, #f0f5ff 0%, #ffffff 100%);
+    border: 1px solid #e2eafc;
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(0, 82, 255, 0.03);
+}
+
+.cta-lock-wrapper {
+    width: 56px;
+    height: 56px;
+    background-color: #e6efff;
+    color: var(--primary);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: 0 8px 16px rgba(0, 82, 255, 0.1);
+}
+
+/* Alerta de Acesso Restrito em Tons Pastel */
+.cta-alert-box {
+    background-color: #fffbeb;
+    border: 1px solid #fde68a;
+    color: #b45309;
+    padding: 0.6rem 1.5rem;
+    border-radius: 50px;
+    display: inline-block;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Ajustes de Responsividade */
+@media (max-width: 991.98px) {
+    .hero-text-col {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    .hero-text-col h1 {
+        font-size: 2.5rem;
+    }
+    .about-img {
+        height: 240px;
+    }
+}
