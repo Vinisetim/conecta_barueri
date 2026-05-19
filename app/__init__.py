@@ -7,8 +7,8 @@ def create_app():
     from app.routes.main import bp as main_bp
     app.register_blueprint(main_bp)
 
-    # ADICIONE ESTAS LINHAS:
+    #Registro de rota Login:
     from app.routes.auth import auth_bp
-    app.register_blueprint(auth_bp, url_prefix='/auth')
+    app.register_blueprint(auth_bp)
 
     return app
