@@ -1,10 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "landing/base_site.html" %}
 
-</body>
-</html>
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='app/static/css/auth/login.css') }}">
+{% endblock %}
+
+{% block content %}
+{##{% extends "auth/base_auth.html" %}#}
+
+    <div class="container">
+        <div>
+            <div>
+                <h1 class="display-4 fw-bold mb-4">
+                    Login
+                </h1>
+                <p class="lead text-muted mb-4">
+                    Acesse sua conta para gerenciar projetos,
+                    dados e seviços da prefeitura de Barueri.
+                </p>
+
+
+                <div>
+                    <label>
+                        Usuário
+                        <input type="text" placeholder="Digite seu usuário">
+                    </label>
+
+
+                    <label>
+                        Senha
+                        <input type="password" placeholder="Digite sua senha">
+                    </label>
+
+
+                   <label>
+                        <input type="checkbox">
+                        Lembrar de mim
+                   </label>
+                    <p>Esqueci minha senha</p>
+
+
+                    <button>Entrar</button>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+{% endblock %}
+
