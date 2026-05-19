@@ -5,4 +5,7 @@ auth_bp = Blueprint('auth', __name__)
 @auth_bp.route('/login')
 def login():
     # Por enquanto, apenas para não dar erro
-    return "Página de Login em construção"
+    return "Nenhum Arquivo para acessar"
+
+#render_template(auth/login.html)
+
