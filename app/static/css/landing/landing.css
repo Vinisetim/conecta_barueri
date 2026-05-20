@@ -1,4 +1,3 @@
-
 .section-padding {
     padding-top: 4rem !important;
     padding-bottom: 4rem !important;
@@ -37,13 +36,13 @@
     /* MÚLTIPLOS BACKGROUNDS NA SEÇÃO INTEIRA:
        1. Gradiente da esquerda para a direita (fundo sólido perto do texto e transparente onde fica a cidade)
        2. A imagem alinhada perfeitamente na direita */
-    background-image: linear-gradient(to right, #f8f9fa 40%, rgba(248, 249, 250, 0.7) 55%, rgba(248, 249, 250, 0) 75%),
+    background-image: linear-gradient(to right, #f8f9fa 0%, #f8f9fa 45%, rgba(248, 249, 250, 0) 70%),
                       url('../../img/hero-dashboard.jpeg');
+    background-size: cover;
     background-position: right center;
-    background-size: contain; /* Mantém a proporção da foto sem cortar os prédios */
     background-repeat: no-repeat;
 }
-/* Elipse azul de fundo vista no Hero da imagem */
+
 /* Elipse azul de fundo vista no Hero da imagem */
 .hero-bg-curve {
     position: absolute;
@@ -55,6 +54,49 @@
     left: -10%;
     z-index: 1;
     pointer-events: none;
+    align-items: center;
+}
+
+/* Cards de Serviço Finos e Limpos */
+.service-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.service-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+}
+
+/* Wrappers Azuis Claros para os Ícones */
+.icon-wrapper {
+    width: 48px;
+    height: 48px;
+    background-color: #e6efff;
+    color: var(--primary);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+/* Imagens das Seções Institucionais */
+.about-img {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid var(--border-color);
+    width: 100%;
+    object-fit: cover;
+    height: 320px;
+}
+
+.about-icon {
+    font-size: 1.5rem;
+    color: var(--primary);
+    display: flex;
     align-items: center;
 }
 
@@ -76,7 +118,7 @@
     align-items: center;
     justify-content: center;
     font-size: 1.5rem;
-    box-shadow: 0 8px 16px rgba(0, 82, 255, 0.1);
+    box-shadow: 0 8px 16px rgba(0, 82, 255, 0.08);
 }
 
 /* Alerta de Acesso Restrito em Tons Pastel */
@@ -91,16 +133,36 @@
     font-weight: 500;
 }
 
+/* ==========================================================================
+   ESTILIZAÇÃO ADICIONADA: ARRUMANDO APENAS A LOGO DA NAVBAR
+   ========================================================================== */
+.navbar-brand {
+    display: inline-flex !important;  /* Garante imagem e textos no mesmo alinhamento horizontal */
+    align-items: center !important;   /* Força o alinhamento central verticalizado com a logo */
+}
+
+.navbar-logo-img {
+    height: 36px;                     /* Altura ideal para harmonizar com a fonte padrão */
+    width: auto;                      /* Mantém a proporção correta de largura */
+    object-fit: contain;              /* Protege contra distorções ou achatamentos */
+    display: inline-block;
+}
+
 /* Ajustes de Responsividade */
 @media (max-width: 991.98px) {
-    .hero-text-col {
-        text-align: center;
-        margin-bottom: 3rem;
+    .navbar-logo-img {
+        height: 32px;                 /* Reduz sutilmente em telas pequenas */
     }
+    
+    .hero-section {
+        background-image: linear-gradient(to top, #f8f9fa 40%, rgba(248, 249, 250, 0.85) 75%), 
+                          url('../../img/hero-dashboard.jpeg');
+        background-position: center center;
+        text-align: center;
+        padding-top: 8rem;
+    }
+    
     .hero-text-col h1 {
         font-size: 2.5rem;
-    }
-    .about-img {
-        height: 240px;
     }
 }

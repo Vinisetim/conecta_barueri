@@ -17,9 +17,11 @@
 
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="{{ url_for('main.index') }}">
-                Conecta <span class="text-primary">Barueri</span>
+            <a class="navbar-brand fw-bold d-inline-flex align-items-center gap-2" href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='img/logo-barueri.jpeg') }}" alt="Logo Barueri" class="navbar-logo-img">
+                <span>Conecta <span class="text-primary">Barueri</span></span>
             </a>
+            
             <div class="ms-auto">
                 <a href="{{ url_for('auth.login') if 'auth' in config else '#' }}" class="btn-outline-primary-custom">
                     <i class="bi bi-person"></i> Login
@@ -50,6 +52,5 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    {% block extra_js %}{% endblock %}
 </body>
 </html>
