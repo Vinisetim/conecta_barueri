@@ -1,7 +1,5 @@
 # PDD - Documento de Descrição do Projeto: Conecta Barueri
 
-# PDD - Documento de Descrição do Projeto: Conecta Barueri
-
 ## 1. Visão Geral do Sistema
 O **Conecta Barueri** é uma plataforma corporativa e institucional de inteligência de dados (Dashboard analítico) desenvolvida em parceria com a Prefeitura de Barueri. O sistema centraliza, processa e exibe indicadores socioeconômicos e operacionais do município, organizados por categorias/módulos (Saúde, Social, Segurança, Educação, Economia e Meio Ambiente).
 
