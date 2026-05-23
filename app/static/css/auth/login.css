@@ -11,6 +11,11 @@
     margin: 40px auto;
 }
 
+.subtitle{
+    color: #0a1931;
+    font-size: 1rem;
+}
+
 /* Lado Esquerdo - Formulário */
 .login-form-side {
     flex: 1;
@@ -41,6 +46,9 @@
 /* Inputs e Grupos */
 .input-group {
     margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    border: none;
 }
 
 .input-group label {
@@ -55,15 +63,20 @@
     position: relative;
     display: flex;
     align-items: center;
-}
-
-.input-icon-wrapper input {
     width: 100%;
-    padding: 14px 16px 14px 40px;
+    padding: 14px 16px 14px 20px;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
     font-size: 0.95rem;
     transition: border-color 0.2s;
+}
+
+.input-icon-wrapper input {
+    width: 100%;
+    padding-left: 0.2rem ;
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+    border: none;
 }
 
 .input-icon-wrapper input:focus {
@@ -145,7 +158,7 @@
 
 .info-description {
     color: #64748b;
-    font-size: 0.9rem;
+    font-size: 1rem;
     line-height: 1.6;
     margin-bottom: 40px;
 }
@@ -164,13 +177,13 @@
 }
 
 .feature-item h4 {
-    font-size: 0.9rem;
+    font-size: 1.5rem;
     color: #0a1931;
     margin-bottom: 4px;
 }
 
 .feature-item p {
-    font-size: 0.8rem;
+    font-size: 1rem;
     color: #64748b;
     line-height: 1.4;
 }
