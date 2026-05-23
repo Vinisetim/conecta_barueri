@@ -187,3 +187,14 @@
     color: #64748b;
     line-height: 1.4;
 }
+.icons{
+    font-size: 1.5rem;
+    color: #0066FF;
+
+}
+.back{
+    background-color: #E3EBFE;
+    border-radius: 10px;
+    height: 1.5rem;
+    padding: 10px;
+}

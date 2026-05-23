@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 350" width="100%" height="100%" opacity="0.15">
+  <path d="M0,350 L0,220 L25,220 L25,180 L50,180 L50,240 L80,240 L80,150 L120,150 L120,210 L150,210 L150,130 L190,130 L190,250 L220,250 L220,160 L260,160 L260,230 L300,230 L300,140 L350,140 L350,260 L390,260 L390,170 L430,170 L430,350 Z" fill="#2563eb" />
+  <path d="M30,350 L30,240 L70,240 L70,190 L110,190 L110,260 L160,260 L160,180 L210,180 L210,270 L280,270 L280,200 L340,200 L340,350 Z" fill="#1d4ed8" opacity="0.5" />
+
+  <g transform="translate(550, 50)">
+    <path d="M100,300 L115,300 L109,20 L106,20 Z" fill="#2563eb" />
+    <line x1="107" y1="50" x2="10" y2="300" stroke="#2563eb" stroke-width="1.5" />
+    <line x1="107" y1="80" x2="30" y2="300" stroke="#2563eb" stroke-width="1.5" />
+    <line x1="107" y1="110" x2="50" y2="300" stroke="#2563eb" stroke-width="1.5" />
+    <line x1="107" y1="140" x2="70" y2="300" stroke="#2563eb" stroke-width="1.5" />
+    
+    <line x1="108" y1="50" x2="210" y2="300" stroke="#2563eb" stroke-width="1.5" />
+    <line x1="108" y1="80" x2="190" y2="300" stroke="#2563eb" stroke-width="1.5" />
+    <line x1="108" y1="110" x2="170" y2="300" stroke="#2563eb" stroke-width="1.5" />
+    <line x1="108" y1="140" x2="150" y2="300" stroke="#2563eb" stroke-width="1.5" />
+    
+    <path d="M-50,300 L260,300 L260,308 L-50,308 Z" fill="#1e3a8a" />
+  </g>
+</svg>
