@@ -24,7 +24,7 @@ class Usuario(UserMixin, db.Model):
 
     #Relacionamento 1:1 com a tabela senha
     #cria automaticamente usuario.senha e senha.usuario usando o backref
-    senha = db.relationship('Senha', backref='usuario', uselist='dynamic')
+    senha = db.relationship('Senha', backref='usuario', uselist=False)
 
 class Senha(db.Model):
     """
@@ -35,5 +35,5 @@ class Senha(db.Model):
     __tablename__ =  'senha'
     __table_args__ = {'schema': 'login'}
 
-    usuario_id = db.Column(db.Integer, db.ForeignKey('login.usuario.id'), primary_key=True)
+    email = db.Column(db.Text, nullable=False)
     senha = db.Column(db.String(255), nullable=False)

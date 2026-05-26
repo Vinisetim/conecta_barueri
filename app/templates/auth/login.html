@@ -1,10 +1,96 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "landing/base_site.html" %}
 
-</body>
-</html>
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth/login.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-form-side">
+        <div class="form-wrapper">
+            <h2>Login</h2>
+            <p class="subtitle">Acesse sua conta para gerenciar projetos, dados e serviços.</p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('auth.login') }}">
+                    {{ form.hidden_tag() }}
+                <div class="input-group">
+                    <label for="username">Usuário</label>
+                    <div class="input-icon-wrapper">
+                        {{ form.email(id="username", class="form-control", placeholder="Digite seu email") }}
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="password">Senha</label>
+                    <div class="input-icon-wrapper">
+                            {{ form.senha(id="password", class="form-control", placeholder="Digite sua senha") }}
+                            <i class="bi bi-lock-fill"></i>
+                    </div>
+                </div>
+
+                <div class="form-utilities">
+                    <label class="checkbox-container">
+                            {{ form.lembrar() }}
+                        <span>Lembrar de mim</span>
+                    </label>
+                    <a href="#" class="forgot-password">Esqueci minha senha</a>
+                </div>
+
+                <button type="submit" class="btn-submit">Entrar</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="login-info-side">
+        <div class="info-wrapper">
+            <div class="center-badge">
+                <div class="icons"><i class="bi bi-buildings"></i></div>
+            </div>
+
+            <h3>Confirme o seu <span>login</span> para acessar:</h3>
+            <p class="info-description">
+                Plataforma integrada para gestão de projetos, indicadores e serviços públicos, promovendo eficiência, transparência e inovação.
+            </p>
+
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="icons"><i class="back bi bi-bar-chart-fill"></i></div>
+                    <div>
+                        <h4>Dados em tempo real</h4>
+                        <p>Acompanhe indicadores e informações atualizadas.</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="icons"><i class="back bi bi-shield-check"></i></div>
+                    <div>
+                        <h4>Segurança e confiabilidade</h4>
+                        <p>Seus dados protegidos com os mais altos padrões.</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="icons"><i class="back bi bi-people"></i></div>
+                    <div>
+                        <h4>Transparência para todos</h4>
+                        <p >Informações claras e acessíveis.</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="icons"><i class="back bi bi-gear"></i></div>
+                    <div>
+                        <h4>Gestão integrada</h4>
+                        <p>Todos os serviços e projetos em um só lugar.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

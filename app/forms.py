@@ -1,7 +1,6 @@
 from flask_wtf import FlaskForm #A classe contém automaticamente a proteção CSRF no formulário
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
-from wtforms.validators import DataRequired, email, length, Email, Length
-
+from wtforms.validators import DataRequired, Email, Length
 
 class LoginForm(FlaskForm):
     """Formulário de Autenticação, Valida as Credenciais antes de consultas ao banco"""

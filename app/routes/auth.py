@@ -24,7 +24,7 @@ def login():
 
             #Se o usuário tentou acessar uma página protegida, redireciona para ela, se não vai para main
             next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('index'))
+            return redirect(next_page) if next_page else redirect(url_for('main.index'))
 
         flash('Credenciais inválidas. Tente novamente', 'danger')
     return render_template('auth/login.html', form=form)
