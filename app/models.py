@@ -31,9 +31,8 @@ class Senha(db.Model):
     Mapeia a tabela login.senha do PostgreSQL.
     Separada do Usuario por segurança - isola credenciais dos dados de perfil
     """
+    __tablename__ = 'senha'
+    __table_args__ = {'schema': 'login'}  # ← estava faltando isso
 
-    __tablename__ =  'senha'
-    __table_args__ = {'schema': 'login'}
-
-    email = db.Column(db.Text, nullable=False)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('login.usuario.id'), primary_key=True)
     senha = db.Column(db.String(255), nullable=False)
