@@ -1,107 +1,190 @@
 # PDD - Documento de Descrição do Projeto: Conecta Barueri
+> **Versão:** 1.1 | **Atualizado em:** 2026-05-29
+
+---
 
 ## 1. Visão Geral do Sistema
 O **Conecta Barueri** é uma plataforma corporativa e institucional de inteligência de dados (Dashboard analítico) desenvolvida em parceria com a Prefeitura de Barueri. O sistema centraliza, processa e exibe indicadores socioeconômicos e operacionais do município, organizados por categorias/módulos (Saúde, Social, Segurança, Educação, Economia e Meio Ambiente).
 
+---
+
 ## 2. Modelo de Negócio e Proposta de Valor
-* **Público-Target Atual:** Servidores públicos municipais e gestores de secretarias da Prefeitura de Barueri.
-* **Proposta de Valor:** Substituir relatórios fragmentados e planilhas por uma interface centralizada e visualmente intuitiva, otimizando a tomada de decisões estratégicas e o acompanhamento de metas governamentais.
+- **Público-Target Atual:** Servidores públicos municipais e gestores de secretarias da Prefeitura de Barueri.
+- **Proposta de Valor:** Substituir relatórios fragmentados e planilhas por uma interface centralizada e visualmente intuitiva, otimizando a tomada de decisões estratégicas e o acompanhamento de metas governamentais.
+
+---
 
 ## 3. Políticas de Acesso e Regras de Autenticação
-* **Regra de Escopo Atual:** O sistema opera em modelo fechado. O acesso à área técnica e aos painéis de dados é restrito exclusivamente a pessoas com credenciais da prefeitura previamente cadastradas por um Administrador do sistema.
-* **Diretriz de Escalabilidade (Futuro):** A arquitetura da aplicação deve ser projetada de forma desacoplada para permitir, caso decidido pela gestão, a abertura de uma versão pública com restrições de escopo de dados (ex: visualização de dados agregados para o cidadão comum, sem permissão de edição ou acesso a relatórios internos confidenciais).
+- **Regra de Escopo Atual:** O sistema opera em modelo fechado. O acesso à área técnica e aos painéis de dados é restrito exclusivamente a pessoas com credenciais da prefeitura previamente cadastradas por um Administrador do sistema.
+- **Diretriz de Escalabilidade (Futuro):** A arquitetura deve ser projetada de forma desacoplada para permitir, caso decidido pela gestão, a abertura de uma versão pública com restrições de escopo de dados (ex: visualização de dados agregados para o cidadão comum, sem permissão de edição ou acesso a relatórios internos confidenciais).
+
+---
 
 ## 4. Stack Tecnológica Base
-* **Backend / Linguagem:** Python 3 (com framework Flask).
-* **Banco de Dados:** PostgreSQL (Mapeado via Flask-SQLAlchemy).
-* **Segurança:** Flask-Login (gerenciamento de sessões) e Flask-Bcrypt (criptografia de senhas em hash).
-* **Frontend:** HTML5, CSS3, Bootstrap 5 (visual corporativo e responsivo) e Bootstrap Icons.
+| Camada | Tecnologia |
+|---|---|
+| Backend / Linguagem | Python 3 + Flask |
+| Banco de Dados | PostgreSQL via Flask-SQLAlchemy |
+| Segurança de Sessão | Flask-Login |
+| Criptografia de Senhas | Flask-Bcrypt |
+| Validação de Formulários | Flask-WTF + WTForms |
+| Frontend | HTML5, CSS3, Bootstrap 5, Bootstrap Icons |
 
-## 5. Estrutura Arquitetural Base (Padrão MVC / Factory)
-A estrutura de diretórios do projeto segue o padrão modular MVC através do uso de Blueprints. Como o sistema está em desenvolvimento ativo, esta árvore reflete a base atual e prevê o crescimento modular de estilos e visões específicas:
+---
+
+## 5. Estrutura Arquitetural (Padrão MVC / Factory)
 
 ```text
 conecta-barueri/
 │
 ├── app/
-│   ├── __init__.py          # Inicialização do app, configurações e registro de extensões/blueprints
-│   ├── models.py            # Modelos do SQLAlchemy correspondentes às tabelas do banco
+│   ├── __init__.py          # Fábrica do app: inicializa extensões e registra blueprints
+│   ├── models.py            # Modelos ORM (SQLAlchemy) mapeando as tabelas do banco
+│   ├── forms.py             # Formulários Flask-WTF com validação e proteção CSRF
 │   │
-│   ├── routes/              # Camada Controller (Rotas e Regras de Negócio)
-│   │   ├── auth.py          # Rotas de controle de sessão (Login, Logout)
-│   │   └── main.py          # Rotas institucionais e páginas gerais (Landing Page)
+│   ├── routes/
+│   │   ├── auth.py          # Rotas de autenticação: /login, /logout
+│   │   └── main.py          # Rotas institucionais: landing page (/)
 │   │
-│   ├── static/              # Arquivos Estáticos Globais e Contextuais
-│   │   ├── css/
-│   │   │   ├── app/         # Folhas de estilo da área interna/dashboard
-│   │   │   ├── auth/        # Folhas de estilo das telas de autenticação
-│   │   │   ├── landing/     # Folhas de estilo da landing page institucional
-│   │   │   └── global.css   # Variáveis globais, resets e padrões de tipografia
-│   │   └── js/              # Scripts comportamentais (divididos por contexto)
+│   ├── static/
+│   │   └── css/
+│   │       ├── app/
+│   │       │   └── dashboard.css    # Estilos da área interna/dashboard
+│   │       ├── auth/
+│   │       │   └── login.css        # Estilos da tela de login
+│   │       ├── landing/
+│   │       │   └── landing.css      # Estilos da landing page
+│   │       ├── global.css           # Variáveis CSS, resets e tipografia global
+│   │       ├── sidebar.css          # Estilos da barra lateral (área logada)
+│   │       └── style.css            # Estilos auxiliares gerais
 │   │
-│   └── templates/           # Camada View (Interface de Usuário em Jinja2)
-│       ├── app/             # Telas da aplicação logada (Dashboard e Módulos)
-│       ├── auth/            # Telas do fluxo de acesso (login.html)
-│       ├── landing/         # Telas da área pública (index.html)
-│       └── base.html        # Estrutura base comum/esqueleto do site
+│   ├── templates/
+│   │   ├── app/
+│   │   │   ├── base_app.html        # Base da área logada (com sidebar/navbar interna)
+│   │   │   └── home.html            # Tela inicial pós-login
+│   │   ├── auth/
+│   │   │   └── login.html           # Tela de login (herda de landing/base_site.html)
+│   │   ├── landing/
+│   │   │   ├── base_site.html       # Base unificada: landing page + telas de auth
+│   │   │   └── index.html           # Landing page institucional
+│   │   └── base.html                # Esqueleto raiz (reservado para usos futuros)
+│   │
+│   └── testes/
+│       └── testes.html              # Arquivo de testes de interface
 │
-├── .gitignore               # Restrição de arquivos de ambiente virtual (.venv) e chaves
-├── banco_de_dados.sql       # Script de definição física e sementes do banco (Sujeito a alterações)
-├── requirements.txt         # Listagem de dependências pip do projeto
-└── run.py                   # Ponto de entrada do servidor web Flask
+├── .gitignore
+├── LICENSE
+├── README.md
+├── banco_de_dados.sql       # Definição física do banco (sujeito a alterações frequentes)
+├── requirements.txt
+└── run.py                   # Ponto de entrada do servidor Flask
 ```
-
-## 6. Modelagem de Dados Atual (PostgreSQL)
-O banco de dados é estruturado através de Schemas para separar o contexto de segurança e controle de acessos da camada de persistência de conteúdo das apresentações.
-
-### 6.1. Schema: login
-* **Tabela usuario:** Armazena o perfil básico dos servidores cadastrados.
-  * `id` (SERIAL, Chave Primária)
-  * `nome` (VARCHAR(255))
-  * `email` (TEXT)
-  * `admin` (BOOLEAN) - Define privilégios de gerenciamento e criação de novos usuários.
-* **Tabela senha:** Relacionamento 1:1 com a tabela de usuários para segregação de credenciais.
-  * `usuario_id` (INTEGER, Chave Primária e Estrangeira referenciando `login.usuario(id)`).
-  * `senha` (VARCHAR(255)) - Armazena a credencial (obrigatoriamente convertida em hash criptográfico Bcrypt pela aplicação).
-
-### 6.2. Schema: apresentacao
-* **Tabela categoria:** Listagem estática das secretarias municipais monitoradas (Saúde, Social, Segurança, Educação, Economia e Meio Ambiente).
-  * `id` (SERIAL, Chave Primária).
-  * `nome` (VARCHAR(100), Único, Não Nulo).
-* **Tabela salvar_apresentacao:** Armazena os registros estruturados e configurações salvos por cada usuário em seus respectivos módulos.
-  * `id` (SERIAL, Chave Primária)[cite: 1]
-  * `categoria_id` (INTEGER, Chave Estrangeira referenciando `apresentacao.categoria(id)`).
-  * `usuario_id` (INTEGER, Chave Estrangeira referenciando `login.usuario(id)`).
-  * `nome` (VARCHAR(255)) - Nome identificador do relatório/painel salvo.
-  * `dados_salvos` (VARCHAR(255)) - Payload ou string de dados técnicos referentes ao estado do painel.
 
 ---
 
-## 7. Diretrizes Críticas para Desenvolvimento (Padrões do Projeto)
+## 6. Modelagem de Dados Atual (PostgreSQL)
 
-### 7.1. Identidade Visual e UI/UX (Abordagem Light Mode)
-* **Estética Geral:** A interface adota permanentemente o padrão Light Mode Corporativo, focado em alta legibilidade, sobriedade institucional e profissionalismo técnico[cite: 1]. O uso de temas totalmente escuros (Dark Mode) foi descontinuado.
-* **Paleta de Cores:**
-  * **Fundos:** Brancos puros (`#FFFFFF`) e variações de cinzas ultra-claros (como `#F8F9FA` ou `#F0F2F5`) para separação de seções e cards.
-  * **Elementos de Destaque:** Textos principais, links e botões de ação devem utilizar variações de Azul Royal e Azul Marinho para transmitir a identidade governamental.
-* **Interface Dividida (Split-Screen) no Login:** O fluxo de autenticação utiliza um layout dividido em duas colunas simétricas em resoluções desktop[cite: 1]:
-  * **Coluna Esquerda:** Reservada exclusivamente ao formulário de credenciais (Inputs de Usuário, Senha, checkbox "Lembrar de mim" e botão "Entrar")[cite: 1].
-  * **Coluna Direita:** Bloco visual informativo contendo ilustrações vetorizadas simples da cidade e pilares institucionais (Dados em tempo real, Segurança, Transparência e Gestão integrada).
-* **Responsividade:** O design deve ser 100% responsivo usando classes utilitárias do Bootstrap (ex: `d-none d-md-flex`)[cite: 1]. Em dispositivos mobile, a coluna informativa da direita deve ser completamente oculta, priorizando o formulário de login na tela inteira.
+O banco usa dois schemas para separar autenticação de conteúdo.
 
-### 7.2. Engenharia de Software e Banco de Dados
+### 6.1. Schema: `login`
 
-#### A. Renderização Baseada em Componentes e Herança (Jinja2)
-* **Proibição de Redundância:** Fica estritamente proibida a duplicação manual de estruturas repetitivas de layout (Tags `<head>`, scripts, folhas de estilo Bootstrap, Navbars ou Footers) nos arquivos HTML individuais.
-* **Layout Central (base.html):** O arquivo `app/templates/base.html` atua como o esqueleto global unificado do sistema[cite: 1]. Ele carrega todas as dependências do Bootstrap, fontes e arquivos de estilização global (`global.css`).
-* **Mecanismo de Extensão:** As visões das páginas de rotas específicas (como `index.html` ou `login.html`) devem iniciar obrigatoriamente declarando a tag `{% extends 'base.html' %}`[cite: 1]. O conteúdo mutável de cada tela deve ser injetado estritamente dentro de blocos nomeados, como `{% block content %}` e `{% endblock %}`.
+**Tabela `usuario`** — perfil dos servidores cadastrados:
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| `id` | SERIAL PK | Identificador único |
+| `nome` | VARCHAR(255) | Nome do servidor |
+| `email` | TEXT | E-mail de acesso (usado como login) |
+| `admin` | BOOLEAN | Define privilégios de administrador |
 
-#### B. Criptografia e Segurança de Credenciais
-* **Armazenamento de Senhas:** Nenhuma credencial de acesso de servidor ou administrador pode trafegar ou ser registrada no banco de dados em formato de texto limpo (texto plano).
-* **Camada de Criptografia (Flask-Bcrypt):** O fluxo de cadastro e validação de usuários deve interceptar a string recebida nos formulários e aplicar funções matemáticas de dispersão (hashing) baseadas em Bcrypt antes de interagir com a persistência.
-* **Validação em Operadores:** Checagens de login não utilizam comparadores lógicos comuns (como `==`)[cite: 1]. A autenticação deve obrigatoriamente chamar o método seguro de verificação da biblioteca para comparar o hash guardado com o texto digitado pelo usuário.
+**Tabela `senha`** — credenciais isoladas (relação 1:1 com `usuario`):
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| `usuario_id` | INTEGER PK/FK | Referencia `login.usuario(id)` |
+| `senha` | VARCHAR(255) | Hash Bcrypt da senha |
 
-#### C. Persistência e Isolamento de Dados (Camada de Abstração)
-* **Desenvolvimento Contínuo do Banco:** Fica estabelecido que a modelagem física de tabelas e a divisão de schemas (`login` e `apresentacao`) no arquivo `banco_de_dados.sql` estão sujeitas a modificações, refinamentos e ajustes estruturais frequentes pela equipe de dados.
-* **Uso de ORM (Flask-SQLAlchemy):** Para mitigar o impacto de alterações estruturais no banco de dados, todas as rotas e regras de negócio do backend Python devem interagir com as tabelas exclusivamente por meio de mapeamento objeto-relacional (modelos de classes no arquivo `models.py`).
-* **Isolamento de Queries:** É proibida a escrita de consultas SQL puras (raw queries) dentro das rotas dos Blueprints[cite: 1]. O isolamento provido pelas classes do SQLAlchemy garante que, caso uma coluna mude de nome ou tipo no arquivo SQL, apenas o arquivo `models.py` precisará de manutenção, sem quebrar o ecossistema de rotas e dashboards do Flask.
+> ⚠️ **Aviso:** O arquivo `banco_de_dados.sql` contém seeds com senhas em texto puro (`'aaaaaa'`, `'bbbbbb'`) para fins de desenvolvimento local. **Nunca usar em produção.** As senhas em banco devem sempre ser hashes Bcrypt gerados pela aplicação.
+
+### 6.2. Schema: `apresentacao`
+
+**Tabela `categoria`** — secretarias municipais monitoradas:
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| `id` | SERIAL PK | Identificador único |
+| `nome` | VARCHAR(100) UNIQUE NOT NULL | Nome da secretaria |
+
+Categorias cadastradas: Saúde, Social, Segurança, Educação, Economia, Meio Ambiente.
+
+**Tabela `salvar_apresentacao`** — painéis e relatórios salvos por usuário:
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| `id` | SERIAL PK | Identificador único |
+| `categoria_id` | INTEGER FK | Referencia `apresentacao.categoria(id)` |
+| `usuario_id` | INTEGER FK | Referencia `login.usuario(id)` |
+| `nome` | VARCHAR(255) | Nome do painel/relatório |
+| `dados_salvos` | VARCHAR(255) | Payload com estado do painel |
+
+---
+
+## 7. Estado Atual de Desenvolvimento
+
+### 7.1. Telas Implementadas
+
+| Tela | Rota | Status |
+|---|---|---|
+| Landing Page | `/` | ✅ Concluída |
+| Login | `/login` | ✅ Concluída |
+| Logout | `/logout` | ✅ Concluído |
+| Home (pós-login) | `/home` | 🔄 Em desenvolvimento |
+
+### 7.2. Telas Planejadas (Próximas Entregas)
+
+| Tela | Descrição |
+|---|---|
+| Home | Painel inicial do usuário logado |
+| Projects | Listagem e gestão de projetos/apresentações |
+| Admin | Gerenciamento de usuários (exclusivo para `admin=True`) |
+
+### 7.3. Pendências Técnicas
+
+> ⚠️ O campo `email` está presente na tabela `login.usuario` do banco e é usado em `auth.py` (`filter_by(email=...)`) mas **não foi mapeado na classe `Usuario` em `models.py`**. Isso causará erro ao tentar autenticar. Adicionar `email = db.Column(db.Text)` ao modelo é prioridade antes de testar o login.
+
+---
+
+## 8. Diretrizes Críticas para Desenvolvimento
+
+### 8.1. Identidade Visual e UI/UX (Light Mode Corporativo)
+
+- **Estética Geral:** Interface permanentemente em Light Mode Corporativo — alta legibilidade, sobriedade institucional, profissionalismo técnico. Dark Mode descontinuado.
+- **Paleta de Cores:**
+  - Fundos: branco puro (`#FFFFFF`) e cinzas ultra-claros (`#F8F9FA`, `#F0F2F5`)
+  - Destaque: variações de Azul Royal e Azul Marinho (`--primary: #0052ff`)
+- **Layout Split-Screen no Login:**
+  - Coluna esquerda: formulário de credenciais
+  - Coluna direita: bloco visual informativo com pilares institucionais
+  - Mobile: coluna direita oculta via `d-none d-md-flex`
+- **Responsividade:** 100% responsivo com utilitários Bootstrap 5.
+
+### 8.2. Herança de Templates (Jinja2)
+
+- **Proibição de Redundância:** Nenhum HTML deve duplicar `<head>`, Bootstrap, Navbar ou Footer manualmente.
+- **Base Unificada Landing + Auth:** `landing/base_site.html` é a base compartilhada da landing page e das telas de autenticação. O arquivo `base_auth.html` foi **excluído** por redundância.
+- **Regra de Extensão:** Todo template de rota deve iniciar com `{% extends '...' %}` e injetar conteúdo em `{% block content %}`.
+
+### 8.3. Segurança de Credenciais (Bcrypt)
+
+- Nenhuma senha trafega ou é persistida em texto puro.
+- O hash é gerado por Flask-Bcrypt antes de qualquer interação com o banco.
+- A validação usa `bcrypt.check_password_hash()`, nunca comparadores diretos (`==`).
+
+### 8.4. Formulários (Flask-WTF)
+
+- Todos os formulários de entrada de dados usam classes `FlaskForm` definidas em `forms.py`.
+- A proteção CSRF é automática via `{{ form.hidden_tag() }}` nos templates.
+- Validações de campo (formato, obrigatoriedade, tamanho) são definidas no formulário, não nas rotas.
+
+### 8.5. Persistência e ORM (SQLAlchemy)
+
+- Toda interação com o banco passa pelos modelos em `models.py`.
+- **Proibido:** raw queries (`db.session.execute("SELECT...")`) dentro das rotas.
+- O isolamento via ORM garante que mudanças no `banco_de_dados.sql` só exijam atualização em `models.py`.
+- Schemas PostgreSQL são declarados via `__table_args__ = {'schema': 'nome_schema'}`.
