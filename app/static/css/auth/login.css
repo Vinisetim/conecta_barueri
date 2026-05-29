@@ -1,0 +1,206 @@
+/* Container Principal que envelopa as duas metades */
+.login-container {
+    display: flex;
+    max-width: 1200px;
+    width: 90%;
+    min-height: 650px;
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    margin: 40px auto;
+}
+
+.subtitle{
+    color: #0a1931;
+    font-size: 1rem;
+}
+
+/* Lado Esquerdo - Formulário */
+.login-form-side {
+    flex: 1;
+    padding: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.field-error {
+    color: #dc2626;
+    font-size: 0.8rem;
+    margin-top: 4px;
+    display: block;
+}
+.form-wrapper {
+    width: 100%;
+    max-width: 400px;
+}
+
+.form-wrapper h2 {
+    font-size: 2.5rem;
+    color: #0a1931; /* Seu Azul Marinho Profundo */
+    margin-bottom: 8px;
+}
+
+.form-wrapper .subtitle {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin-bottom: 32px;
+    line-height: 1.5;
+}
+
+/* Inputs e Grupos */
+.input-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    border: none;
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #0a1931;
+    margin-bottom: 8px;
+}
+
+.input-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 14px 16px 14px 20px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+}
+
+.input-icon-wrapper input {
+    width: 100%;
+    padding-left: 0.2rem ;
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+    border: none;
+}
+
+.input-icon-wrapper input:focus {
+    border-color: #2563eb; /* Azul Royal */
+    outline: none;
+}
+
+/* Utilitários (Remember me / Esqueci a senha) */
+.form-utilities {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    margin-bottom: 32px;
+}
+
+.forgot-password {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 14px;
+    background-color: #0066ff; /* Azul característico da foto */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-submit:hover {
+    background-color: #0052cc;
+}
+
+/* Lado Direito - Painel Informativo */
+.login-info-side {
+    flex: 1.1;
+    background-color: #f0f5ff; /* Azul bem claro de fundo */
+    background-image: url('/static/images/skyline-mockup.svg'); /* Sua imagem de fundo do skyline */
+    background-position: top center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    padding: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.info-wrapper {
+    max-width: 500px;
+    text-align: center;
+}
+
+.center-badge {
+    width: 60px;
+    height: 60px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px auto;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.info-wrapper h3 {
+    font-size: 1.75rem;
+    color: #0a1931;
+    margin-bottom: 16px;
+}
+
+.info-wrapper h3 span {
+    color: #0066ff;
+}
+
+.info-description {
+    color: #64748b;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 40px;
+}
+
+/* Grid de Funcionalidades inferiores */
+.features-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    text-align: left;
+}
+
+.feature-item {
+    display: flex;
+    gap: 12px;
+}
+
+.feature-item h4 {
+    font-size: 1.5rem;
+    color: #0a1931;
+    margin-bottom: 4px;
+}
+
+.feature-item p {
+    font-size: 1rem;
+    color: #64748b;
+    line-height: 1.4;
+}
+.icons{
+    font-size: 1.5rem;
+    color: #0066FF;
+
+}
+.back{
+    background-color: #E3EBFE;
+    border-radius: 10px;
+    height: 1.4rem;
+    padding: 10px;
+}
