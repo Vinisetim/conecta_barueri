@@ -5,22 +5,25 @@
 {% endblock %}
 
 {% block content %}
-<section class="hero-section">
-    <div class="container">
+<section class="hero-section container-fluid py-5 mt-5">
+    <div class="hero-bg-curve"></div>
+
+    <div class="container" style="position: relative; z-index: 2;">
         <div class="row align-items-center min-vh-75">
-            <div class="col-lg-6 hero-text-col">
-                <h1 class="display-5 fw-bold mb-4">Administração de dados em <span class="text-primary">tempo real</span></h1>
-                <p class="lead text-muted mb-4">Gerencie, monitore e visualize dados em tempo real com segurança, eficiência e total transparência.</p>
-                <a href="#sobre" class="btn-primary-custom px-5 py-3 shadow-sm">Leia Mais</a>
+
+            <div class="col-lg-6 col-xl-5 hero-text-col">
+                <h1 class="display-4 fw-bold mb-4">
+                    Administração de dados em <span class="text-primary">tempo real</span>
+                </h1>
+                <p class="lead text-muted mb-4">
+                    Gerencie, monitore e visualize dados em tempo real com segurança, eficiência e total transparência.
+                </p>
+                <a href="#sobre" class="btn btn-primary btn-lg px-5">Leia Mais</a>
             </div>
-            <div class="col-lg-6 position-relative text-center">
-                <div class="hero-bg-curve"></div>
-                <img src="{{ url_for('static', filename='img/hero-dashboard.png') }}" class="img-fluid hero-img rounded-4 shadow-lg" alt="Dashboard Preview">
+
             </div>
-        </div>
     </div>
 </section>
-
 <section id="servicos" class="container py-5 section-padding">
     <h2 class="section-title fw-bold">Serviços</h2>
     <div class="row g-4">
@@ -59,7 +62,7 @@
 
     <div class="row align-items-center mb-5 pb-4">
         <div class="col-lg-6 mb-4 mb-lg-0">
-            <img src="{{ url_for('static', filename='img/team-1.jpg') }}" class="img-fluid rounded-4 shadow-sm about-img" alt="Equipe de inovação">
+            <img src="{{ url_for('static', filename='img/team-1.jpeg') }}" class="img-fluid rounded-4 shadow-sm about-img" alt="Equipe de inovação">
         </div>
         <div class="col-lg-6 ps-lg-5">
             <div class="d-flex align-items-center gap-2 mb-3">
@@ -79,7 +82,7 @@
             <p class="text-muted">Nossa missão é oferecer uma plataforma digital capaz de facilitar o acesso à informação, melhorar a experiência do usuário e fornecer dados estratégicos que apoiem a tomada de decisão, a organization institucional e a evolução contínua do ambiente digital.</p>
         </div>
         <div class="col-lg-6 mb-4 mb-lg-0">
-            <img src="{{ url_for('static', filename='img/team-2.jpg') }}" class="img-fluid rounded-4 shadow-sm about-img" alt="Colaboração e metas">
+            <img src="{{ url_for('static', filename='img/team-2.jpeg') }}" class="img-fluid rounded-4 shadow-sm about-img" alt="Colaboração e metas">
         </div>
     </div>
 </section>

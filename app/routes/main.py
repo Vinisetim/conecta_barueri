@@ -1,6 +1,14 @@
 from flask import Blueprint, render_template
-bp = Blueprint('main', __name__)
 
-@bp.route('/')
+# Nome padronizado do Blueprint
+main_bp = Blueprint('main', __name__)
+
+# Rota principal (carrega a HOME)
+@main_bp.route('/')
 def index():
-    return render_template('landing/index.html')
+    return render_template('home/home.html')
+
+# Rota alternativa (opcional)
+@main_bp.route('/home')
+def home():
+    return render_template('home/home.html')

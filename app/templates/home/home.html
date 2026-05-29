@@ -1,0 +1,56 @@
+{% extends "home/base_home.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home/home.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<div class="hero">
+
+    <div class="hero-text">
+        <h1>Conecta <span>Barueri</span></h1>
+        <p>
+            Plataforma integrada de dados da cidade com dashboards inteligentes
+            e gestão em tempo real.
+        </p>
+
+        <div class="hero-buttons">
+            <button class="btn btn-primary">Explorar indicadores</button>
+            <button class="btn btn-outline-primary">Criar apresentação</button>
+        </div>
+    </div>
+
+    <img src="{{ url_for('static', filename='img/mapa.jpeg') }}" class="hero-img">
+
+</div>
+
+<!-- CARDS -->
+<h5 class="mb-4">Acesse rapidamente</h5>
+
+<div class="cards">
+
+    <div class="card-item">
+        <i class="bi bi-graph-up"></i>
+        <h6>Indicadores</h6>
+    </div>
+
+    <div class="card-item">
+        <i class="bi bi-folder"></i>
+        <h6>Projetos</h6>
+    </div>
+
+    <div class="card-item">
+        <i class="bi bi-bar-chart"></i>
+        <h6>Apresentações</h6>
+    </div>
+
+    <div class="card-item">
+        <i class="bi bi-database"></i>
+        <h6>Dados</h6>
+    </div>
+
+</div>
+
+{% endblock %}
