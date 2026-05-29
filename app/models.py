@@ -13,17 +13,16 @@ def load_user(user_id):
 class Usuario(UserMixin, db.Model):
     """
     Mapeia a tabela login.usuario do PostgreSQL.
-    Herda User Mixin para compatibilildade com Flask-Login.
+    Herda UserMixin para compatibilidade com Flask-Login.
     """
     __tablename__ = 'usuario'
     __table_args__ = {'schema': 'login'}
 
     id = db.Column(db.Integer, primary_key=True)
-    nome = db.Column(db.String(255), nullable=False)
+    nome = db.Column(db.String(255))
+    email = db.Column(db.Text)
     admin = db.Column(db.Boolean, default=False)
 
-    #Relacionamento 1:1 com a tabela senha
-    #cria automaticamente usuario.senha e senha.usuario usando o backref
     senha = db.relationship('Senha', backref='usuario', uselist=False)
 
 class Senha(db.Model):

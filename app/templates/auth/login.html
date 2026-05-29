@@ -24,14 +24,20 @@
                 <div class="input-group">
                     <label for="username">Usuário</label>
                     <div class="input-icon-wrapper">
-                        {{ form.email(id="username", class="form-control", placeholder="Digite seu email") }}
+                         {{ form.email(id="username", class="form-control", placeholder="Digite seu email") }}
                     </div>
+                        {% for erro in form.email.errors %}
+                            <span class="field-error">{{ erro }}</span>
+                        {% endfor %}
                 </div>
 
                 <div class="input-group">
                     <label for="password">Senha</label>
                     <div class="input-icon-wrapper">
-                            {{ form.senha(id="password", class="form-control", placeholder="Digite sua senha") }}
+                        {{ form.senha(id="password", class="form-control", placeholder="Digite sua senha") }}
+                        {% for erro in form.senha.errors %}
+                             <span class="field-error">{{ erro }}</span>
+                        {% endfor %}
                             <i class="bi bi-lock-fill"></i>
                     </div>
                 </div>
