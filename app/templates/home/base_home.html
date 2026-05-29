@@ -2,98 +2,163 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>{% block title %}Conecta Barueri{% endblock %}</title>
 
     <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
 
-    <!-- Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    >
 
-    <!-- CSS -->
+    <!-- Fonte Inter -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- CSS da Home -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/home/home.css') }}"
+    >
+
     {% block extra_css %}{% endblock %}
 </head>
 
 <body>
 
-<div class="layout">
+    <div class="dashboard-layout">
 
-    <!-- SIDEBAR -->
-    <aside id="sidebar" class="sidebar">
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="sidebar">
 
-        <div class="logo">
-            <span class="fw-bold">Conecta</span>
-            <span class="text-primary">Barueri</span>
-        </div>
+            <div class="sidebar-brand">
+                <img
+                    src="{{ url_for('static', filename='img/logo-barueri.jpeg') }}"
+                    alt="Logo Prefeitura de Barueri"
+                    class="brand-logo"
+                >
 
-        <nav>
-
-            <a href="#" class="nav-item active">
-                <i class="bi bi-house"></i>
-                <span>Item 1</span>
-            </a>
-
-            <a href="#" class="nav-item">
-                <i class="bi bi-graph-up"></i>
-                <span>Item 2</span>
-            </a>
-
-            <a href="#" class="nav-item">
-                <i class="bi bi-folder"></i>
-                <span>Item 3</span>
-            </a>
-
-            <a href="#" class="nav-item">
-                <i class="bi bi-bar-chart"></i>
-                <span>Item 4</span>
-            </a>
-
-            <a href="#" class="nav-item">
-                <i class="bi bi-database"></i>
-                <span>Item 5</span>
-            </a>
-
-        </nav>
-
-        <div class="logout">
-            <a href="#">
-                <i class="bi bi-box-arrow-left"></i>
-                Sair
-            </a>
-        </div>
-
-    </aside>
-
-    <!-- MAIN -->
-    <div class="main">
-
-        <!-- TOPBAR -->
-        <header class="topbar">
-            <button id="menuToggle" class="menu-btn">
-                <i class="bi bi-list"></i>
-            </button>
-
-            <div class="profile">
-                <i class="bi bi-person-circle"></i>
+                <div class="brand-text">
+                    <span class="brand-small">Prefeitura de</span>
+                    <strong>Barueri</strong>
+                </div>
             </div>
-        </header>
 
-        <!-- CONTENT -->
-        <main class="content">
-            {% block content %}{% endblock %}
-        </main>
+            <div class="system-name">
+                Conecta <span>Barueri</span>
+            </div>
+
+            <nav class="sidebar-menu">
+
+                <a href="#" class="menu-link active">
+                    <i class="bi bi-house-door"></i>
+                    <span>Placeholder 1</span>
+                </a>
+
+                <a href="#" class="menu-link">
+                    <i class="bi bi-graph-up-arrow"></i>
+                    <span>Placeholder 2</span>
+                </a>
+
+                <a href="#" class="menu-link">
+                    <i class="bi bi-folder2-open"></i>
+                    <span>Placeholder 3</span>
+                </a>
+
+                <a href="#" class="menu-link">
+                    <i class="bi bi-display"></i>
+                    <span>Placeholder 4</span>
+                </a>
+
+                <a href="#" class="menu-link">
+                    <i class="bi bi-database"></i>
+                    <span>Placeholder 5</span>
+                </a>
+
+                <a href="#" class="menu-link">
+                    <i class="bi bi-gear"></i>
+                    <span>Placeholder 6</span>
+                </a>
+
+            </nav>
+
+            <div class="sidebar-bottom">
+                <a href="#" class="menu-link logout-link">
+                    <i class="bi bi-box-arrow-left"></i>
+                    <span>Sair</span>
+                </a>
+            </div>
+
+        </aside>
+
+        <!-- ÁREA PRINCIPAL -->
+        <div class="main-area">
+
+            <!-- TOPBAR -->
+            <header class="topbar">
+
+                <button id="sidebarToggle" class="sidebar-toggle" type="button" aria-label="Abrir ou fechar menu lateral">
+                    <i class="bi bi-list"></i>
+                </button>
+
+                <div class="topbar-actions">
+                    <button class="profile-button" type="button">
+                        <i class="bi bi-person"></i>
+                    </button>
+
+                    <button class="profile-dropdown" type="button">
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
+                </div>
+
+            </header>
+
+            <!-- CONTEÚDO -->
+            <main class="content">
+                {% block content %}{% endblock %}
+            </main>
+
+        </div>
 
     </div>
 
-</div>
 
-<script>
-document.getElementById("menuToggle").onclick = () => {
-    document.getElementById("sidebar").classList.toggle("collapsed");
-};
-</script>
+    <footer>
+        <div class="container">
+            <div class="row align-items-center justify-content-between">
+                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                    <span class="fw-bold text-dark fs-5">Conecta <span class="text-primary">Barueri</span></span>
+                    <p class="small mb-0 mt-1">© 2026 - Projeto Técnico Etec (Informática para Internet).</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <div class="d-flex justify-content-center justify-content-md-end gap-3">
+                        <a href="#" class="footer-icon"><i class="bi bi-github"></i></a>
+                        <a href="#" class="footer-icon"><i class="bi bi-envelope"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script>
+        const sidebar = document.getElementById("sidebar");
+        const sidebarToggle = document.getElementById("sidebarToggle");
+
+        sidebarToggle.addEventListener("click", function () {
+            sidebar.classList.toggle("collapsed");
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
 
 </body>
 </html>
-``

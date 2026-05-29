@@ -1,56 +1,142 @@
 {% extends "home/base_home.html" %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/home/home.css') }}">
-{% endblock %}
+{% block title %}Home | Conecta Barueri{% endblock %}
 
 {% block content %}
 
-<!-- HERO -->
-<div class="hero">
+<section class="home-wrapper">
 
-    <div class="hero-text">
-        <h1>Conecta <span>Barueri</span></h1>
-        <p>
-            Plataforma integrada de dados da cidade com dashboards inteligentes
-            e gestão em tempo real.
-        </p>
+    <!-- HERO -->
+    <div class="hero-grid">
 
-        <div class="hero-buttons">
-            <button class="btn btn-primary">Explorar indicadores</button>
-            <button class="btn btn-outline-primary">Criar apresentação</button>
+        <div class="hero-copy">
+
+            <span class="page-kicker">
+                Plataforma institucional
+            </span>
+
+            <h1>
+                Conecta <span>Barueri</span>
+            </h1>
+
+            <p>
+                Plataforma integrada de dados da cidade e apresentações dinâmicas
+                para uma gestão mais inteligente, acessível e transparente.
+            </p>
+
+            <div class="hero-actions">
+
+                <a href="#" class="btn-primary-home">
+                    <i class="bi bi-bar-chart-line"></i>
+                    Explorar indicadores
+                </a>
+
+                <a href="#" class="btn-outline-home">
+                    <i class="bi bi-file-earmark-bar-graph"></i>
+                    Criar apresentação
+                </a>
+
+            </div>
+
         </div>
+
+        <div class="map-card">
+            <img
+                src="{{ url_for('static', filename='img/mapa.jpeg') }}"
+                alt="Mapa de Barueri"
+                class="map-image"
+            >
+        </div>
+
     </div>
 
-    <img src="{{ url_for('static', filename='img/mapa.jpeg') }}" class="hero-img">
+    <!-- ACESSOS -->
+    <section class="quick-access">
 
-</div>
+        <div class="section-header">
+            <div>
+                <span class="section-kicker">Acesso rápido</span>
+                <h2>Acesse o que você precisa</h2>
+            </div>
 
-<!-- CARDS -->
-<h5 class="mb-4">Acesse rapidamente</h5>
+            <p>
+                Atalhos temporários para os módulos previstos do sistema.
+            </p>
+        </div>
 
-<div class="cards">
+        <div class="access-grid">
 
-    <div class="card-item">
-        <i class="bi bi-graph-up"></i>
-        <h6>Indicadores</h6>
-    </div>
+            <a href="#" class="access-card">
+                <div class="card-icon">
+                    <i class="bi bi-graph-up-arrow"></i>
+                </div>
 
-    <div class="card-item">
-        <i class="bi bi-folder"></i>
-        <h6>Projetos</h6>
-    </div>
+                <h3>Placeholder 1</h3>
 
-    <div class="card-item">
-        <i class="bi bi-bar-chart"></i>
-        <h6>Apresentações</h6>
-    </div>
+                <p>
+                    Área reservada para visualização de dados, métricas e indicadores.
+                </p>
 
-    <div class="card-item">
-        <i class="bi bi-database"></i>
-        <h6>Dados</h6>
-    </div>
+                <span class="card-arrow">
+                    <i class="bi bi-arrow-right"></i>
+                </span>
+            </a>
 
-</div>
+            <a href="#" class="access-card">
+                <div class="card-icon">
+                    <i class="bi bi-folder2-open"></i>
+                </div>
+
+                <h3>Placeholder 2</h3>
+
+                <p>
+                    Espaço destinado ao acompanhamento de registros e ações cadastradas.
+                </p>
+
+                <span class="card-arrow">
+                    <i class="bi bi-arrow-right"></i>
+                </span>
+            </a>
+
+            <a href="#" class="access-card">
+                <div class="card-icon">
+                    <i class="bi bi-display"></i>
+                </div>
+
+                <h3>Placeholder 3</h3>
+
+                <p>
+                    Módulo reservado para criação e organização de apresentações.
+                </p>
+
+                <span class="card-arrow">
+                    <i class="bi bi-arrow-right"></i>
+                </span>
+            </a>
+
+            <a href="#" class="access-card">
+                <div class="card-icon">
+                    <i class="bi bi-database"></i>
+                </div>
+
+                <h3>Placeholder 4</h3>
+
+                <p>
+                    Seção destinada ao acesso, consulta ou download de bases de dados.
+                </p>
+
+                <span class="card-arrow">
+                    <i class="bi bi-arrow-right"></i>
+                </span>
+            </a>
+
+        </div>
+
+    </section>
+
+    <!-- RODAPÉ VISUAL -->
+
+
+</section>
 
 {% endblock %}
