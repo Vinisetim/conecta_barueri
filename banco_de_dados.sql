@@ -19,13 +19,14 @@ CREATE TABLE login.usuario(
 
 
 /* SELECT usuario */
-SELECT * FROM usuario;
+SELECT * FROM login.usuario;
 
 SELECT * FROM login.usuario
 /* UPDATE usuario */
 UPDATE login.usuario
 	SET equipe_id = 2
 WHERE id = 2;
+
 
 
 
@@ -47,9 +48,13 @@ CREATE TABLE login.senha(
 		ON UPDATE CASCADE
 		ON DELETE CASCADE
 )
+ALTER TABLE UPDATE COLUMN senha 
 
-/* SELECT SEN */
-SELECT * FROM senha;
+ALTER TABLE login.senha
+    ADD CONSTRAINT chk_senha_hash
+    CHECK (LENGTH(senha) >= 60);
+
+SELECT * FROM login.senha;
 
 
 SELECT * 
@@ -57,15 +62,7 @@ SELECT *
 	JOIN login.senha ON senha.usuario_id = usuario.id
 	ORDER BY usuario.nome DESC
 
-	UPDATE usuario
-		SET id = 5
-		WHERE id = 3;
 		
-
-
-INSERT INTO login.senha (usuario_id, senha) VALUES(7,'aaaaaa');
-INSERT INTO login.senha (usuario_id, senha) VALUES(8,'bbbbbb');
-
 
 
 
