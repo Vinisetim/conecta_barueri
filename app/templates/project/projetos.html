@@ -1,0 +1,65 @@
+{% extends "project/base_projeto.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/projetos/projeto.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div>
+        <div>
+            <h1>Projetos</h1>
+            <p>Crie gerencie e compartilhe  projetos dinâmicos com dados e indicadores  da cidade</p>
+        </div>
+
+        <div>
+            <button><i class="bi bi-upload"></i> Importar Projetos</button>
+            <button><i class="bi bi-plus"></i> Novo projeto</button>
+        </div>
+    </div>
+
+
+
+
+    <div>
+        <div>
+            <div>
+                <input type="text" id="username" name="username" placeholder="Buscar Projetos">
+            </div>
+
+            <div>
+                <input type="text" id="username" name="username" placeholder="Digite seu usuário" >
+            </div>
+
+            <div>
+                <div class="dropdown">
+                      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Dropdown button
+                      </button>
+                      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                      </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="dropdown">
+                      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Dropdown button
+                      </button>
+                      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                      </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div>
+            
+        </div>
+    </div>
+{% endblock %}

@@ -7,7 +7,4 @@ def login():
     return render_template('auth/login.html')
 
 
-#"Nenhum Arquivo para acessar"
-
-#render_template(auth/login.html)
 

@@ -198,3 +198,28 @@
     height: 1.4rem;
     padding: 10px;
 }
+.navbar-logo-img {
+    height: 36px;                     /* Altura ideal para harmonizar com a fonte padrão */
+    width: auto;                      /* Mantém a proporção correta de largura */
+    object-fit: contain;              /* Protege contra distorções ou achatamentos */
+    display: inline-block;
+}
+
+/* Ajustes de Responsividade */
+@media (max-width: 991.98px) {
+    .navbar-logo-img {
+        height: 32px;                 /* Reduz sutilmente em telas pequenas */
+    }
+
+    .hero-section {
+        background-image: linear-gradient(to top, #f8f9fa 40%, rgba(248, 249, 250, 0.85) 75%),
+                          url('../../img/hero-dashboard.jpeg');
+        background-position: center center;
+        text-align: center;
+        padding-top: 8rem;
+    }
+
+    .hero-text-col h1 {
+        font-size: 2.5rem;
+    }
+}
