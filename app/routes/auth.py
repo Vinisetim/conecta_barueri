@@ -37,3 +37,14 @@ def logout():
     return redirect(url_for('main.index'))
 #render_template(auth/login.html)
 
+#============================================================
+#ROTA TEMPORÁRIA - NÃO LEVAR PARA A PRODUÇÃO
+#Permite acesso à home sem autenticação (desenvolvimento)
+#============================================================
+
+@auth_bp.route('/dev-login')
+def dev_login():
+    """Rota de desenvolvimento - bypassa autenticação"""
+    return redirect(url_for('app.home'))
+
+

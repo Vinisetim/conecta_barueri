@@ -11,6 +11,18 @@
     margin: 40px auto;
 }
 
+.dev-link{
+    display: block;
+    text-align: center;
+    margin-top: 12px;
+    color: var(--primary);
+    font-size: 0.85rem;
+    text-decoration: none;
+}
+
+.dev-link:hover{
+    text-decoration: underline;
+}
 .subtitle{
     color: #0a1931;
     font-size: 1rem;
