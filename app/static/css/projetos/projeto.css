@@ -722,6 +722,289 @@ body {
     }
 }
 
+    .card-creator {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              margin-bottom: 12px;
+              padding: 8px 10px;
+              border-radius: 8px;
+                background-color: #F0F2F5;
+
+    }
+
+    .creator-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .creator-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .creator-name {
+          font-size: 12px;
+          font-weight: 600;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+    }
+
+    .creator-date {
+      font-size: 11px;
+    }
+
+    /* ── FILTERS BAR ── */
+    .filters-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+        flex: 1;
+        min-width: 220px;
+        max-width: 480px;
+        position: relative;
+        border-radius: 20px;
+    }
+
+    .search-box i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 9px 12px 9px 36px;
+      border: 1.5px solid ;
+      border-radius: 8px;
+      font-size: 13.5px;
+      background: var(--surface);
+      color: var(--text);
+      transition: border-color .15s;
+    }
+
+    .search-box input:focus { border-color: var(--primary); }
+    .search-box input::placeholder { color: var(--muted); }
+
+    .filter-select {
+      padding: 9px 12px;
+      border: 1.5px solid ;
+      border-radius: 8px;
+      font-size: 13.5px;
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .view-toggle {
+      display: flex;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--surface);
+      margin-left: auto;
+    }
+
+    .view-btn {
+      padding: 8px 11px;
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 15px;
+      transition: all .15s;
+    }
+
+    .view-btn.active { background: var(--primary); color: #fff; }
+
+
+    .projeto{
+        background-color: white;
+        border-radius: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        padding: 2rem;
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+
+     .project-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: box-shadow .2s, transform .2s;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+     box-shadow: 0 8px 24px rgba(0,82,255,.10);
+      transform: translateY(-2px);
+    }
+
+    .project-card:hover {
+      box-shadow: 0 8px 24px rgba(0,82,255,.10);
+      transform: translateY(-2px);
+    }
+
+    .card-thumb {
+      height: 140px;
+      background: linear-gradient(135deg, #0a1628 0%, #1a3a6e 60%, #0052ff 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Diferentes padrões visuais para cada categoria */
+    .card-thumb.saude    { background: linear-gradient(135deg, #0f2a45 0%, #1e5f8a 60%, #2196f3 100%); }
+    .card-thumb.educacao { background: linear-gradient(135deg, #0a1628 0%, #1a3a6e 60%, #0052ff 100%); }
+    .card-thumb.orcamento{ background: linear-gradient(135deg, #0d2137 0%, #1a4a72 60%, #0069c0 100%); }
+    .card-thumb.mobilidade{ background: linear-gradient(135deg, #0a2040 0%, #154075 60%, #1565c0 100%); }
+    .card-thumb.seguranca { background: linear-gradient(135deg, #1a0a28 0%, #3a1a6e 60%, #6a1aff 100%); }
+    .card-thumb.financas  { background: linear-gradient(135deg, #0a280a 0%, #1a6e2a 60%, #1aaa3a 100%); }
+    .card-thumb.economia  { background: linear-gradient(135deg, #280a0a 0%, #6e1a1a 60%, #c0390e 100%); }
+
+    .thumb-mock {
+      width: 90%;
+      height: 90%;
+      opacity: .55;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .thumb-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 5px;
+      height: 60px;
+    }
+
+    .thumb-bar {
+      width: 12px;
+      border-radius: 3px 3px 0 0;
+      background: rgba(255,255,255,.8);
+    }
+
+    .thumb-circle {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: 7px solid rgba(255,255,255,.7);
+      margin-right: 10px;
+    }
+
+    .thumb-line {
+      width: 70px;
+      height: 2px;
+      background: rgba(255,255,255,.6);
+      border-radius: 2px;
+      position: relative;
+    }
+
+    .card-body-proj {
+      padding: 16px 16px 12px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      margin: 0 0 3px;
+    }
+
+    .card-updated {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0 0 12px;
+    }
+
+
+
+    /* ── NEW PROJECT CARD ── */
+    .new-project-card {
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      min-height: 220px;
+    }
+
+    .new-project-card:hover {
+      border-color: var(--primary);
+    }
+
+    .new-project-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      border: 1.5px solid var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+
+    .new-project-card:hover .new-project-icon {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .new-project-card h6 {
+      font-family: 'Sora', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      margin: 0 0 6px;
+    }
+
+    .new-project-card p {
+      font-size: 12.5px;
+      margin: 0 0 14px;
+    }
+
+    .link-criar {
+      color: var(--primary);
+      font-size: 13.5px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+
+
+
 footer {
     background-color: #ffffff;
     border-top: 1px solid var(--border-color);
