@@ -1,0 +1,387 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Administrador | Conecta Barueri{% endblock %}
+
+{% block content %}
+
+<section class="admin-wrapper">
+
+    <!-- CABEÇALHO -->
+    <div class="admin-header">
+        <div>
+            <h1>Administrador</h1>
+            <p>Visão geral do sistema e monitoramento de dados</p>
+        </div>
+    </div>
+
+    <!-- CARDS SUPERIORES -->
+    <section class="admin-stats-grid">
+
+        <article class="admin-stat-card">
+            <div class="stat-main">
+                <div class="stat-icon blue">
+                    <i class="bi bi-people"></i>
+                </div>
+
+                <div>
+                    <span>Usuários</span>
+                    <strong>48</strong>
+                    <small>Ativos</small>
+                </div>
+            </div>
+
+            <a href="#" class="stat-link">
+                Gerenciar
+                <i class="bi bi-arrow-right"></i>
+            </a>
+        </article>
+
+        <article class="admin-stat-card">
+            <div class="stat-main">
+                <div class="stat-icon purple">
+                    <i class="bi bi-diagram-3"></i>
+                </div>
+
+                <div>
+                    <span>Equipes</span>
+                    <strong>12</strong>
+                    <small>Ativas</small>
+                </div>
+            </div>
+
+            <a href="#" class="stat-link">
+                Gerenciar
+                <i class="bi bi-arrow-right"></i>
+            </a>
+        </article>
+
+        <article class="admin-stat-card">
+            <div class="stat-main">
+                <div class="stat-icon yellow">
+                    <i class="bi bi-folder"></i>
+                </div>
+
+                <div>
+                    <span>Projetos</span>
+                    <strong>36</strong>
+                    <small>Ativos</small>
+                </div>
+            </div>
+
+            <a href="#" class="stat-link">
+                Gerenciar
+                <i class="bi bi-arrow-right"></i>
+            </a>
+        </article>
+
+        <article class="admin-stat-card">
+            <div class="stat-main">
+                <div class="stat-icon green">
+                    <i class="bi bi-database"></i>
+                </div>
+
+                <div>
+                    <span>Fontes de dados</span>
+                    <strong>24</strong>
+                    <small>Conectadas</small>
+                </div>
+            </div>
+
+            <a href="#" class="stat-link">
+                Ver detalhes
+                <i class="bi bi-arrow-right"></i>
+            </a>
+        </article>
+
+    </section>
+
+    <!-- CARDS CENTRAIS -->
+    <section class="admin-feature-grid">
+
+        <!-- GESTÃO ORGANIZACIONAL -->
+        <article class="admin-feature-card">
+
+            <div class="feature-visual visual-blue">
+                <div class="people-chart">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+
+                <div class="people-group">
+                    <i class="bi bi-person-fill"></i>
+                    <i class="bi bi-person-fill main-person"></i>
+                    <i class="bi bi-person-fill"></i>
+                </div>
+            </div>
+
+            <div class="feature-info">
+
+                <div class="feature-title">
+                    <div class="small-card-icon blue">
+                        <i class="bi bi-people"></i>
+                    </div>
+
+                    <h2>Gestão Organizacional</h2>
+                </div>
+
+                <p>Gerencie usuários, equipes e projetos da plataforma.</p>
+
+                <div class="admin-info-list">
+
+                    <div class="admin-info-row">
+                        <div>
+                            <i class="bi bi-people"></i>
+                            <span>Usuários</span>
+                        </div>
+
+                        <strong>48</strong>
+                    </div>
+
+                    <div class="admin-info-row">
+                        <div>
+                            <i class="bi bi-diagram-3"></i>
+                            <span>Equipes</span>
+                        </div>
+
+                        <strong>12</strong>
+                    </div>
+
+                    <div class="admin-info-row">
+                        <div>
+                            <i class="bi bi-folder"></i>
+                            <span>Projetos</span>
+                        </div>
+
+                        <strong>36</strong>
+                    </div>
+
+                </div>
+
+                <a href="#" class="admin-primary-button">
+                    Gerenciar
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+
+            </div>
+
+        </article>
+
+        <!-- MONITORAMENTO DE DADOS -->
+        <article class="admin-feature-card">
+
+            <div class="feature-visual visual-green">
+                <div class="data-line">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+
+                <div class="database-icon">
+                    <i class="bi bi-database-fill"></i>
+                </div>
+            </div>
+
+            <div class="feature-info">
+
+                <div class="feature-title">
+                    <div class="small-card-icon green">
+                        <i class="bi bi-database"></i>
+                    </div>
+
+                    <h2>Monitoramento de Dados</h2>
+                </div>
+
+                <p>Acompanhe o status das fontes de dados, requisições e logs do sistema.</p>
+
+                <div class="admin-info-list">
+
+                    <div class="admin-info-row">
+                        <div>
+                            <i class="bi bi-database"></i>
+                            <span>Fontes conectadas</span>
+                        </div>
+
+                        <strong>24</strong>
+                    </div>
+
+                    <div class="admin-info-row danger">
+                        <div>
+                            <i class="bi bi-exclamation-circle"></i>
+                            <span>Falhas nas últimas 24h</span>
+                        </div>
+
+                        <strong>3</strong>
+                    </div>
+
+                    <div class="admin-info-row success">
+                        <div>
+                            <i class="bi bi-cloud-check"></i>
+                            <span>Requisições bem sucedidas (24h)</span>
+                        </div>
+
+                        <strong>1.286</strong>
+                    </div>
+
+                </div>
+
+                <a href="#" class="admin-outline-button">
+                    Ver detalhes
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+
+            </div>
+
+        </article>
+
+    </section>
+
+    <!-- TABELA -->
+    <section class="admin-table-card">
+
+        <div class="table-title-row">
+            <h2>Usuários recentes</h2>
+            <a href="#">Ver todos</a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="admin-table">
+
+                <thead>
+                    <tr>
+                        <th>Usuário</th>
+                        <th>E-mail</th>
+                        <th>Perfil</th>
+                        <th>Último acesso</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <span class="user-avatar blue">ML</span>
+                                <strong>Mariana Lima</strong>
+                            </div>
+                        </td>
+
+                        <td>mariana.lima@barueri.sp.gov.br</td>
+
+                        <td>
+                            <span class="role-badge editor">Editor</span>
+                        </td>
+
+                        <td>Hoje, 10:45</td>
+
+                        <td>
+                            <button class="action-button" type="button">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <span class="user-avatar purple">RC</span>
+                                <strong>Ricardo Castro</strong>
+                            </div>
+                        </td>
+
+                        <td>ricardo.castro@barueri.sp.gov.br</td>
+
+                        <td>
+                            <span class="role-badge viewer">Visualizador</span>
+                        </td>
+
+                        <td>Hoje, 09:32</td>
+
+                        <td>
+                            <button class="action-button" type="button">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <span class="user-avatar yellow">AF</span>
+                                <strong>Ana Ferreira</strong>
+                            </div>
+                        </td>
+
+                        <td>ana.ferreira@barueri.sp.gov.br</td>
+
+                        <td>
+                            <span class="role-badge admin">Administrador</span>
+                        </td>
+
+                        <td>Ontem, 16:20</td>
+
+                        <td>
+                            <button class="action-button" type="button">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <span class="user-avatar green">JS</span>
+                                <strong>João Silva</strong>
+                            </div>
+                        </td>
+
+                        <td>joao.silva@barueri.sp.gov.br</td>
+
+                        <td>
+                            <span class="role-badge editor">Editor</span>
+                        </td>
+
+                        <td>Ontem, 15:10</td>
+
+                        <td>
+                            <button class="action-button" type="button">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <span class="user-avatar pink">CP</span>
+                                <strong>Camila Pereira</strong>
+                            </div>
+                        </td>
+
+                        <td>camila.pereira@barueri.sp.gov.br</td>
+
+                        <td>
+                            <span class="role-badge viewer">Visualizador</span>
+                        </td>
+
+                        <td>Ontem, 11:08</td>
+
+                        <td>
+                            <button class="action-button" type="button">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+        </div>
+
+    </section>
+
+</section>
+
+{% endblock %}

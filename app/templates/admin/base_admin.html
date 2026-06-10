@@ -2,21 +2,34 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Conecta Barueri{% endblock %}</title>
+
+    <title>{% block title %}Administração | Conecta Barueri{% endblock %}</title>
+
     <!-- Bootstrap -->
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-        rel="stylesheet">
+        rel="stylesheet"
+    >
+
+    <!-- Bootstrap Icons -->
     <link
         rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    >
+
+    <!-- Fonte Inter -->
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
+        rel="stylesheet"
+    >
+
+    <!-- CSS Administração -->
     <link
         rel="stylesheet"
-        href="{{ url_for('static', filename='css/projetos/projeto.css') }}">
+        href="{{ url_for('static', filename='css/admin/administracao.css') }}"
+    >
 
     {% block extra_css %}{% endblock %}
 </head>
@@ -25,7 +38,7 @@
 
     <div class="dashboard-layout">
 
-        <!-- SIDEBAR -->
+        <!-- SIDEBAR FIXA -->
         <aside id="sidebar" class="sidebar">
 
             <div class="sidebar-brand">
@@ -45,30 +58,88 @@
                 Conecta <span>Barueri</span>
             </div>
 
-            <nav class="sidebar-menu">
+            <!-- MENU PRINCIPAL -->
+            <div class="menu-section-label">Principal</div>
 
-                <a href="#" class="menu-link active">
+            <nav class="sidebar-menu">
+                <a href="#" class="menu-link">
                     <i class="bi bi-house-door"></i>
-                    <span>Home</span>
+                    <span>Placeholder 1</span>
                 </a>
 
                 <a href="#" class="menu-link">
                     <i class="bi bi-graph-up-arrow"></i>
-                    <span>Indicadores</span>
+                    <span>Placeholder 2</span>
                 </a>
 
                 <a href="#" class="menu-link">
                     <i class="bi bi-folder2-open"></i>
-                    <span>Projetos</span>
+                    <span>Placeholder 3</span>
                 </a>
 
+                <a href="#" class="menu-link">
+                    <i class="bi bi-display"></i>
+                    <span>Placeholder 4</span>
+                </a>
 
                 <a href="#" class="menu-link">
                     <i class="bi bi-database"></i>
-                    <span>Dados Abertos</span>
+                    <span>Placeholder 5</span>
+                </a>
+            </nav>
+
+            <!-- MENU ADMIN -->
+            <div class="menu-section-label admin-label">Administração</div>
+
+            <nav class="sidebar-menu admin-menu">
+
+                <a href="#" class="menu-link admin-parent active-parent">
+                    <i class="bi bi-shield-check"></i>
+                    <span>Administrador</span>
+                    <i class="bi bi-chevron-up admin-chevron"></i>
                 </a>
 
-                <a href="#" class="menu-link">
+                <a href="#" class="submenu-link active">
+                    <span class="submenu-dot"></span>
+                    <span>Visão geral</span>
+                </a>
+
+                <a href="#" class="submenu-link">
+                    <i class="bi bi-people"></i>
+                    <span>Usuários</span>
+                </a>
+
+                <a href="#" class="submenu-link">
+                    <i class="bi bi-diagram-3"></i>
+                    <span>Equipes</span>
+                </a>
+
+                <a href="#" class="submenu-link">
+                    <i class="bi bi-folder"></i>
+                    <span>Projetos</span>
+                </a>
+
+                <a href="#" class="submenu-link">
+                    <i class="bi bi-database"></i>
+                    <span>Fontes de dados</span>
+                </a>
+
+                <a href="#" class="submenu-link">
+                    <i class="bi bi-arrow-repeat"></i>
+                    <span>Requisições</span>
+                </a>
+
+                <a href="#" class="submenu-link">
+                    <i class="bi bi-journal-text"></i>
+                    <span>Logs de requisições</span>
+                </a>
+
+                <a href="#" class="submenu-link">
+                    <i class="bi bi-key"></i>
+                    <span>Permissões</span>
+                </a>
+
+                <a href="#" class="submenu-link">
                     <i class="bi bi-gear"></i>
                     <span>Configurações</span>
                 </a>
@@ -84,28 +155,34 @@
 
         </aside>
 
-        <!-- ÁREA PRINCIPAL -->
+        <!-- ÁREA DIREITA -->
         <div class="main-area">
 
             <!-- TOPBAR -->
             <header class="topbar">
 
-                <button id="sidebarToggle" class="sidebar-toggle" type="button" aria-label="Abrir ou fechar menu lateral">
+                <button
+                    id="sidebarToggle"
+                    class="sidebar-toggle"
+                    type="button"
+                    aria-label="Abrir ou fechar menu lateral"
+                >
                     <i class="bi bi-list"></i>
                 </button>
 
-                <div>
-                    <h5>Nome da Equipe</h5>
-                </div>
+                <div class="topbar-actions admin-user-area">
 
-                <div class="topbar-actions">
-                    <button class="profile-button" type="button">
-                        <i class="bi bi-person"></i>
-                    </button>
+                    <div class="admin-avatar">AD</div>
+
+                    <div class="admin-user-info">
+                        <strong>Administrador</strong>
+                        <span>Super Administrador</span>
+                    </div>
 
                     <button class="profile-dropdown" type="button">
                         <i class="bi bi-chevron-down"></i>
                     </button>
+
                 </div>
 
             </header>
@@ -115,11 +192,7 @@
                 {% block content %}{% endblock %}
             </main>
 
-        </div>
-
-    </div>
-
-
+            <!-- MESMO FOOTER DA HOME -->
             <footer class="home-page-footer">
                 <div class="footer-content">
                     <div>

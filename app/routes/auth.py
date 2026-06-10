@@ -3,7 +3,6 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/login')
 def login():
-    # Por enquanto, apenas para não dar erro
     return render_template('auth/login.html')
 
 

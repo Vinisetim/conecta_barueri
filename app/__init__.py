@@ -14,4 +14,13 @@ def create_app():
     from app.routes.projetos import projetos_bp
     app.register_blueprint(projetos_bp)
 
+    from app.routes.admin import admin_bp
+    app.register_blueprint(admin_bp)
+
+    from app.routes.equipes import equipes_bp
+    app.register_blueprint(equipes_bp)
+
+    from app.routes.funcionarios import funcionarios_bp
+    app.register_blueprint(funcionarios_bp)
+
     return app

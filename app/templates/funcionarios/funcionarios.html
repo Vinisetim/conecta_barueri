@@ -1,0 +1,155 @@
+{% extends "funcionarios/base_func.html" %}
+
+{% block title %}Administrador | Conecta Barueri{% endblock %}
+
+{% block content %}
+
+    <div class="indicadores">
+       <a href="app/templates/funcionarios/funcionarios.html" class="menu-link">
+            <span>Projetos</span>
+       </a>
+        <a href="app/templates/funcionarios/funcionarios.html" class="menu-link">
+            <span>Funcionários</span>
+        </a>
+    </div>
+    <hr>
+
+
+    <div class="content">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Funcionários</h1>
+        <p class="page-subtitle">Gerencie os servidores com acesso à plataforma Conecta Barueri.</p>
+      </div>
+      <button class="btn-primary-action" onclick="openAddModal()">
+        <i class="bi bi-person-plus-fill"></i> Adicionar funcionário
+      </button>
+    </div>
+
+    <!-- SEARCH BAR -->
+    <div class="func-search-wrap">
+      <div class="search-box" style="max-width:500px; flex:none; width:100%;">
+        <i class="bi bi-search"></i>
+        <input type="text" id="funcSearch" placeholder="Buscar funcionário por nome, e-mail ou secretaria..." oninput="filterFuncionarios()"/>
+      </div>
+      <div class="func-count" id="funcCount">
+        <i class="bi bi-people"></i> <span id="totalCount">8</span> funcionários
+      </div>
+    </div>
+
+    <!-- ── ADMINISTRADORES ── -->
+    <section class="func-section" id="adminSection">
+      <div class="func-section-header">
+        <h2 class="func-section-title">Administradores</h2>
+        <span class="func-section-count" id="adminCount">2</span>
+      </div>
+      <div class="func-divider"></div>
+
+      <div id="adminList">
+        <div class="func-row" data-id="1" data-role="admin" data-nome="João Silva" data-email="joao.silva@barueri.sp.gov.br" data-setor="TI / Gestão de Sistemas" oncontextmenu="openContextMenu(event, 1)">
+          <div class="func-avatar" style="background:#0052ff">JS</div>
+          <div class="func-info">
+            <div class="func-nome">João Silva</div>
+            <div class="func-email">joao.silva@barueri.sp.gov.br</div>
+          </div>
+          <div class="func-setor">TI / Gestão de Sistemas</div>
+          <span class="func-badge admin"><i class="bi bi-shield-check"></i> Admin</span>
+        </div>
+
+        <div class="func-row" data-id="2" data-role="admin" data-nome="Luciana Oliveira" data-email="luciana.oliveira@barueri.sp.gov.br" data-setor="Secretaria de Finanças" oncontextmenu="openContextMenu(event, 2)">
+          <div class="func-avatar" style="background:#9333ea">LO</div>
+          <div class="func-info">
+            <div class="func-nome">Luciana Oliveira</div>
+            <div class="func-email">luciana.oliveira@barueri.sp.gov.br</div>
+          </div>
+          <div class="func-setor">Secretaria de Finanças</div>
+          <span class="func-badge admin"><i class="bi bi-shield-check"></i> Admin</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FUNCIONÁRIOS ── -->
+    <section class="func-section" id="funcSection">
+      <div class="func-section-header">
+        <h2 class="func-section-title">Funcionários</h2>
+        <span class="func-section-count" id="funcSectionCount">6</span>
+      </div>
+      <div class="func-divider"></div>
+
+      <div id="funcList">
+        <div class="func-row" data-id="3" data-role="func" data-nome="Maria Aparecida" data-email="maria.aparecida@barueri.sp.gov.br" data-setor="Secretaria de Educação" oncontextmenu="openContextMenu(event, 3)">
+          <div class="func-avatar" style="background:#0052ff">MA</div>
+          <div class="func-info">
+            <div class="func-nome">Maria Aparecida</div>
+            <div class="func-email">maria.aparecida@barueri.sp.gov.br</div>
+          </div>
+          <div class="func-setor">Secretaria de Educação</div>
+          <span class="func-badge funcionario"><i class="bi bi-person-badge"></i> Funcionário</span>
+        </div>
+
+        <div class="func-row" data-id="4" data-role="func" data-nome="Carlos Ferreira" data-email="carlos.ferreira@barueri.sp.gov.br" data-setor="Secretaria de Saúde" oncontextmenu="openContextMenu(event, 4)">
+          <div class="func-avatar" style="background:#16a34a">CF</div>
+          <div class="func-info">
+            <div class="func-nome">Carlos Ferreira</div>
+            <div class="func-email">carlos.ferreira@barueri.sp.gov.br</div>
+          </div>
+          <div class="func-setor">Secretaria de Saúde</div>
+          <span class="func-badge funcionario"><i class="bi bi-person-badge"></i> Funcionário</span>
+        </div>
+
+        <div class="func-row" data-id="5" data-role="func" data-nome="Rafael Santos" data-email="rafael.santos@barueri.sp.gov.br" data-setor="Secretaria de Transportes" oncontextmenu="openContextMenu(event, 5)">
+          <div class="func-avatar" style="background:#dc2626">RS</div>
+          <div class="func-info">
+            <div class="func-nome">Rafael Santos</div>
+            <div class="func-email">rafael.santos@barueri.sp.gov.br</div>
+          </div>
+          <div class="func-setor">Secretaria de Transportes</div>
+          <span class="func-badge funcionario"><i class="bi bi-person-badge"></i> Funcionário</span>
+        </div>
+
+        <div class="func-row" data-id="6" data-role="func" data-nome="Patricia Moura" data-email="patricia.moura@barueri.sp.gov.br" data-setor="Secretaria de Finanças" oncontextmenu="openContextMenu(event, 6)">
+          <div class="func-avatar" style="background:#ca8a04">PM</div>
+          <div class="func-info">
+            <div class="func-nome">Patricia Moura</div>
+            <div class="func-email">patricia.moura@barueri.sp.gov.br</div>
+          </div>
+          <div class="func-setor">Secretaria de Finanças</div>
+          <span class="func-badge funcionario"><i class="bi bi-person-badge"></i> Funcionário</span>
+        </div>
+
+        <div class="func-row" data-id="7" data-role="func" data-nome="Ana Nakamura" data-email="ana.nakamura@barueri.sp.gov.br" data-setor="Secretaria de Economia" oncontextmenu="openContextMenu(event, 7)">
+          <div class="func-avatar" style="background:#0891b2">AN</div>
+          <div class="func-info">
+            <div class="func-nome">Ana Nakamura</div>
+            <div class="func-email">ana.nakamura@barueri.sp.gov.br</div>
+          </div>
+          <div class="func-setor">Secretaria de Economia</div>
+          <span class="func-badge funcionario"><i class="bi bi-person-badge"></i> Funcionário</span>
+        </div>
+
+        <div class="func-row" data-id="8" data-role="func" data-nome="Tiago Oliveira" data-email="tiago.oliveira@barueri.sp.gov.br" data-setor="Secretaria de Segurança" oncontextmenu="openContextMenu(event, 8)">
+          <div class="func-avatar" style="background:#c026d3">TO</div>
+          <div class="func-info">
+            <div class="func-nome">Tiago Oliveira</div>
+            <div class="func-email">tiago.oliveira@barueri.sp.gov.br</div>
+          </div>
+          <div class="func-setor">Secretaria de Segurança</div>
+          <span class="func-badge funcionario"><i class="bi bi-person-badge"></i> Funcionário</span>
+        </div>
+      </div>
+
+      <!-- EMPTY STATE -->
+      <div class="func-empty" id="emptyState" style="display:none;">
+        <i class="bi bi-person-x"></i>
+        <p>Nenhum funcionário encontrado.</p>
+      </div>
+    </section>
+
+  </div><!-- /content -->
+
+
+
+
+{%endblock%}
