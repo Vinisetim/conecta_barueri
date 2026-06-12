@@ -33,7 +33,7 @@ def create_app():
     login_manager.login_view = 'auth.login'
 
     # Registro do Blueprint da Landing Page
-    from app.routes.main import bp as main_bp
+    from app.routes.main import main_bp
     app.register_blueprint(main_bp)
 
     #Registro de rota Login:

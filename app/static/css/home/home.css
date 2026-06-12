@@ -1,0 +1,145 @@
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: #f6f8fb;
+}
+
+/* LAYOUT */
+.layout {
+    display: flex;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 240px;
+    height: 100vh;
+    background: #ffffff;
+    border-right: 1px solid #eaeaea;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    transition: 0.3s;
+}
+
+.sidebar.collapsed {
+    width: 80px;
+}
+
+.logo {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 10px;
+    color: #333;
+    text-decoration: none;
+}
+
+.nav-item:hover {
+    background: #f0f5ff;
+}
+
+.nav-item.active {
+    background: #e6efff;
+    color: #0d6efd;
+}
+
+.logout {
+    margin-top: auto;
+}
+
+/* TOPBAR */
+.topbar {
+    height: 60px;
+    background: #fff;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+}
+
+/* MAIN */
+.main {
+    flex: 1;
+}
+
+.content {
+    padding: 30px;
+}
+
+/* HERO */
+.hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.hero-text h1 {
+    font-size: 2.4rem;
+}
+
+.hero-text span {
+    color: #0d6efd;
+}
+
+.hero-img {
+    width: 500px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* BUTTONS */
+.hero-buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+/* CARDS */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.card-item {
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    text-align: center;
+    border: 1px solid #eee;
+    transition: 0.3s;
+}
+
+.card-item:hover {
+    transform: translateY(-5px);
+}
+
+.card-item i {
+    font-size: 1.8rem;
+    color: #0d6efd;
+    margin-bottom: 10px;
+}
+
+/* RESPONSIVO */
+@media (max-width: 900px) {
+    .cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .hero {
+        flex-direction: column;
+    }
+
+    .hero-img {
+        width: 100%;
+        margin-top: 20px;
+    }
+}
