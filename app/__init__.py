@@ -41,6 +41,6 @@ def create_app():
     app.register_blueprint(auth_bp)
 
     #Registro da areal logada
-    from app.routes.app import app_bp
+    from app.routes.inicial import app_bp
     app.register_blueprint(app_bp)
     return app
