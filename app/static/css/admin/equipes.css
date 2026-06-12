@@ -42,264 +42,39 @@ body {
     min-width: 100vh;
 }
 
-/* ==============================
-   SIDEBAR
-================================= */
 
-.sidebar {
-    width: var(--sidebar-width);
-    min-width: var(--sidebar-width);
-    height: 100vh;
-    position: sticky;
-    top: 0;
-
-    background: rgba(255, 255, 255, 0.92);
-    border-right: 1px solid var(--border-soft);
-
-    padding: 28px 20px;
-    margin-bottom: 0;
-
-    display: flex;
-    flex-direction: column;
-
-    transition: width 0.25s ease, min-width 0.25s ease;
-    z-index: 10;
-}
-
-.sidebar.collapsed {
-    width: var(--sidebar-collapsed-width);
-    min-width: var(--sidebar-collapsed-width);
-}
-
-.sidebar-brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-height: 48px;
-}
-
-.brand-logo {
-    width: 42px;
-    height: 42px;
-    object-fit: contain;
-    flex-shrink: 0;
-}
-
-.brand-text {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.05;
-    color: var(--primary-dark);
-}
-
-.brand-text .brand-small {
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-
-.brand-text strong {
-    font-size: 1.7rem;
-    font-weight: 800;
-    letter-spacing: -0.04em;
-}
-
-.system-name {
-    margin-top: 26px;
-    margin-bottom: 34px;
-
-    font-size: 1.28rem;
-    font-weight: 800;
-    color: var(--text-main);
-    white-space: nowrap;
-}
-
-.system-name span {
-    color: var(--primary);
-}
-
-.sidebar-menu {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-
-}
-
-.menu-link {
-    min-height: 52px;
-
-    display: flex;
-    align-items: center;
-    gap: 13px;
-
-    padding: 0 15px;
-
-    border-radius: 12px;
-
-    color: #253858;
-    text-decoration: none;
-
-    font-size: 0.95rem;
-    font-weight: 500;
-
-    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
-}
-
-.menu-link i {
-    font-size: 1.25rem;
-    color: #516282;
-    min-width: 22px;
-    text-align: center;
-}
-
-.menu-link:hover {
-    background: #f2f6ff;
-    color: var(--primary);
-    transform: translateX(2px);
-}
-
-.menu-link:hover i {
-    color: var(--primary);
-}
-
-.menu-link.active {
-    background: var(--primary-soft);
-    color: var(--primary);
-}
-
-.menu-link.active i {
-    color: var(--primary);
-}
-
-.sidebar-bottom {
-    margin-top: auto;
-    padding-top: 22px;
-    border-top: 1px solid var(--border-soft);
-}
-
-.logout-link {
-    color: #344054;
-}
-
-/* Estado recolhido */
-.sidebar.collapsed .brand-text,
-.sidebar.collapsed .system-name,
-.sidebar.collapsed .menu-link span {
-    display: none;
-}
-
-.sidebar.collapsed .sidebar-brand {
-    justify-content: center;
-}
-
-.sidebar.collapsed .menu-link {
-    justify-content: center;
-    padding: 0;
-}
-
-.sidebar.collapsed .menu-link i {
-    min-width: auto;
-}
 
 /* ==============================
    ÁREA PRINCIPAL
 ================================= */
 
+
 .main-area {
-    width: 100%;
-    min-width: 0;
+    width: calc(100% - var(--sidebar-width));
+
+    margin-left: var(--sidebar-width);
 
     display: flex;
     flex-direction: column;
-    margin-left: 0;
+
+    transition: margin-left 0.25s ease, width 0.25s ease;
 }
 
-/* ==============================
-   TOPBAR
-================================= */
+.sidebar.collapsed ~ .main-area {
+    margin-left: var(--sidebar-collapsed-width);
+    width: calc(100% - var(--sidebar-collapsed-width));
+}
 
-/*.topbar {*/
-/*    height: 76px;*/
-/*    padding: 0 38px;*/
 
-/*    display: flex;*/
-/*    align-items: center;*/
-/*    justify-content: space-between;*/
-/*}*/
+.content {
+    flex: 1;
+    padding: 18px 54px 28px;
+}
 
-/*.sidebar-toggle {*/
-/*    width: 42px;*/
-/*    height: 42px;*/
-
-/*    border: 1px solid var(--border-soft);*/
-/*    border-radius: 14px;*/
-
-/*    background: #ffffff;*/
-/*    color: var(--primary-dark);*/
-
-/*    display: flex;*/
-/*    align-items: center;*/
-/*    justify-content: center;*/
-
-/*    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);*/
-/*}*/
-
-/*.sidebar-toggle i {*/
-/*    font-size: 1.35rem;*/
-/*}*/
-
-/*.topbar-actions {*/
-/*    display: flex;*/
-/*    align-items: center;*/
-/*    gap: 8px;*/
-/*}*/
-
-/*.profile-button {*/
-/*    width: 46px;*/
-/*    height: 46px;*/
-
-/*    border: 1px solid var(--border-soft);*/
-/*    border-radius: 50%;*/
-
-/*    background: #ffffff;*/
-/*    color: var(--primary);*/
-
-/*    display: flex;*/
-/*    align-items: center;*/
-/*    justify-content: center;*/
-
-/*    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);*/
-/*}*/
-
-/*.profile-button i {*/
-/*    font-size: 1.35rem;*/
-/*}*/
-
-/*.profile-dropdown {*/
-/*    width: 34px;*/
-/*    height: 34px;*/
-
-/*    border: none;*/
-/*    background: transparent;*/
-/*    color: #46546f;*/
-
-/*    display: flex;*/
-/*    align-items: center;*/
-/*    justify-content: center;*/
-/*}*/
-
-/* ==============================
-   CONTEÚDO
-================================= */
-
-/*.content {*/
-/*    flex: 1;*/
-/*    padding: 18px 54px 28px;*/
-/*}*/
-
-/*.home-wrapper {*/
-/*    max-width: 1280px;*/
-/*    margin: 0 auto;*/
-/*}*/
+.home-wrapper {
+    max-width: 1280px;
+    margin: 0 auto;
+}
 
 /* ==============================
    HERO
@@ -429,74 +204,7 @@ body {
 }
 
 
-/* ==============================
-   RODAPÉ
-================================= */
 
-.home-footer {
-    margin-top: 20px;
-    padding: 0 0 12px;
-
-    text-align: center;
-    color: #8a96aa;
-    font-size: 0.78rem;
-}
-
-.city-silhouette {
-    height: 62px;
-    max-width: 720px;
-    margin: 12px auto 10px;
-
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    gap: 6px;
-
-    opacity: 0.22;
-}
-
-.city-silhouette span {
-    width: 22px;
-    background: linear-gradient(180deg, #8bbcff, #dceaff);
-    border-radius: 4px 4px 0 0;
-}
-
-.city-silhouette span:nth-child(1) {
-    height: 20px;
-}
-
-.city-silhouette span:nth-child(2) {
-    height: 34px;
-}
-
-.city-silhouette span:nth-child(3) {
-    height: 44px;
-}
-
-.city-silhouette span:nth-child(4) {
-    height: 28px;
-}
-
-.city-silhouette span:nth-child(5) {
-    height: 52px;
-}
-
-.city-silhouette span:nth-child(6) {
-    width: 84px;
-    height: 34px;
-    border-radius: 34px 34px 0 0;
-    background: transparent;
-    border: 8px solid #b9d8ff;
-    border-bottom: none;
-}
-
-.city-silhouette span:nth-child(7) {
-    height: 42px;
-}
-
-.city-silhouette span:nth-child(8) {
-    height: 26px;
-}
 
 /* ==============================
    RESPONSIVO
