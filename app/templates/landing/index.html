@@ -100,7 +100,7 @@
             Acesso restrito: É necessário possuir login e senha.
         </div>
         <br>
-        <a href="{{ url_for('auth.login') if 'auth' in config else '#' }}" class="btn-primary-custom px-5 py-3 shadow">Ir para o Login</a>
+        <a href="{{ url_for('auth.login') }}" class="btn-primary-custom px-5 py-3 shadow">Ir para o Login</a>
     </div>
 </section>
 {% endblock %}
