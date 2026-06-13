@@ -1,0 +1,63 @@
+{% extends "admin/base_admin.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/equipes.css') }}">
+{% endblock %}
+
+{% block title %}Administrador | Conecta Barueri{% endblock %}
+
+{% block content %}
+
+
+    <div class="parte-cima">
+        <div>
+            <h1>Equipes</h1>
+            <p>Gerencie as equipes da plataforma</p>
+        </div>
+
+        <div class="bota-equipe">
+            <button class="btn btn-primary"><i class="bi bi-plus-lg"></i> Nova equipe</button>
+        </div>
+    </div>
+
+
+
+
+       <div class="projeto" id="projectsGrid">
+
+
+            <div class="projects-grid">
+                  <!-- CARD 1 -->
+                      <div class="project-card" data-status="published" data-title="Indicadores de Educação">
+                        <div class="card-thumb saude">
+                          <div class="thumb-mock">
+                            <div style="display:flex;align-items:center;gap:12px;">
+                              <div class="thumb-circle"></div>
+                              <div class="thumb-chart">
+                                <div class="thumb-bar" style="height:40px;"></div>
+                                <div class="thumb-bar" style="height:55px;"></div>
+                                <div class="thumb-bar" style="height:30px;"></div>
+                                <div class="thumb-bar" style="height:48px;"></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="card-body-proj">
+                          <div class="card-creator">
+                            <div class="creator-avatar" style="background:#0052ff;">UB</div>
+                            <div class="creator-info">
+                              <div class="creator-name">Uber</div>
+                              <div class="creator-date"><i class="bi bi-calendar3" style="font-size:10px;"></i> Criado em 12 mai. 2026</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+        </div><!-- /projects-grid -->
+
+    </div>
+
+
+
+
+{%endblock%}

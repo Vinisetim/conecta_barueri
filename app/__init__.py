@@ -40,7 +40,15 @@ def create_app():
     from app.routes.auth import auth_bp
     app.register_blueprint(auth_bp)
 
-    #Registro da areal logada
+    #Registro da area logada
     from app.routes.inicial import app_bp
     app.register_blueprint(app_bp)
+
+    #registro das rotas de admin
+    from app.routes.admin import admin_bp
+    app.register_blueprint(admin_bp)
+
     return app
+
+
+
