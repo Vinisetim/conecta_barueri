@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apresentação — Conecta Barueri</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <!-- CSS Global + Apresentação -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/apresentacao/apresentacao.css') }}">
+</head>
+<body>
+
+    <!-- Header Flutuante -->
+    <header class="apresentacao-header">
+        <span class="apresentacao-titulo">Apresentação Executiva — Indicadores Municipais</span>
+        <a href="{{ url_for('app.home') }}" class="btn-sair">
+            <i class="bi bi-box-arrow-right"></i> Sair
+        </a>
+    </header>
+
+    <!-- Mapa Tela Cheia -->
+    <div id="map"></div>
+
+    <!-- Popup Flutuante (escondido por padrão) -->
+    <div id="popup" class="popup-flutuante d-none">
+        <div class="popup-header">
+            <div class="popup-titulo">
+                <div class="popup-icone" id="popup-icone"></div>
+                <div>
+                    <span class="popup-modulo" id="popup-modulo"></span>
+                    <h5 class="popup-bairro" id="popup-bairro"></h5>
+                    <small class="text-muted" id="popup-data"></small>
+                </div>
+            </div>
+            <button class="popup-fechar" id="popup-fechar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="popup-grafico-header">
+            <div>
+                <p class="popup-grafico-titulo">Atendimentos</p>
+                <p class="text-muted small">Total no período</p>
+            </div>
+            <select class="form-select form-select-sm w-auto" id="tipo-grafico">
+                <option value="line">Últimos 12 meses</option>
+                <option value="bar">Barras</option>
+                <option value="pie">Pizza</option>
+            </select>
+        </div>
+
+        <!-- Número destaque -->
+        <div class="popup-numero">
+            <span id="popup-total"></span>
+            <span class="popup-variacao text-success" id="popup-variacao"></span>
+        </div>
+
+        <!-- Gráfico Chart.js -->
+        <div class="popup-canvas-wrapper">
+            <canvas id="grafico-popup"></canvas>
+        </div>
+
+        <!-- Cards de métricas -->
+        <div class="popup-cards">
+            <div class="popup-card">
+                <i class="bi bi-clipboard2-pulse text-primary"></i>
+                <div>
+                    <p class="popup-card-label" id="card1-label"></p>
+                    <p class="popup-card-valor" id="card1-valor"></p>
+                    <p class="popup-card-variacao text-success" id="card1-var"></p>
+                </div>
+            </div>
+            <div class="popup-card">
+                <i class="bi bi-activity text-primary"></i>
+                <div>
+                    <p class="popup-card-label" id="card2-label"></p>
+                    <p class="popup-card-valor" id="card2-valor"></p>
+                    <p class="popup-card-variacao text-success" id="card2-var"></p>
+                </div>
+            </div>
+            <div class="popup-card">
+                <i class="bi bi-file-medical text-primary"></i>
+                <div>
+                    <p class="popup-card-label" id="card3-label"></p>
+                    <p class="popup-card-valor" id="card3-valor"></p>
+                    <p class="popup-card-variacao text-success" id="card3-var"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='js/apresentacao.js') }}"></script>
+</body>
+</html>
