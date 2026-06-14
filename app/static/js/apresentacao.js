@@ -107,14 +107,14 @@ const meses = ['Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez', 'Jan', 'Fev', 'M
 // ============================================================
 // MAPA
 const map = L.map('map', {
-    center: [-23.5044, -46.8756],
-    zoom: 14,       // ← era 13
-    minZoom: 13,    // ← era 12
-    maxZoom: 16,
+    center: [-23.5030, -46.8750],
+    zoom: 14,           // ← aumentar
+    minZoom: 13,        // ← impede afastar do zoom inicial
+    maxZoom: 17,
     zoomControl: false,
     maxBounds: [
-        [-23.65, -47.05],
-        [-23.38, -46.70]
+        [-23.58, -46.95],  // ← bounds mais apertados
+        [-23.43, -46.78]   // ← força o mapa a ficar em Barueri
     ],
     maxBoundsViscosity: 1.0
 })
@@ -125,7 +125,8 @@ L.Icon.Default.mergeOptions({
     shadowUrl: ''
 })
 // Tile minimalista — sem poluição visual nas ruas
-L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+// Trocar o tile atual por esse
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png', {
     attribution: '© OpenStreetMap © CARTO'
 }).addTo(map)
 
