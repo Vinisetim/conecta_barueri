@@ -49,6 +49,27 @@ body {
     background: #f1f5f9;
     color: var(--dark-slate);
 }
+/* Pin wrapper */
+.pin-wrapper {
+    width: 44px;
+    height: 44px;
+    background: white;
+    border-radius: 50%;
+    border: 2px solid var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: var(--primary);
+    box-shadow: 0 4px 12px rgba(0, 82, 255, 0.25);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.pin-wrapper:hover {
+    transform: scale(1.15);
+    box-shadow: 0 6px 20px rgba(0, 82, 255, 0.4);
+}
 
 /* Popup flutua sobre o mapa no canto direito */
 .popup-flutuante {

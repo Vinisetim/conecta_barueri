@@ -6,7 +6,7 @@ main_bp = Blueprint('main', __name__)
 # Rota principal (carrega a HOME)
 @main_bp.route('/')
 def index():
-    return render_template('landing/index.html')
+    return render_template('apresentacao/apresentacao.html')
 
 # Rota alternativa (opcional)
 @main_bp.route('/home')
