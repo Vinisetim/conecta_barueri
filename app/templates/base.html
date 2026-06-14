@@ -5,7 +5,7 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{% block title %}Administração | Conecta Barueri{% endblock %}</title>
+    <title>{% block title %}Conecta Barueri{% endblock %}</title>
 
     <!-- Bootstrap -->
     <link
@@ -25,7 +25,7 @@
         rel="stylesheet"
     >
 
-    <!-- CSS Administração -->
+    <!-- CSS principal da sidebar/layout -->
     <link
         rel="stylesheet"
         href="{{ url_for('static', filename='css/sidebar.css') }}"
@@ -62,9 +62,10 @@
             <div class="menu-section-label">Principal</div>
 
             <nav class="sidebar-menu">
-                <a href="#" class="menu-link">
+
+                <a href="/home" class="menu-link">
                     <i class="bi bi-house-door"></i>
-                    <span>Placeholder 1</span>
+                    <span>Home</span>
                 </a>
 
                 <a href="#" class="menu-link">
@@ -86,6 +87,7 @@
                     <i class="bi bi-database"></i>
                     <span>Placeholder 5</span>
                 </a>
+
             </nav>
 
             <!-- MENU ADMIN -->
@@ -93,33 +95,33 @@
 
             <nav class="sidebar-menu admin-menu">
 
-                <a href="#" class="menu-link admin-parent active-parent">
+                <a href="/admin/visao-geral" class="menu-link admin-parent active-parent">
                     <i class="bi bi-shield-check"></i>
                     <span>Administrador</span>
                     <i class="bi bi-chevron-up admin-chevron"></i>
                 </a>
 
-                <a href="#" class="submenu-link active">
+                <a href="/admin/visao-geral" class="submenu-link active">
                     <span class="submenu-dot"></span>
                     <span>Visão geral</span>
                 </a>
 
-                <a href="#" class="submenu-link">
+                <a href="/admin/usuario" class="submenu-link">
                     <i class="bi bi-people"></i>
                     <span>Usuários</span>
                 </a>
 
-                <a href="#" class="submenu-link">
+                <a href="/admin/equipes" class="submenu-link">
                     <i class="bi bi-diagram-3"></i>
                     <span>Equipes</span>
                 </a>
 
-                <a href="#" class="submenu-link">
+                <a href="/admin/projetos" class="submenu-link">
                     <i class="bi bi-folder"></i>
                     <span>Projetos</span>
                 </a>
 
-                <a href="#" class="submenu-link">
+                <a href="/admin/fonte-de-dados" class="submenu-link">
                     <i class="bi bi-database"></i>
                     <span>Fontes de dados</span>
                 </a>
@@ -134,20 +136,10 @@
                     <span>Logs de requisições</span>
                 </a>
 
-                <a href="#" class="submenu-link">
-                    <i class="bi bi-key"></i>
-                    <span>Permissões</span>
-                </a>
-
-                <a href="#" class="submenu-link">
-                    <i class="bi bi-gear"></i>
-                    <span>Configurações</span>
-                </a>
-
             </nav>
 
             <div class="sidebar-bottom">
-                <a href="#" class="menu-link logout-link">
+                <a href="/login" class="menu-link logout-link">
                     <i class="bi bi-box-arrow-left"></i>
                     <span>Sair</span>
                 </a>
@@ -187,14 +179,16 @@
 
             </header>
 
-            <!-- CONTEÚDO -->
+            <!-- CONTEÚDO DAS PÁGINAS -->
             <main class="content">
                 {% block content %}{% endblock %}
             </main>
 
-            <!-- MESMO FOOTER DA HOME -->
+            <!-- FOOTER -->
             <footer class="home-page-footer">
+
                 <div class="footer-content">
+
                     <div>
                         <span class="footer-brand">
                             Conecta <span>Barueri</span>
@@ -206,6 +200,7 @@
                     </div>
 
                     <div class="footer-links">
+
                         <a href="#" class="footer-icon">
                             <i class="bi bi-github"></i>
                         </a>
@@ -213,8 +208,11 @@
                         <a href="#" class="footer-icon">
                             <i class="bi bi-envelope"></i>
                         </a>
+
                     </div>
+
                 </div>
+
             </footer>
 
         </div>

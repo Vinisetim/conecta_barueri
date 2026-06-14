@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Fontes de dados | Conecta Barueri{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/fontes.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="fontes-wrapper">
+
+    <!-- HEADER -->
+    <div class="fontes-header">
+        <div>
+            <h1>Fontes de dados</h1>
+            <p>Gerencie as fontes de dados conectadas</p>
+        </div>
+
+        <button class="btn-nova-fonte">
+            <i class="bi bi-plus-lg"></i>
+            Nova fonte
+        </button>
+    </div>
+
+    <!-- CARD -->
+    <div class="fontes-card">
+
+        <table class="fontes-table">
+
+            <thead>
+                <tr>
+                    <th>Fonte de dados</th>
+                    <th>Descrição</th>
+                    <th>Status</th>
+                    <th>Última sincronização</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr>
+                    <td><strong>SAFEM</strong></td>
+                    <td>Sistema Integrado de Administração Financeira</td>
+                    <td><span class="badge sucesso">Conectado</span></td>
+                    <td>24/05/2025 10:45</td>
+                    <td class="acoes"><i class="bi bi-three-dots-vertical"></i></td>
+                </tr>
+
+                <tr>
+                    <td><strong>Portal Transparência</strong></td>
+                    <td>Dados do Portal da Transparência</td>
+                    <td><span class="badge sucesso">Conectado</span></td>
+                    <td>24/05/2025 10:30</td>
+                    <td class="acoes"><i class="bi bi-three-dots-vertical"></i></td>
+                </tr>
+
+                <tr>
+                    <td><strong>Censo Escolar</strong></td>
+                    <td>Dados do Censo Escolar</td>
+                    <td><span class="badge erro">Erro</span></td>
+                    <td>24/05/2025 09:15</td>
+                    <td class="acoes"><i class="bi bi-three-dots-vertical"></i></td>
+                </tr>
+
+                <tr>
+                    <td><strong>GeoBarueri</strong></td>
+                    <td>Dados geoespaciais do município</td>
+                    <td><span class="badge sucesso">Conectado</span></td>
+                    <td>24/05/2025 07:40</td>
+                    <td class="acoes"><i class="bi bi-three-dots-vertical"></i></td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+        <!-- PAGINAÇÃO -->
+        <div class="fontes-footer">
+
+            <span>1-4 de 24</span>
+
+            <div class="pagination">
+                <button><i class="bi bi-chevron-left"></i></button>
+                <button class="active">1</button>
+                <button>2</button>
+                <button>3</button>
+                <button><i class="bi bi-chevron-right"></i></button>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

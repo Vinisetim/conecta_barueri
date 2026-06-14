@@ -1,6 +1,13 @@
-{% extends "home/base_home.html" %}
+{% extends "base.html" %}
 
 {% block title %}Home | Conecta Barueri{% endblock %}
+
+{% block extra_css %}
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/home/home.css') }}"
+>
+{% endblock %}
 
 {% block content %}
 
