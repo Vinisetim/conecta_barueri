@@ -520,3 +520,34 @@ body {
         align-items: flex-start;
     }
 }
+
+.admin-submenu {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.admin-submenu.open {
+    max-height: 300px;
+}
+
+/* Remove estilo de botão do toggle */
+.admin-parent {
+    width: 100%;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+}
+
+.admin-chevron {
+    margin-left: auto;
+    transition: transform 0.3s ease;
+}
+
+.admin-chevron.rotated {
+    transform: rotate(180deg);
+}

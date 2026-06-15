@@ -48,6 +48,12 @@ def create_app():
     from app.routes.admin import admin_bp
     app.register_blueprint(admin_bp)
 
+    from app.routes.apresentacao import apresentacao_bp
+    app.register_blueprint(apresentacao_bp)
+
+    from app.routes.indicadores import indicadores_bp
+    app.register_blueprint(indicadores_bp)
+
     return app
 
 

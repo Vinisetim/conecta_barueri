@@ -5,4 +5,4 @@ indicadores_bp = Blueprint('indicadores', __name__)
 @indicadores_bp.route('/indicadores')
 def indicadores():
     """Rota principal de apresentacao"""
-    return render_template('apresentacao/indicadores.html')
+    return "render_template em desenvolvimento"

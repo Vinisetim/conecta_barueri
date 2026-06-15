@@ -40,7 +40,7 @@
 
                 <a href="#" class="btn-outline-home">
                     <i class="bi bi-file-earmark-bar-graph"></i>
-                    Criar apresentação
+                    Iniciar apresentação
                 </a>
 
             </div>
@@ -73,7 +73,7 @@
 
         <div class="access-grid">
 
-            <a href="#" class="access-card">
+            <a href="{{ url_for('indicadores.indicadores') }}" class="access-card">
 
                 <div class="card-icon">
                     <i class="bi bi-graph-up-arrow"></i>
@@ -91,7 +91,7 @@
 
             </a>
 
-            <a href="#" class="access-card">
+            <a href="{{ url_for('admin.projetos') }}" class="access-card">
 
                 <div class="card-icon">
                     <i class="bi bi-folder2-open"></i>
@@ -109,7 +109,7 @@
 
             </a>
 
-            <a href="#" class="access-card">
+            <a href="{{ url_for('apresentacao.apresentacao') }}" class="access-card">
 
                 <div class="card-icon">
                     <i class="bi bi-display"></i>
