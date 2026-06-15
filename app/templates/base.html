@@ -67,25 +67,27 @@
                     <i class="bi bi-house-door"></i>
                     <span>Home</span>
                 </a>
+                
+                <a href="/apresentacao" class="menu-link">
+                    <i class="bi bi-display"></i>
+                    <span>Apresentação</span>
+                </a>
+
 
                 <a href="#" class="menu-link">
                     <i class="bi bi-graph-up-arrow"></i>
-                    <span>Placeholder 2</span>
+                    <span>Indicadores</span>
                 </a>
 
-                <a href="#" class="menu-link">
+                <a href="/admin/projetos" class="menu-link">
                     <i class="bi bi-folder2-open"></i>
-                    <span>Placeholder 3</span>
+                    <span>Projetos</span>
                 </a>
 
-                <a href="#" class="menu-link">
-                    <i class="bi bi-display"></i>
-                    <span>Placeholder 4</span>
-                </a>
 
                 <a href="#" class="menu-link">
                     <i class="bi bi-database"></i>
-                    <span>Placeholder 5</span>
+                    <span>Dados Abertos</span>
                 </a>
 
             </nav>
@@ -95,13 +97,13 @@
 
             <nav class="sidebar-menu admin-menu">
 
-                <a href="/admin/visao-geral" class="menu-link admin-parent active-parent">
+                <a href="/admin/visao-geral" class="menu-link admin-parent">
                     <i class="bi bi-shield-check"></i>
                     <span>Administrador</span>
                     <i class="bi bi-chevron-up admin-chevron"></i>
                 </a>
 
-                <a href="/admin/visao-geral" class="submenu-link active">
+                <a href="/admin/visao-geral" class="submenu-link">
                     <span class="submenu-dot"></span>
                     <span>Visão geral</span>
                 </a>
@@ -116,24 +118,9 @@
                     <span>Equipes</span>
                 </a>
 
-                <a href="/admin/projetos" class="submenu-link">
-                    <i class="bi bi-folder"></i>
-                    <span>Projetos</span>
-                </a>
-
                 <a href="/admin/fonte-de-dados" class="submenu-link">
                     <i class="bi bi-database"></i>
                     <span>Fontes de dados</span>
-                </a>
-
-                <a href="#" class="submenu-link">
-                    <i class="bi bi-arrow-repeat"></i>
-                    <span>Requisições</span>
-                </a>
-
-                <a href="#" class="submenu-link">
-                    <i class="bi bi-journal-text"></i>
-                    <span>Logs de requisições</span>
                 </a>
 
             </nav>
@@ -195,7 +182,7 @@
                         </span>
 
                         <p>
-                            © 2026 - Projeto Técnico Etec — Informática para Internet.
+                            © 2026 - Projeto Técnico Etec 
                         </p>
                     </div>
 
@@ -223,8 +210,26 @@
         const sidebar = document.getElementById("sidebar");
         const sidebarToggle = document.getElementById("sidebarToggle");
 
-        sidebarToggle.addEventListener("click", function () {
-            sidebar.classList.toggle("collapsed");
+        if (sidebar && sidebarToggle) {
+            sidebarToggle.addEventListener("click", function () {
+                sidebar.classList.toggle("collapsed");
+            });
+        }
+
+        const currentPath = window.location.pathname;
+        const sidebarLinks = document.querySelectorAll(".menu-link, .submenu-link");
+
+        sidebarLinks.forEach(function (link) {
+            const href = link.getAttribute("href");
+
+            if (href && href !== "#" && href === currentPath) {
+                link.classList.add("active");
+
+                const adminParent = document.querySelector(".admin-parent");
+                if (currentPath.startsWith("/admin") && adminParent) {
+                    adminParent.classList.add("active-parent");
+                }
+            }
         });
     </script>
 

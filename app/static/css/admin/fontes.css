@@ -1,11 +1,167 @@
+/* =========================================================
+   TELA: FONTES DE DADOS
+   CSS isolado da página.
+   Não altera sidebar, topbar, footer, main-area ou layout global.
+========================================================= */
+
 /* ==============================
-   FONTES DE DADOS
-   CSS isolado da tela.
-   Não-flex;   Não altera sidebar, topbar ou footer.
+   CONTAINER GERAL
+================================= */
+
+.fontes-page {
+    width: 100%;
+    max-width: 1320px;
+    margin: 0 auto;
+}
+
+/* ==============================
+   CABEÇALHO
+================================= */
+
+.fontes-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 34px;
+}
+
+.fontes-header h1 {
+    margin: 0 0 10px;
+    color: #07194f;
+    font-size: 2.35rem;
+    line-height: 1.1;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+}
+
+.fontes-header p {
+    margin: 0;
+    color: #667085;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+/* ==============================
+   BOTÃO NOVA FONTE
+================================= */
+
+.fontes-new-btn {
+    min-width: 170px;
+    height: 52px;
+    padding: 0 20px;
+
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 10px;
 
+    border: none;
+    border-radius: 8px;
+
+    background-color: #0d6efd;
+    color: #ffffff;
+    text-decoration: none;
+
+    font-size: 0.95rem;
+    font-weight: 800;
+
+    box-shadow: 0 14px 28px rgba(13, 110, 253, 0.2);
+    cursor: pointer;
+
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fontes-new-btn:hover {
+    background-color: #075bd8;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 18px 34px rgba(13, 110, 253, 0.28);
+}
+
+.fontes-new-btn i {
+    font-size: 1.15rem;
+}
+
+/* ==============================
+   CARD PRINCIPAL
+================================= */
+
+.fontes-card {
+    width: 100%;
+    background-color: #ffffff;
+    border: 1px solid #e6ebf5;
+    border-radius: 14px;
+    padding: 34px 32px 26px;
+    box-shadow: 0 14px 35px rgba(15, 23, 42, 0.045);
+}
+
+.fontes-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* ==============================
+   TABELA
+================================= */
+
+.fontes-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.fontes-table thead th {
+    padding: 0 0 24px;
+    color: #111c44;
+    font-size: 0.84rem;
+    font-weight: 800;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.fontes-table tbody tr {
+    border-top: 1px solid #e8edf5;
+}
+
+.fontes-table tbody td {
+    padding: 25px 0;
+    color: #26324f;
+    font-size: 0.94rem;
+    font-weight: 500;
+    vertical-align: middle;
+}
+
+.fontes-table tbody td:first-child strong {
+    color: #07194f;
+    font-weight: 800;
+}
+
+.fontes-table tbody td:nth-child(2) {
+    max-width: 380px;
+    line-height: 1.45;
+    color: #384563;
+}
+
+.fontes-table tbody td:nth-child(4) {
+    white-space: nowrap;
+}
+
+.fontes-table tbody td:last-child {
+    text-align: right;
+}
+
+/* ==============================
+   STATUS
+================================= */
+
+.fontes-status {
+    min-width: 104px;
+    height: 30px;
     padding: 0 14px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
     border-radius: 999px;
 
@@ -14,14 +170,18 @@
 }
 
 .fontes-status.success {
-    background: #dcfce7;
+    background-color: #dcfce7;
     color: #15803d;
 }
 
 .fontes-status.error {
-    background: #ffe4e6;
+    background-color: #ffe4e6;
     color: #dc3545;
 }
+
+/* ==============================
+   BOTÃO DE AÇÕES
+================================= */
 
 .fontes-action {
     width: 36px;
@@ -30,7 +190,7 @@
     border: none;
     border-radius: 10px;
 
-    background: transparent;
+    background-color: transparent;
     color: #1d2947;
 
     display: inline-flex;
@@ -38,12 +198,23 @@
     justify-content: center;
 
     cursor: pointer;
+
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.fontes-action i {
+    font-size: 1.25rem;
 }
 
 .fontes-action:hover {
-    background: #f2f6ff;
+    background-color: #f2f6ff;
     color: #0d6efd;
+    transform: translateY(-1px);
 }
+
+/* ==============================
+   PAGINAÇÃO
+================================= */
 
 .fontes-pagination {
     margin-top: 38px;
@@ -77,20 +248,27 @@
     color: #26324f;
     text-decoration: none;
 
+    font-size: 0.95rem;
     font-weight: 800;
+
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
 .fontes-pages a.active {
-    background: #eaf2ff;
+    background-color: #eaf2ff;
     color: #0d6efd;
 }
 
 .fontes-pages a:hover {
-    background: #f2f6ff;
+    background-color: #f2f6ff;
     color: #0d6efd;
+    transform: translateY(-1px);
 }
 
-/* Responsivo apenas da tela fontes */
+/* ==============================
+   RESPONSIVIDADE DA TELA
+   Não interfere na sidebar/nav.
+================================= */
 
 @media (max-width: 1100px) {
     .fontes-table {
@@ -101,6 +279,12 @@
 @media (max-width: 780px) {
     .fontes-header {
         flex-direction: column;
+        align-items: stretch;
+        margin-bottom: 28px;
+    }
+
+    .fontes-header h1 {
+        font-size: 2rem;
     }
 
     .fontes-new-btn {
@@ -123,124 +307,12 @@
     }
 }
 
-.fontes-page {
-    max-width: 1320px;
-    margin: 0 auto;
-}
+@media (max-width: 520px) {
+    .fontes-header h1 {
+        font-size: 1.75rem;
+    }
 
-.fontes-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 24px;
-
-    margin-bottom: 34px;
-}
-
-.fontes-header h1 {
-    margin: 0 0 10px;
-
-    font-size: 2.35rem;
-    line-height: 1.1;
-    font-weight: 800;
-    letter-spacing: -0.04em;
-
-    color: #07194f;
-}
-
-.fontes-header p {
-    margin: 0;
-
-    color: #667085;
-    font-size: 1rem;
-    font-weight: 500;
-}
-
-.fontes-new-btn {
-    min-width: 170px;
-    height: 52px;
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-
-    border-radius: 8px;
-
-    background: #0d6efd;
-    color: #ffffff;
-    text-decoration: none;
-
-    font-weight: 800;
-    font-size: 0.95rem;
-
-    box-shadow: 0 14px 28px rgba(13, 110, 253, 0.2);
-    transition: 0.2s ease;
-}
-
-.fontes-new-btn:hover {
-    background: #075bd8;
-    color: #ffffff;
-    transform: translateY(-2px);
-}
-
-.fontes-card {
-    background: #ffffff;
-
-    border: 1px solid #e6ebf5;
-    border-radius: 14px;
-
-    padding: 34px 32px 26px;
-
-    box-shadow: 0 14px 35px rgba(15, 23, 42, 0.045);
-}
-
-.fontes-table-wrap {
-    width: 100%;
-    overflow-x: auto;
-}
-
-.fontes-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.fontes-table thead th {
-    padding: 0 0 24px;
-
-    color: #111c44;
-    font-size: 0.84rem;
-    font-weight: 800;
-    text-align: left;
-    white-space: nowrap;
-}
-
-.fontes-table tbody tr {
-    border-top: 1px solid #e8edf5;
-}
-
-.fontes-table tbody td {
-    padding: 25px 0;
-
-    color: #26324f;
-    font-size: 0.94rem;
-    font-weight: 500;
-
-    vertical-align: middle;
-}
-
-.fontes-table tbody td:first-child strong {
-    color: #07194f;
-    font-weight: 800;
-}
-
-.fontes-table tbody td:nth-child(2) {
-    max-width: 360px;
-    line-height: 1.45;
-}
-
-.fontes-status {
-    min-width: 104px;
-    height: 30px;
-
+    .fontes-card {
+        border-radius: 10px;
+    }
 }

@@ -206,6 +206,7 @@ body {
 .main-area {
     width: 100%;
     min-width: 0;
+    margin: 0;
 
     display: flex;
     flex-direction: column;
