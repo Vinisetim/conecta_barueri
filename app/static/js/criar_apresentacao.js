@@ -1,0 +1,227 @@
+/* ══════════════════════════════════════
+   DADOS MOCKADOS
+   ══════════════════════════════════════ */
+const MONTHS = ['Jun','Jul','Ago','Set','Out','Nov','Dez','Jan','Fev','Mar','Abr','Mai'];
+const DATA12 = [6800,6500,7100,7400,7200,7800,7600,8100,8400,8700,9100,10300];
+const DATA6  = DATA12.slice(6);
+const DATA3  = DATA12.slice(9);
+
+const MODAL_DATA = {
+  'Parque dos Camargos': { total:'8.735', c1:'6.421', c2:'1.842', growth:'+12,5%', data: DATA12 },
+  'Alphaville':          { total:'3.210', c1:'2.450', c2:'560',   growth:'+7,3%',  data: [2400,2500,2700,2800,2900,3000,3100,3050,3100,3150,3180,3210] },
+  'Engenho Novo':        { total:'4.580', c1:'3.200', c2:'980',   growth:'+9,1%',  data: [3200,3400,3600,3700,3800,4000,4100,4200,4350,4400,4500,4580] },
+  'Centro':              { total:'5.120', c1:'3.900', c2:'820',   growth:'+5,4%',  data: [4400,4500,4600,4700,4750,4800,4850,4900,4980,5000,5080,5120] },
+  'Aldeia da Serra':     { total:'2.870', c1:'2.100', c2:'480',   growth:'+11,2%', data: [1800,1900,2000,2100,2200,2300,2450,2550,2650,2730,2800,2870] },
+  'Jardim Mutinga':      { total:'3.640', c1:'2.700', c2:'720',   growth:'+8,6%',  data: [2800,2900,3000,3100,3150,3200,3300,3400,3500,3550,3600,3640] },
+};
+
+/* ══════════════════════════════════════
+   GRÁFICO DE LINHA (painel principal)
+   ══════════════════════════════════════ */
+let lineChart;
+
+function buildLineChart(data, labels) {
+  const canvas = document.getElementById('lineChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (lineChart) lineChart.destroy();
+
+  lineChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data,
+        borderColor: '#0052ff',
+        backgroundColor: 'rgba(0,82,255,.08)',
+        borderWidth: 2.5,
+        pointRadius: 4,
+        pointBackgroundColor: '#0052ff',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        tension: 0.35,
+        fill: true,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return ' ' + context.parsed.y.toLocaleString('pt-BR') + ' atendimentos';
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { font: { size: 11, family: 'Inter' }, color: '#6c757d' }
+        },
+        y: {
+          grid: { color: '#f1f3f5' },
+          border: { display: false },
+          ticks: {
+            font: { size: 10, family: 'Inter' },
+            color: '#6c757d',
+            callback: function(v) {
+              return v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+// Inicializa o gráfico principal
+buildLineChart(DATA12, MONTHS);
+
+/* ══════════════════════════════════════
+   FILTROS E EVENTOS
+   ══════════════════════════════════════ */
+const periodSelect = document.getElementById('period-select');
+if (periodSelect) {
+  periodSelect.addEventListener('change', function() {
+    var p = parseInt(this.value);
+    var data   = p === 12 ? DATA12 : p === 6 ? DATA6 : DATA3;
+    var labels = p === 12 ? MONTHS : p === 6 ? MONTHS.slice(6) : MONTHS.slice(9);
+    buildLineChart(data, labels);
+  });
+}
+
+const selEscopo = document.getElementById('sel-escopo');
+if (selEscopo) {
+  selEscopo.addEventListener('change', function() {
+    var bairroGroup = document.getElementById('bairro-group');
+    if (bairroGroup) bairroGroup.style.display = this.value === 'bairro' ? '' : 'none';
+  });
+}
+
+const btnApply = document.getElementById('btn-apply-filters');
+if (btnApply) {
+  btnApply.addEventListener('click', function() {
+    var newData = DATA12.map(function(v) {
+      return Math.round(v * (0.85 + Math.random() * 0.3));
+    });
+    buildLineChart(newData, MONTHS);
+    var total = Math.floor(Math.random() * 8000) + 2000;
+    const bigNum = document.getElementById('big-num');
+    if (bigNum) bigNum.textContent = total.toLocaleString('pt-BR');
+  });
+}
+
+/* ══════════════════════════════════════
+   MODAL
+   ══════════════════════════════════════ */
+var modalChart;
+
+function openModal(bairro, modulo, bg, color) {
+  var d = MODAL_DATA[bairro] || MODAL_DATA['Parque dos Camargos'];
+
+  document.getElementById('modal-title').textContent  = bairro + ' — ' + modulo;
+  document.getElementById('modal-growth').textContent = d.growth + ' vs. período anterior';
+  document.getElementById('mk1').textContent = d.total;
+  document.getElementById('mk2').textContent = d.c1;
+  document.getElementById('mk3').textContent = d.c2;
+
+  document.getElementById('modal-overlay').classList.add('open');
+
+  setTimeout(function() {
+    var canvas = document.getElementById('modalChart');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    if (modalChart) modalChart.destroy();
+
+    modalChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: MONTHS,
+        datasets: [{
+          data: d.data,
+          backgroundColor: color + '99',
+          borderColor: color,
+          borderWidth: 1.5,
+          borderRadius: 5,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false }, ticks: { font: { size: 10 }, color: '#6c757d' } },
+          y: {
+            grid: { color: '#f1f3f5' },
+            border: { display: false },
+            ticks: {
+              font: { size: 10 },
+              color: '#6c757d',
+              callback: function(v) { return v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v; }
+            }
+          }
+        }
+      }
+    });
+  }, 50);
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+const modalOverlay = document.getElementById('modal-overlay');
+if (modalOverlay) {
+  modalOverlay.addEventListener('click', function(e) {
+    if (e.target.id === 'modal-overlay') closeModal();
+  });
+}
+
+/* ══════════════════════════════════════
+   CONFIGURAÇÃO DO MAPA (LEAFLET)
+   ══════════════════════════════════════ */
+const map = L.map('map', {
+    center: [-23.5030, -46.8750],
+    zoom: 14,
+    minZoom: 13,
+    maxZoom: 17,
+    zoomControl: false,
+    maxBounds: [
+        [-23.58, -46.95],
+        [-23.43, -46.78]
+    ],
+    maxBoundsViscosity: 1.0
+});
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap © CARTO'
+}).addTo(map);
+
+L.control.zoom({ position: 'bottomleft' }).addTo(map);
+
+// GEOJSON Barueri
+fetch('/static/data/barueri.geojson')
+    .then(response => response.json())
+    .then(data => {
+        const mundo = [[-90, -180], [-90, 180], [90, 180], [90, -180], [-90, -180]];
+        const barueri = data.features[0].geometry.coordinates[0];
+
+        L.polygon([mundo, barueri], {
+            color: 'none',
+            fillColor: '#0f172a',
+            fillOpacity: 0.55
+        }).addTo(map);
+
+        L.geoJSON(data, {
+            style: {
+                color: '#0052ff',
+                weight: 2.5,
+                fillColor: '#4d82ff',
+                fillOpacity: 0.25
+            }
+        }).addTo(map);
+    })
+    .catch(err => console.error("Erro ao carregar o GeoJSON do mapa:", err));

@@ -1,0 +1,216 @@
+{% extends "admin/base_admin.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/apresentacao/criar_apresentacao.css') }}">
+{% endblock %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+{% block title %}Administrador | Conecta Barueri{% endblock %}
+
+{% block content %}
+
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1>Mapas</h1>
+      <p>Explore os indicadores da cidade de Barueri por módulo e região.</p>
+    </div>
+    <div class="topbar-right">
+      <button class="btn-save-icon"><i class="bi bi-bookmark"></i> Salvar como ícone</button>
+      <button class="btn-add-apres"><i class="bi bi-plus-lg"></i> Adicionar à apresentação</button>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+<div class="filter-bar">
+    <div class="filter-group">
+      <label>Módulo</label>
+      <select class="filter-select" id="sel-modulo">
+        <option value="saude">♥ Saúde</option>
+        <option value="seguranca">🛡 Segurança</option>
+        <option value="educacao">🎓 Educação</option>
+        <option value="mobilidade">🚌 Mobilidade</option>
+        <option value="meio-ambiente">🌿 Meio Ambiente</option>
+        <option value="social">👥 Assistência Social</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Escopo</label>
+      <select class="filter-select" id="sel-escopo">
+        <option value="bairro">Bairro específico</option>
+        <option value="cidade">Barueri inteira</option>
+      </select>
+    </div>
+    <div class="filter-group" id="bairro-group">
+      <label>Selecione o bairro</label>
+      <select class="filter-select" id="sel-bairro">
+        <option>Parque dos Camargos</option>
+        <option>Alphaville</option>
+        <option>Engenho Novo</option>
+        <option>Jardim Silveira</option>
+        <option>Jardim Mutinga</option>
+        <option>Parque Viana</option>
+        <option>Centro</option>
+        <option>Aldeia da Serra</option>
+        <option>Tamboré</option>
+      </select>
+    </div>
+    <button class="btn-apply" id="btn-apply-filters"><i class="bi bi-funnel"></i> Aplicar filtros</button>
+  </div>
+    </div>
+
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- MAP + CHART -->
+    <div class="map-chart-grid">
+        <div id="map"></div>
+      </div>
+      <!-- CHART PANEL -->
+      <div class="card-panel" style="display:flex;flex-direction:column;">
+        <div class="chart-header">
+          <div>
+            <div class="chart-module-tag">Saúde <span>•</span> Parque dos Camargos</div>
+            <div style="margin-top:4px"><span class="live-dot"></span><span class="live-label">Dados atualizados em 24/05/2025 10:45</span></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <select class="date-select" id="period-select" onchange="updateChart()">
+              <option value="12">Últimos 12 meses</option>
+              <option value="6">Últimos 6 meses</option>
+              <option value="3">Últimos 3 meses</option>
+            </select>
+            <button style="background:none;border:none;color:var(--gray-400);font-size:18px;cursor:pointer;padding:2px;">⋮</button>
+          </div>
+        </div>
+
+        <div class="big-number" id="big-num">8.735</div>
+        <div class="big-label">atendimentos</div>
+        <div class="growth-tag" id="growth-tag"><i class="bi bi-arrow-up-short"></i> 12,5% <span>vs. período anterior</span></div>
+
+        <div class="chart-wrap">
+          <canvas id="lineChart"></canvas>
+        </div>
+
+        <div class="kpi-row">
+          <div class="kpi-card">
+            <div class="kpi-icon-wrap" style="background:#eff6ff;color:#2563eb"><i class="bi bi-stethoscope"></i></div>
+            <div class="kpi-body">
+              <small>Consultas</small>
+              <strong>6.421</strong>
+              <span class="kpi-growth">↑ 10,2% <span>vs. período anterior</span></span>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon-wrap" style="background:#f0fdf4;color:#16a34a"><i class="bi bi-clipboard2-pulse"></i></div>
+            <div class="kpi-body">
+              <small>Exames</small>
+              <strong>1.842</strong>
+              <span class="kpi-growth">↑ 14,8% <span>vs. período anterior</span></span>
+            </div>
+          </div>
+          <div class="kpi-card" style="border-right:none">
+            <div class="kpi-icon-wrap" style="background:#fef3c7;color:#d97706"><i class="bi bi-journal-medical"></i></div>
+            <div class="kpi-body">
+              <small>Procedimentos</small>
+              <strong>472</strong>
+              <span class="kpi-growth">↑ 8,7% <span>vs. período anterior</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SAVED ICONS -->
+    <div class="saved-section">
+      <div class="saved-header">
+        <div>
+          <h3>Ícones salvos para apresentações</h3>
+          <p>Use esses ícones em suas apresentações. Ao clicar durante a apresentação, o gráfico da região será exibido.</p>
+        </div>
+      </div>
+
+      <div class="icons-grid">
+        <!-- card 1 — active -->
+        <div class="saved-icon-card active-card" onclick="openModal('Parque dos Camargos','Saúde','#eff6ff','#2563eb','bi-heart-pulse')">
+          <button class="card-menu-btn">⋮</button>
+          <div class="icon-bubble" style="background:#eff6ff;color:#2563eb"><i class="bi bi-heart-pulse"></i></div>
+          <span class="ic-name">Parque dos Camargos</span>
+          <span class="ic-module">Saúde</span>
+        </div>
+        <div class="saved-icon-card" onclick="openModal('Alphaville','Segurança','#f0fdf4','#16a34a','bi-shield-check')">
+          <div class="icon-bubble" style="background:#f0fdf4;color:#16a34a"><i class="bi bi-shield-check"></i></div>
+          <span class="ic-name">Alphaville</span>
+          <span class="ic-module">Segurança</span>
+        </div>
+        <div class="saved-icon-card" onclick="openModal('Engenho Novo','Educação','#faf5ff','#7c3aed','bi-mortarboard')">
+          <div class="icon-bubble" style="background:#faf5ff;color:#7c3aed"><i class="bi bi-mortarboard"></i></div>
+          <span class="ic-name">Engenho Novo</span>
+          <span class="ic-module">Educação</span>
+        </div>
+        <div class="saved-icon-card" onclick="openModal('Centro','Mobilidade','#fef3c7','#d97706','bi-bus-front')">
+          <div class="icon-bubble" style="background:#fef3c7;color:#d97706"><i class="bi bi-bus-front"></i></div>
+          <span class="ic-name">Centro</span>
+          <span class="ic-module">Mobilidade</span>
+        </div>
+        <div class="saved-icon-card" onclick="openModal('Aldeia da Serra','Meio Ambiente','#f0fdf4','#15803d','bi-tree')">
+          <div class="icon-bubble" style="background:#f0fdf4;color:#15803d"><i class="bi bi-tree"></i></div>
+          <span class="ic-name">Aldeia da Serra</span>
+          <span class="ic-module">Meio Ambiente</span>
+        </div>
+        <div class="saved-icon-card" onclick="openModal('Jardim Mutinga','Assist. Social','#fff1f2','#e11d48','bi-people')">
+          <div class="icon-bubble" style="background:#fff1f2;color:#e11d48"><i class="bi bi-people"></i></div>
+          <span class="ic-name">Jardim Mutinga</span>
+          <span class="ic-module">Assistência Social</span>
+        </div>
+        <!-- new -->
+        <div class="saved-icon-card new-card">
+          <div class="icon-bubble" style="background:var(--gray-100);color:var(--gray-400)"><i class="bi bi-plus-lg"></i></div>
+          <span class="ic-name" style="color:var(--gray-600)">Novo ícone</span>
+          <span class="ic-module">Criar</span>
+        </div>
+      </div>
+
+      <div class="hint-bar">
+        <i class="bi bi-lightbulb" style="color:var(--primary)"></i>
+        Dica: arraste os ícones para organizar a ordem em que aparecem nas apresentações.
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h5 id="modal-title">Parque dos Camargos — Saúde</h5>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-tag"><i class="bi bi-arrow-up-short"></i> <span id="modal-growth">+12,5% vs. período anterior</span></div>
+      <div class="modal-kpi-row">
+        <div class="modal-kpi"><small>Total</small><strong id="mk1">8.735</strong></div>
+        <div class="modal-kpi"><small>Consultas</small><strong id="mk2">6.421</strong></div>
+        <div class="modal-kpi"><small>Exames</small><strong id="mk3">1.842</strong></div>
+      </div>
+      <div class="modal-chart-wrap"><canvas id="modalChart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='js/criar_apresentacao.js') }}"></script>
+
+{% endblock %}
+
+
+
+
+
+
