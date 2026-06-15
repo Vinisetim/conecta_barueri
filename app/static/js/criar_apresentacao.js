@@ -80,9 +80,11 @@ function buildLineChart(data, labels) {
 // Inicializa o gráfico principal
 buildLineChart(DATA12, MONTHS);
 
+
 /* ══════════════════════════════════════
-   FILTROS E EVENTOS
+   FILTROS E EVENTOS (ATUALIZADO)
    ══════════════════════════════════════ */
+
 const periodSelect = document.getElementById('period-select');
 if (periodSelect) {
   periodSelect.addEventListener('change', function() {
@@ -104,13 +106,48 @@ if (selEscopo) {
 const btnApply = document.getElementById('btn-apply-filters');
 if (btnApply) {
   btnApply.addEventListener('click', function() {
-    var newData = DATA12.map(function(v) {
-      return Math.round(v * (0.85 + Math.random() * 0.3));
-    });
-    buildLineChart(newData, MONTHS);
-    var total = Math.floor(Math.random() * 8000) + 2000;
+    // 1. Captura os elementos dos filtros
+    const selModulo = document.getElementById('sel-modulo');
+    const selEscopo = document.getElementById('sel-escopo');
+    const selBairro = document.getElementById('sel-bairro');
+
+    // 2. Elementos que vamos atualizar no topo do gráfico
+    const chartTag = document.querySelector('.chart-module-tag');
     const bigNum = document.getElementById('big-num');
-    if (bigNum) bigNum.textContent = total.toLocaleString('pt-BR');
+
+    // Pegar o texto do Módulo formatado bonitinho (removendo o emoji se preferir, ou deixando completo)
+    let moduloTexto = selModulo.options[selModulo.selectedIndex].text;
+    let escopoTexto = "";
+    let dadosBairro = null;
+
+    if (selEscopo.value === 'bairro') {
+      escopoTexto = selBairro.value;
+      // Busca os dados mockados reais desse bairro específico na sua tabela MODAL_DATA
+      dadosBairro = MODAL_DATA[escopoTexto];
+    } else {
+      escopoTexto = "Barueri inteira";
+    }
+
+    // 3. Atualiza dinamicamente o texto da tag do gráfico!
+    if (chartTag) {
+      chartTag.innerHTML = `${moduloTexto} <span>•</span> ${escopoTexto}`;
+    }
+
+    // 4. Atualiza os dados do gráfico baseado no bairro escolhido
+    if (dadosBairro) {
+      // Se achou o bairro no banco simulado, renderiza os dados dele
+      buildLineChart(dadosBairro.data, MONTHS);
+      if (bigNum) bigNum.textContent = dadosBairro.total;
+    } else {
+      // Caso seja "Barueri inteira" ou um escopo geral, gera o cálculo randômico padrão
+      var newData = DATA12.map(function(v) {
+        return Math.round(v * (0.85 + Math.random() * 0.3));
+      });
+      buildLineChart(newData, MONTHS);
+
+      var totalAleatorio = Math.floor(Math.random() * 20000) + 15000;
+      if (bigNum) bigNum.textContent = totalAleatorio.toLocaleString('pt-BR');
+    }
   });
 }
 
@@ -183,6 +220,9 @@ if (modalOverlay) {
 /* ══════════════════════════════════════
    CONFIGURAÇÃO DO MAPA (LEAFLET)
    ══════════════════════════════════════ */
+
+
+
 const map = L.map('map', {
     center: [-23.5030, -46.8750],
     zoom: 14,
@@ -195,6 +235,23 @@ const map = L.map('map', {
     ],
     maxBoundsViscosity: 1.0
 });
+
+
+const layer=L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png', {
+   maxZoom: 20
+})
+
+
+layer.addTo(map);
+/* ══════════════════════════════════════
+   CORREÇÃO DO MAPA APAGADO/CINZA
+   ══════════════════════════════════════ */
+// Executa imediatamente e repete após o carregamento total da janela
+// function forcarRenderizacaoMapa() {
+//     map.invalidateSize();
+// }
+
+
 
 L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png', {
     attribution: '© OpenStreetMap © CARTO'
@@ -225,3 +282,4 @@ fetch('/static/data/barueri.geojson')
         }).addTo(map);
     })
     .catch(err => console.error("Erro ao carregar o GeoJSON do mapa:", err));
+

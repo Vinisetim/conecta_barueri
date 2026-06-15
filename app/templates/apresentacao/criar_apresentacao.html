@@ -2,30 +2,26 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/apresentacao/criar_apresentacao.css') }}">
+ <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
 {% endblock %}
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-
-{% block title %}Administrador | Conecta Barueri{% endblock %}
 
 {% block content %}
 
-<div class="main">
-
-  <!-- TOPBAR -->
   <div class="topbar">
     <div class="topbar-left">
       <h1>Mapas</h1>
       <p>Explore os indicadores da cidade de Barueri por módulo e região.</p>
     </div>
-    <div class="topbar-right">
-      <button class="btn-save-icon"><i class="bi bi-bookmark"></i> Salvar como ícone</button>
-      <button class="btn-add-apres"><i class="bi bi-plus-lg"></i> Adicionar à apresentação</button>
-    </div>
   </div>
 
-  <!-- FILTER BAR -->
-<div class="filter-bar">
+
+<div class="main">
+
+
+
+  <div class="filter-bar">
     <div class="filter-group">
       <label>Módulo</label>
       <select class="filter-select" id="sel-modulo">
@@ -60,19 +56,21 @@
     </div>
     <button class="btn-apply" id="btn-apply-filters"><i class="bi bi-funnel"></i> Aplicar filtros</button>
   </div>
-    </div>
 
 
-  <!-- CONTENT -->
   <div class="content">
 
-    <!-- MAP + CHART -->
     <div class="map-chart-grid">
+
+      <div class="card-panel-mapa">
+        <div class="card-panel-header">
+          <span class="card-panel-title">Mapa de atendimentos <i class="bi bi-info-circle" title="Intensidade de atendimentos por região"></i></span>
+        </div>
         <div id="map"></div>
       </div>
-      <!-- CHART PANEL -->
-      <div class="card-panel" style="display:flex;flex-direction:column;">
-        <div class="chart-header">
+
+      <div class="card-panel" style="display:flex; flex-direction:column; justify-content: space-between;">
+        <div class="chart-header" style="padding:0; margin-bottom:10px;">
           <div>
             <div class="chart-module-tag">Saúde <span>•</span> Parque dos Camargos</div>
             <div style="margin-top:4px"><span class="live-dot"></span><span class="live-label">Dados atualizados em 24/05/2025 10:45</span></div>
@@ -87,45 +85,19 @@
           </div>
         </div>
 
-        <div class="big-number" id="big-num">8.735</div>
-        <div class="big-label">atendimentos</div>
-        <div class="growth-tag" id="growth-tag"><i class="bi bi-arrow-up-short"></i> 12,5% <span>vs. período anterior</span></div>
+        <div style="flex: 1; display:flex; flex-direction:column; justify-content:center;">
+          <div class="big-number" style="padding:0;" id="big-num">8.735</div>
+          <div class="big-label" style="padding:0;">atendimentos</div>
+          <div class="growth-tag" style="padding:0; margin-top:4px;" id="growth-tag"><i class="bi bi-arrow-up-short"></i> 12,5% <span>vs. período anterior</span></div>
 
-        <div class="chart-wrap">
-          <canvas id="lineChart"></canvas>
+          <div class="chart-wrap" style="padding:10px 0; height:180px;">
+            <canvas id="lineChart"></canvas>
+          </div>
         </div>
 
-        <div class="kpi-row">
-          <div class="kpi-card">
-            <div class="kpi-icon-wrap" style="background:#eff6ff;color:#2563eb"><i class="bi bi-stethoscope"></i></div>
-            <div class="kpi-body">
-              <small>Consultas</small>
-              <strong>6.421</strong>
-              <span class="kpi-growth">↑ 10,2% <span>vs. período anterior</span></span>
-            </div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-icon-wrap" style="background:#f0fdf4;color:#16a34a"><i class="bi bi-clipboard2-pulse"></i></div>
-            <div class="kpi-body">
-              <small>Exames</small>
-              <strong>1.842</strong>
-              <span class="kpi-growth">↑ 14,8% <span>vs. período anterior</span></span>
-            </div>
-          </div>
-          <div class="kpi-card" style="border-right:none">
-            <div class="kpi-icon-wrap" style="background:#fef3c7;color:#d97706"><i class="bi bi-journal-medical"></i></div>
-            <div class="kpi-body">
-              <small>Procedimentos</small>
-              <strong>472</strong>
-              <span class="kpi-growth">↑ 8,7% <span>vs. período anterior</span></span>
-            </div>
-          </div>
-        </div>
       </div>
-    </div>
 
-    <!-- SAVED ICONS -->
-    <div class="saved-section">
+    </div> <div class="saved-section">
       <div class="saved-header">
         <div>
           <h3>Ícones salvos para apresentações</h3>
@@ -134,7 +106,6 @@
       </div>
 
       <div class="icons-grid">
-        <!-- card 1 — active -->
         <div class="saved-icon-card active-card" onclick="openModal('Parque dos Camargos','Saúde','#eff6ff','#2563eb','bi-heart-pulse')">
           <button class="card-menu-btn">⋮</button>
           <div class="icon-bubble" style="background:#eff6ff;color:#2563eb"><i class="bi bi-heart-pulse"></i></div>
@@ -166,10 +137,9 @@
           <span class="ic-name">Jardim Mutinga</span>
           <span class="ic-module">Assistência Social</span>
         </div>
-        <!-- new -->
         <div class="saved-icon-card new-card">
           <div class="icon-bubble" style="background:var(--gray-100);color:var(--gray-400)"><i class="bi bi-plus-lg"></i></div>
-          <span class="ic-name" style="color:var(--gray-600)">Novo ícone</span>
+          <span class="ic-name" style="color:var(--gray-600)">Adicionar a apresentação</span>
           <span class="ic-module">Criar</span>
         </div>
       </div>
@@ -180,11 +150,7 @@
       </div>
     </div>
 
-  </div><!-- /content -->
-</div><!-- /main -->
-
-<!-- MODAL -->
-<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+  </div></div><div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
   <div class="modal-box">
     <div class="modal-header">
       <h5 id="modal-title">Parque dos Camargos — Saúde</h5>
@@ -202,15 +168,9 @@
   </div>
 </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="{{ url_for('static', filename='js/criar_apresentacao.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/criar_apresentacao.js') }}"></script>
 
 {% endblock %}
-
-
-
-
-
-
