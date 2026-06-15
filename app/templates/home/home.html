@@ -33,12 +33,12 @@
 
             <div class="hero-actions">
 
-                <a href="#" class="btn-primary-home">
+                <a href="{{ url_for('indicadores.indicadores') }}" class="btn-primary-home">
                     <i class="bi bi-bar-chart-line"></i>
                     Explorar indicadores
                 </a>
 
-                <a href="#" class="btn-outline-home">
+                <a href="{{ url_for('apresentacao.apresentacao') }}" class="btn-outline-home">
                     <i class="bi bi-file-earmark-bar-graph"></i>
                     Iniciar apresentação
                 </a>
@@ -91,7 +91,7 @@
 
             </a>
 
-            <a href="{{ url_for('admin.projetos') }}" class="access-card">
+            <a href="{{ url_for('projetos.projetos') }}" class="access-card">
 
                 <div class="card-icon">
                     <i class="bi bi-folder2-open"></i>

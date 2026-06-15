@@ -34,7 +34,7 @@
                 </div>
             </div>
 
-            <a href="/usuario" class="stat-link">
+            <a href="{{ url_for('admin.usuario') }}" class="stat-link">
                 Gerenciar
                 <i class="bi bi-arrow-right"></i>
             </a>
@@ -48,12 +48,12 @@
 
                 <div>
                     <span>Equipes</span>
-                    <strong>12</strong>
+                    <strong>1</strong>
                     <small>Ativas</small>
                 </div>
             </div>
 
-            <a href="#" class="stat-link">
+            <a href="{{ url_for('admin.equipes') }}" class="stat-link">
                 Gerenciar
                 <i class="bi bi-arrow-right"></i>
             </a>
@@ -72,7 +72,7 @@
                 </div>
             </div>
 
-            <a href="#" class="stat-link">
+            <a href="{{ url_for('projetos.projetos') }}" class="stat-link">
                 Gerenciar
                 <i class="bi bi-arrow-right"></i>
             </a>
@@ -91,7 +91,7 @@
                 </div>
             </div>
 
-            <a href="#" class="stat-link">
+            <a href="{{ url_for('admin.fonte_dados') }}" class="stat-link">
                 Ver detalhes
                 <i class="bi bi-arrow-right"></i>
             </a>
@@ -162,7 +162,7 @@
 
                 </div>
 
-                <a href="#" class="admin-primary-button">
+                <a href="{{ url_for('admin.equipes') }}" class="admin-primary-button">
                     Gerenciar
                     <i class="bi bi-arrow-right"></i>
                 </a>
@@ -230,7 +230,7 @@
 
                 </div>
 
-                <a href="#" class="admin-outline-button">
+                <a href="{{ url_for('admin.fonte_dados') }}" class="admin-outline-button">
                     Ver detalhes
                     <i class="bi bi-arrow-right"></i>
                 </a>
