@@ -129,7 +129,7 @@ Iniciar Apresentação | Conecta Barueri
                             Atualizado em 24/05/2025 10:45
                         </small>
 
-                        <a href="#">
+                        <a href="{{ url_for('projetos.projetos') }}">
 
                             Ver projeto
 
@@ -150,7 +150,7 @@ Iniciar Apresentação | Conecta Barueri
 
                     <h2>Outros projetos</h2>
 
-                    <a href="#">
+                    <a href="{{ url_for('projetos.projetos') }}">
                         Ver todos os projetos
                     </a>
 
@@ -242,9 +242,11 @@ Iniciar Apresentação | Conecta Barueri
                     type="button"
                 >
 
-                    <i class="bi bi-play-fill"></i>
+                <i class="bi bi-play-fill">   <a  class = "apresentar" href="{{ url_for('apresentacao.apresentacao') }}" >
+                        Iniciar apresentação
+                    </a></i>
 
-                    Iniciar apresentação
+
 
                 </button>
 
@@ -256,8 +258,13 @@ Iniciar Apresentação | Conecta Barueri
                 >
 
                     <i class="bi bi-grid"></i>
+                        <a href="{{ url_for('indicadores.indicadores') }}">
 
-                    Revisar indicadores
+                             Revisar indicadores
+                            <i class="bi bi-arrow-right"></i>
+
+                        </a>
+
 
                 </button>
 
