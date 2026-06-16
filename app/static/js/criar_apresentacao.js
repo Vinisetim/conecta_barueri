@@ -152,6 +152,62 @@ if (btnApply) {
 }
 
 /* ══════════════════════════════════════
+   LOGICA PARA SALVAR NOVO ÍCONE
+   ══════════════════════════════════════ */
+
+// 1. Mapeamento de estilos por módulo (para o ícone saber qual cor e desenho usar)
+const estilosModulo = {
+    'saude': { icon: 'bi-heart-pulse', color: '#2563eb', bg: '#eff6ff', label: 'Saúde' },
+    'seguranca': { icon: 'bi-shield-check', color: '#16a34a', bg: '#f0fdf4', label: 'Segurança' },
+    'educacao': { icon: 'bi-mortarboard', color: '#7c3aed', bg: '#faf5ff', label: 'Educação' },
+    'mobilidade': { icon: 'bi-bus-front', color: '#d97706', bg: '#fef3c7', label: 'Mobilidade' },
+    'meio-ambiente': { icon: 'bi-tree', color: '#15803d', bg: '#f0fdf4', label: 'Meio Ambiente' },
+    'social': { icon: 'bi-people', color: '#e11d48', bg: '#fff1f2', label: 'Assistência Social' }
+};
+
+// 2. Seleciona o botão de salvar (o da Topbar)
+const btnSaveIcon = document.querySelector('.btn-save-icon');
+
+if (btnSaveIcon) {
+    btnSaveIcon.addEventListener('click', function() {
+        // Captura os valores atuais dos selects
+        const moduloVal = document.getElementById('sel-modulo').value;
+        const escopoVal = document.getElementById('sel-escopo').value;
+        const bairroVal = document.getElementById('sel-bairro').value;
+
+        // Define o nome que aparecerá no card
+        const nomeRegiao = (escopoVal === 'cidade') ? 'Barueri (Geral)' : bairroVal;
+        const estilo = estilosModulo[moduloVal];
+
+        // Criar o HTML do novo Card
+        const novoCardHTML = `
+            <div class="saved-icon-card" 
+                 onclick="openModal('${nomeRegiao}', '${estilo.label}', '${estilo.bg}', '${estilo.color}')">
+                <button class="card-menu-btn">⋮</button>
+                <div class="icon-bubble" style="background:${estilo.bg}; color:${estilo.color}">
+                    <i class="bi ${estilo.icon}"></i>
+                </div>
+                <span class="ic-name">${nomeRegiao}</span>
+                <span class="ic-module">${estilo.label}</span>
+            </div>
+        `;
+
+        // Seleciona a grade de ícones
+        const iconsGrid = document.querySelector('.icons-grid');
+        const newCardPlaceholder = document.querySelector('.new-card');
+
+        // Insere o novo card antes do botão de "Novo ícone"
+        if (iconsGrid && newCardPlaceholder) {
+            newCardPlaceholder.insertAdjacentHTML('beforebegin', novoCardHTML);
+
+            // Feedback visual opcional
+            alert(`Ícone de ${nomeRegiao} salvo com sucesso!`);
+        }
+    });
+}
+
+
+/* ══════════════════════════════════════
    MODAL
    ══════════════════════════════════════ */
 var modalChart;
@@ -253,11 +309,8 @@ layer.addTo(map);
 
 
 
-L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png', {
-    attribution: '© OpenStreetMap © CARTO'
-}).addTo(map);
 
-L.control.zoom({ position: 'bottomleft' }).addTo(map);
+
 
 // GEOJSON Barueri
 fetch('/static/data/barueri.geojson')
