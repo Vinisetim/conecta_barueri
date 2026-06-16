@@ -56,6 +56,9 @@ def create_app():
 
     from app.routes.projetos import projetos_bp
     app.register_blueprint(projetos_bp)
+    
+    from app.routes.dados_abertos import dados_abertos_bp
+    app.register_blueprint(dados_abertos_bp)
 
     return app
 
