@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+
+{% block title %}
+Iniciar Apresentação | Conecta Barueri
+{% endblock %}
+
+{% block extra_css %}
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/apresentacao/iniciar_apresentacao.css') }}"
+>
+{% endblock %}
+
+{% block content %}
+
+<section class="ap-page">
+
+    <!-- HEADER -->
+    <header class="ap-header">
+
+        <div>
+            <h1>Apresentação Executiva – Indicadores Municipais</h1>
+
+            <p>
+                Revise as informações e inicie sua apresentação.
+            </p>
+        </div>
+
+    </header>
+
+    <!-- GRID -->
+    <section class="ap-grid">
+
+        <!-- LEFT -->
+        <div class="ap-left">
+
+            <!-- INDICADORES -->
+            <section class="ap-card">
+
+                <h2>Indicadores Ativos (5)</h2>
+
+                <div class="ap-indicators">
+
+                    <article class="ap-indicator">
+
+                        <div class="ap-icon blue">
+                            <i class="bi bi-heart-pulse"></i>
+                        </div>
+
+                        <span>Saúde</span>
+
+                    </article>
+
+                    <article class="ap-indicator">
+
+                        <div class="ap-icon purple">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+
+                        <span>Segurança</span>
+
+                    </article>
+
+                    <article class="ap-indicator">
+
+                        <div class="ap-icon green">
+                            <i class="bi bi-mortarboard"></i>
+                        </div>
+
+                        <span>Educação</span>
+
+                    </article>
+
+                    <article class="ap-indicator">
+
+                        <div class="ap-icon orange">
+                            <i class="bi bi-bus-front"></i>
+                        </div>
+
+                        <span>Mobilidade</span>
+
+                    </article>
+
+                    <article class="ap-indicator">
+
+                        <div class="ap-icon pink">
+                            <i class="bi bi-people"></i>
+                        </div>
+
+                        <span>Assistência Social</span>
+
+                    </article>
+
+                </div>
+
+            </section>
+
+            <!-- PROJETO -->
+            <section class="ap-card">
+
+                <div class="ap-section-header">
+
+                    <h2>Projeto selecionado</h2>
+
+                    <button type="button">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+
+                </div>
+
+                <article class="ap-project">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1506744038136-46273834b3fb"
+                        alt="Projeto"
+                    >
+
+                    <div class="ap-project-info">
+
+                        <h3>Parque dos Camargos</h3>
+
+                        <p>
+                            Acompanhe indicadores e atendimentos
+                            da região do Parque dos Camargos.
+                        </p>
+
+                        <small>
+                            <i class="bi bi-circle-fill"></i>
+                            Atualizado em 24/05/2025 10:45
+                        </small>
+
+                        <a href="#">
+
+                            Ver projeto
+
+                            <i class="bi bi-arrow-right"></i>
+
+                        </a>
+
+                    </div>
+
+                </article>
+
+            </section>
+
+            <!-- OUTROS PROJETOS -->
+            <section class="ap-card">
+
+                <div class="ap-section-header">
+
+                    <h2>Outros projetos</h2>
+
+                    <a href="#">
+                        Ver todos os projetos
+                    </a>
+
+                </div>
+
+                <div class="ap-other-projects">
+
+                    <article class="ap-mini-project">
+
+                        <img
+                            src="https://images.unsplash.com/photo-1506744038136-46273834b3fb"
+                            alt="Projeto"
+                        >
+
+                        <div>
+
+                            <strong>Alphaville</strong>
+
+                            <p>
+                                Acompanhe indicadores da região.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+                    <article class="ap-mini-project">
+
+                        <img
+                            src="https://images.unsplash.com/photo-1494526585095-c41746248156"
+                            alt="Projeto"
+                        >
+
+                        <div>
+
+                            <strong>Centro</strong>
+
+                            <p>
+                                Acompanhe indicadores centrais.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+                    <article class="ap-mini-project">
+
+                        <img
+                            src="https://images.unsplash.com/photo-1469474968028-56623f02e42e"
+                            alt="Projeto"
+                        >
+
+                        <div>
+
+                            <strong>Aldeia da Serra</strong>
+
+                            <p>
+                                Indicadores da região.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+                </div>
+
+            </section>
+
+        </div>
+
+        <!-- RIGHT -->
+        <aside class="ap-right">
+
+            <section class="ap-start-card">
+
+                <div class="ap-illustration">
+                    <i class="bi bi-bar-chart"></i>
+                </div>
+
+                <h2>Pronto para apresentar?</h2>
+
+                <p>
+                    Confira os indicadores ativos e o projeto
+                    selecionado.
+                </p>
+
+                <button
+                    class="ap-primary-btn"
+                    type="button"
+                >
+
+                    <i class="bi bi-play-fill"></i>
+
+                    Iniciar apresentação
+
+                </button>
+
+                <span>ou</span>
+
+                <button
+                    class="ap-secondary-btn"
+                    type="button"
+                >
+
+                    <i class="bi bi-grid"></i>
+
+                    Revisar indicadores
+
+                </button>
+
+                <small>
+                    Edite os indicadores, ordem e conteúdos.
+                </small>
+
+            </section>
+
+        </aside>
+
+    </section>
+
+</section>
+
+{% endblock %}

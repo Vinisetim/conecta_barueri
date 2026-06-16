@@ -1,0 +1,422 @@
+/* =========================================================
+   INICIAR APRESENTAÇÃO
+========================================================= */
+
+.ap-page {
+    width: 100%;
+    max-width: 1500px;
+    margin: 0 auto;
+}
+
+/* ==============================
+   HEADER
+================================= */
+
+.ap-header {
+    margin-bottom: 26px;
+}
+
+.ap-header h1 {
+    margin: 0 0 10px;
+
+    color: #1b2559;
+
+    font-size: 2rem;
+    font-weight: 800;
+
+    letter-spacing: -0.04em;
+}
+
+.ap-header p {
+    margin: 0;
+
+    color: #667085;
+
+    font-size: 0.95rem;
+}
+
+/* ==============================
+   GRID
+================================= */
+
+.ap-grid {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1.45fr)
+        minmax(340px, 0.9fr);
+
+    gap: 22px;
+}
+
+/* ==============================
+   CARD
+================================= */
+
+.ap-card,
+.ap-start-card {
+    background: #ffffff;
+
+    border: 1px solid #e8edf5;
+    border-radius: 16px;
+
+    padding: 22px;
+}
+
+.ap-card {
+    margin-bottom: 22px;
+}
+
+.ap-card h2,
+.ap-start-card h2 {
+    margin: 0 0 18px;
+
+    color: #1b2559;
+
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+/* ==============================
+   INDICADORES
+================================= */
+
+.ap-indicators {
+    display: flex;
+    gap: 26px;
+    flex-wrap: wrap;
+}
+
+.ap-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.ap-icon {
+    width: 62px;
+    height: 62px;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 1.5rem;
+}
+
+.ap-icon.blue {
+    background: #eaf2ff;
+    color: #0d6efd;
+}
+
+.ap-icon.purple {
+    background: #f3e8ff;
+    color: #9333ea;
+}
+
+.ap-icon.green {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.ap-icon.orange {
+    background: #ffedd5;
+    color: #ea580c;
+}
+
+.ap-icon.pink {
+    background: #fce7f3;
+    color: #db2777;
+}
+
+.ap-indicator span {
+    color: #344054;
+
+    font-size: 0.84rem;
+    font-weight: 700;
+}
+
+/* ==============================
+   SECTION HEADER
+================================= */
+
+.ap-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 18px;
+}
+
+.ap-section-header button {
+    border: none;
+    background: transparent;
+
+    color: #667085;
+
+    cursor: pointer;
+}
+
+.ap-section-header a {
+    color: #0d6efd;
+
+    text-decoration: none;
+
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+/* ==============================
+   PROJETO
+================================= */
+
+.ap-project {
+    display: grid;
+
+    grid-template-columns: 260px 1fr;
+
+    gap: 20px;
+}
+
+.ap-project img {
+    width: 100%;
+    height: 180px;
+
+    object-fit: cover;
+
+    border-radius: 14px;
+}
+
+.ap-project-info h3 {
+    margin: 8px 0 10px;
+
+    color: #1b2559;
+
+    font-size: 1.6rem;
+    font-weight: 800;
+}
+
+.ap-project-info p {
+    margin: 0 0 14px;
+
+    color: #667085;
+
+    line-height: 1.5;
+}
+
+.ap-project-info small {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-bottom: 18px;
+
+    color: #667085;
+
+    font-size: 0.82rem;
+}
+
+.ap-project-info small i {
+    color: #22c55e;
+
+    font-size: 0.5rem;
+}
+
+.ap-project-info a {
+    width: fit-content;
+
+    height: 42px;
+
+    padding: 0 18px;
+
+    border: 1px solid #bfd4ff;
+    border-radius: 10px;
+
+    color: #0d6efd;
+
+    text-decoration: none;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+
+    font-size: 0.88rem;
+    font-weight: 700;
+}
+
+/* ==============================
+   OUTROS PROJETOS
+================================= */
+
+.ap-other-projects {
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 16px;
+}
+
+.ap-mini-project {
+    border: 1px solid #edf1f7;
+    border-radius: 12px;
+
+    overflow: hidden;
+
+    background: #ffffff;
+}
+
+.ap-mini-project img {
+    width: 100%;
+    height: 90px;
+
+    object-fit: cover;
+}
+
+.ap-mini-project div {
+    padding: 12px;
+}
+
+.ap-mini-project strong {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #1b2559;
+
+    font-size: 0.88rem;
+}
+
+.ap-mini-project p {
+    margin: 0;
+
+    color: #667085;
+
+    font-size: 0.78rem;
+
+    line-height: 1.4;
+}
+
+/* ==============================
+   RIGHT CARD
+================================= */
+
+.ap-start-card {
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+}
+
+.ap-illustration {
+    width: 180px;
+    height: 180px;
+
+    border-radius: 20px;
+
+    background: #f8fbff;
+
+    color: #0d6efd;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 5rem;
+
+    margin-bottom: 26px;
+}
+
+.ap-start-card p {
+    margin: 0 0 24px;
+
+    color: #667085;
+
+    line-height: 1.6;
+}
+
+.ap-primary-btn,
+.ap-secondary-btn {
+    width: 100%;
+    height: 52px;
+
+    border-radius: 10px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    font-size: 0.95rem;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.ap-primary-btn {
+    border: none;
+
+    background: #0d6efd;
+    color: #ffffff;
+
+    margin-bottom: 18px;
+}
+
+.ap-secondary-btn {
+    border: 1px solid #bfd4ff;
+
+    background: #ffffff;
+    color: #0d6efd;
+
+    margin-top: 18px;
+}
+
+.ap-start-card span {
+    color: #98a2b3;
+
+    font-size: 0.84rem;
+}
+
+.ap-start-card small {
+    margin-top: 14px;
+
+    color: #98a2b3;
+
+    font-size: 0.78rem;
+}
+
+/* ==============================
+   RESPONSIVO
+================================= */
+
+@media (max-width: 1180px) {
+
+    .ap-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ap-other-projects {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 780px) {
+
+    .ap-project {
+        grid-template-columns: 1fr;
+    }
+
+    .ap-indicators {
+        justify-content: center;
+    }
+
+    .ap-header h1 {
+        font-size: 1.7rem;
+    }
+}
