@@ -1,0 +1,215 @@
+/* Mapa ocupa a tela toda — sem scroll, sem margens */
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+#map {
+    width: 100vw;
+    height: 100vh;
+}
+
+/* Header flutua sobre o mapa */
+.apresentacao-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000; /* fica acima do mapa */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.apresentacao-titulo {
+    font-weight: 600;
+    color: var(--dark-slate);
+}
+
+.btn-sair {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--dark-slate);
+    text-decoration: none;
+    font-size: 0.9rem;
+    background: white;
+    transition: all 0.2s;
+}
+
+.btn-sair:hover {
+    background: #f1f5f9;
+    color: var(--dark-slate);
+}
+/* Pin wrapper */
+.pin-wrapper {
+    width: 44px;
+    height: 44px;
+    background: white;
+    border-radius: 50%;
+    border: 2px solid var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: var(--primary);
+    box-shadow: 0 4px 12px rgba(0, 82, 255, 0.25);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.pin-wrapper:hover {
+    transform: scale(1.15);
+    box-shadow: 0 6px 20px rgba(0, 82, 255, 0.4);
+}
+
+/* Popup flutua sobre o mapa no canto direito */
+.popup-flutuante {
+    position: absolute;
+    top: 80px;
+    right: 24px;
+    z-index: 1000;
+    width: 380px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    padding: 1.5rem;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+}
+
+.popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.2rem;
+}
+
+.popup-titulo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.popup-icone {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #e6efff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: var(--primary);
+}
+
+.popup-modulo {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    display: block;
+}
+
+.popup-bairro {
+    margin: 0;
+    font-weight: 700;
+    color: var(--dark-slate);
+}
+
+.popup-fechar {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.25rem;
+    font-size: 1rem;
+    transition: color 0.2s;
+}
+
+.popup-fechar:hover {
+    color: var(--dark-slate);
+}
+
+.popup-grafico-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.popup-grafico-titulo {
+    font-weight: 600;
+    margin: 0;
+    color: var(--dark-slate);
+}
+
+.popup-numero {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.popup-numero span:first-child {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--dark-slate);
+}
+
+.popup-variacao {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.popup-canvas-wrapper {
+    margin-bottom: 1.2rem;
+    height: 160px;
+}
+
+/* Cards de métricas */
+.popup-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.popup-card {
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.popup-card i {
+    font-size: 1.2rem;
+    margin-bottom: 0.25rem;
+}
+
+.popup-card-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.popup-card-valor {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--dark-slate);
+    margin: 0;
+}
+
+.popup-card-variacao {
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin: 0;
+}

@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Fontes de dados | Conecta Barueri{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/fontes.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<section class="fontes-page">
+
+    <div class="fontes-header">
+        <div>
+            <h1>Fontes de dados</h1>
+            <p>Gerencie as fontes de dados conectadas</p>
+        </div>
+
+        <a href="#" class="fontes-new-btn">
+            <i class="bi bi-plus-lg"></i>
+            Nova fonte
+        </a>
+    </div>
+
+    <section class="fontes-card">
+
+        <div class="fontes-table-wrap">
+            <table class="fontes-table">
+
+                <thead>
+                    <tr>
+                        <th>Fonte de dados</th>
+                        <th>Descrição</th>
+                        <th>Status</th>
+                        <th>Última sincronização</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td><strong>SAFEM</strong></td>
+                        <td>Sistema Integrado de Administração Financeira</td>
+                        <td><span class="fontes-status success">Conectado</span></td>
+                        <td>24/05/2025 10:45</td>
+                        <td>
+                            <button class="fontes-action" type="button">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Portal Transparência</strong></td>
+                        <td>Dados do Portal da Transparência</td>
+                        <td><span class="fontes-status success">Conectado</span></td>
+                        <td>24/05/2025 10:30</td>
+                        <td>
+                            <button class="fontes-action" type="button">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Censo Escolar</strong></td>
+                        <td>Dados do Censo Escolar</td>
+                        <td><span class="fontes-status error">Erro</span></td>
+                        <td>24/05/2025 09:15</td>
+                        <td>
+                            <button class="fontes-action" type="button">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Produção Ambulatorial</strong></td>
+                        <td>Dados da Produção Ambulatorial</td>
+                        <td><span class="fontes-status success">Conectado</span></td>
+                        <td>24/05/2025 08:50</td>
+                        <td>
+                            <button class="fontes-action" type="button">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>SIAB</strong></td>
+                        <td>Sistema de Informação de Atenção Básica</td>
+                        <td><span class="fontes-status success">Conectado</span></td>
+                        <td>24/05/2025 08:30</td>
+                        <td>
+                            <button class="fontes-action" type="button">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>GeoBarueri</strong></td>
+                        <td>Dados geoespaciais do município</td>
+                        <td><span class="fontes-status success">Conectado</span></td>
+                        <td>24/05/2025 07:40</td>
+                        <td>
+                            <button class="fontes-action" type="button">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+        </div>
+
+        <div class="fontes-pagination">
+            <span>1-6 de 24</span>
+
+            <div class="fontes-pages">
+                <a href="#"><i class="bi bi-chevron-left"></i></a>
+                <a href="#" class="active">1</a>
+                <a href="#">2</a>
+                <a href="#">3</a>
+                <a href="#">4</a>
+                <a href="#"><i class="bi bi-chevron-right"></i></a>
+            </div>
+        </div>
+
+    </section>
+
+</section>
+
+{% endblock %}

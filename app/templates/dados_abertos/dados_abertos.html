@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+
+{% block title %}Dados Abertos | Conecta Barueri{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dados_abertos/dados_abertos.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<section class="dados-page">
+
+    <!-- TOPO -->
+    <header class="dados-header">
+
+        <div>
+            <h1>Dados Abertos</h1>
+            <p>Acesse, filtre e exporte os dados públicos da cidade de Barueri.</p>
+        </div>
+
+        <a href="#" class="dados-export-btn">
+            <i class="bi bi-download"></i>
+            Exportar Dados
+        </a>
+
+    </header>
+
+    <!-- FILTROS SUPERIORES -->
+    <section class="dados-filter-card">
+
+        <div class="dados-filter-group">
+            <label>Indicador</label>
+
+            <div class="dados-select-box">
+                <i class="bi bi-heart-pulse"></i>
+                <select>
+                    <option>Saúde</option>
+                    <option>Educação</option>
+                    <option>Segurança</option>
+                    <option>Mobilidade</option>
+                    <option>Meio Ambiente</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="dados-filter-group">
+            <label>Período</label>
+
+            <div class="dados-select-box">
+                <i class="bi bi-calendar3"></i>
+                <select>
+                    <option>2024</option>
+                    <option>2025</option>
+                    <option>2026</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="dados-filter-group">
+            <label>Região (Bairro)</label>
+
+            <div class="dados-select-box">
+                <i class="bi bi-geo-alt"></i>
+                <select>
+                    <option>Todos os bairros</option>
+                    <option>Parque dos Camargos</option>
+                    <option>Centro</option>
+                    <option>Alphaville</option>
+                    <option>Jardim Belval</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="dados-filter-btn" type="button">
+            <i class="bi bi-funnel"></i>
+            Aplicar Filtro
+        </button>
+
+    </section>
+
+    <!-- ABAS -->
+    <div class="dados-tabs">
+
+        <a href="#" class="dados-tab">
+            <i class="bi bi-graph-up"></i>
+            Dashboard
+        </a>
+
+        <a href="#" class="dados-tab active">
+            <i class="bi bi-table"></i>
+            Tabela
+        </a>
+
+    </div>
+
+    <!-- CARD DA TABELA -->
+    <section class="dados-table-card">
+
+        <!-- BARRA DE AÇÕES DA TABELA -->
+        <div class="dados-table-toolbar">
+
+            <div class="dados-search">
+                <input type="text" placeholder="Pesquisar na tabela...">
+                <i class="bi bi-search"></i>
+            </div>
+
+            <div class="dados-table-actions">
+
+                <button type="button">
+                    <i class="bi bi-layout-three-columns"></i>
+                    Colunas
+                </button>
+
+                <button type="button">
+                    <i class="bi bi-funnel"></i>
+                    Filtros
+                </button>
+
+                <button type="button">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    Limpar
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- TABELA -->
+        <div class="dados-table-wrapper">
+
+            <table class="dados-table">
+
+                <thead>
+                    <tr>
+                        <th>Data <i class="bi bi-arrow-down-up"></i></th>
+                        <th>Indicador <i class="bi bi-arrow-down-up"></i></th>
+                        <th>Categoria <i class="bi bi-arrow-down-up"></i></th>
+                        <th>Bairro <i class="bi bi-arrow-down-up"></i></th>
+                        <th>Valor <i class="bi bi-arrow-down-up"></i></th>
+                        <th>Unidade <i class="bi bi-arrow-down-up"></i></th>
+                        <th>Fonte <i class="bi bi-arrow-down-up"></i></th>
+                        <th>Última Atualização <i class="bi bi-arrow-down-up"></i></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>01/01/2024</td>
+                        <td>Atendimentos Médicos</td>
+                        <td>Consultas</td>
+                        <td>Parque dos Camargos</td>
+                        <td>8.732</td>
+                        <td>Atendimentos</td>
+                        <td>Secretaria de Saúde</td>
+                        <td>24/05/2025 10:45</td>
+                    </tr>
+
+                    <tr>
+                        <td>01/01/2024</td>
+                        <td>Exames Realizados</td>
+                        <td>Exames</td>
+                        <td>Parque dos Camargos</td>
+                        <td>1.842</td>
+                        <td>Exames</td>
+                        <td>Secretaria de Saúde</td>
+                        <td>24/05/2025 10:45</td>
+                    </tr>
+
+                    <tr>
+                        <td>01/01/2024</td>
+                        <td>Procedimentos</td>
+                        <td>Procedimentos</td>
+                        <td>Parque dos Camargos</td>
+                        <td>472</td>
+                        <td>Procedimentos</td>
+                        <td>Secretaria de Saúde</td>
+                        <td>24/05/2025 10:45</td>
+                    </tr>
+
+                    <tr>
+                        <td>01/02/2024</td>
+                        <td>Atendimentos Médicos</td>
+                        <td>Consultas</td>
+                        <td>Parque dos Camargos</td>
+                        <td>7.956</td>
+                        <td>Atendimentos</td>
+                        <td>Secretaria de Saúde</td>
+                        <td>24/05/2025 10:45</td>
+                    </tr>
+
+                    <tr>
+                        <td>01/02/2024</td>
+                        <td>Exames Realizados</td>
+                        <td>Exames</td>
+                        <td>Parque dos Camargos</td>
+                        <td>1.721</td>
+                        <td>Exames</td>
+                        <td>Secretaria de Saúde</td>
+                        <td>24/05/2025 10:45</td>
+                    </tr>
+
+                    <tr>
+                        <td>01/03/2024</td>
+                        <td>Atendimentos Médicos</td>
+                        <td>Consultas</td>
+                        <td>Parque dos Camargos</td>
+                        <td>8.312</td>
+                        <td>Atendimentos</td>
+                        <td>Secretaria de Saúde</td>
+                        <td>24/05/2025 10:45</td>
+                    </tr>
+
+                    <tr>
+                        <td>01/04/2024</td>
+                        <td>Procedimentos</td>
+                        <td>Procedimentos</td>
+                        <td>Parque dos Camargos</td>
+                        <td>498</td>
+                        <td>Procedimentos</td>
+                        <td>Secretaria de Saúde</td>
+                        <td>24/05/2025 10:45</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <!-- RODAPÉ DA TABELA -->
+        <footer class="dados-table-footer">
+
+            <span>Mostrando 1 a 12 de 1.248 registros</span>
+
+            <div class="dados-footer-right">
+
+                <label>
+                    Linhas por página:
+                    <select>
+                        <option>25</option>
+                        <option>50</option>
+                        <option>100</option>
+                    </select>
+                </label>
+
+                <nav class="dados-pagination" aria-label="Paginação">
+                    <a href="#"><i class="bi bi-chevron-double-left"></i></a>
+                    <a href="#"><i class="bi bi-chevron-left"></i></a>
+                    <a href="#" class="active">1</a>
+                    <a href="#">2</a>
+                    <a href="#">3</a>
+                    <a href="#">4</a>
+                    <a href="#">5</a>
+                    <a href="#">...</a>
+                    <a href="#">50</a>
+                    <a href="#"><i class="bi bi-chevron-right"></i></a>
+                    <a href="#"><i class="bi bi-chevron-double-right"></i></a>
+                </nav>
+
+            </div>
+
+        </footer>
+
+    </section>
+
+    <!-- AVISO -->
+    <div class="dados-alert">
+        <i class="bi bi-info-circle"></i>
+        Os dados apresentados são de fontes oficiais da Prefeitura de Barueri e estão sujeitos a atualizações.
+    </div>
+
+</section>
+
+{% endblock %}

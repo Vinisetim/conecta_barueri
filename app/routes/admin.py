@@ -14,9 +14,6 @@ def usuario():
 def equipes():
     return render_template("admin/admin_equipes.html")
 
-@admin_bp.route('/projetos')
-def projetos():
-    return render_template("admin/admin_projetos.html")
 
 @admin_bp.route('/fonte-de-dados')
 def fonte_dados():
