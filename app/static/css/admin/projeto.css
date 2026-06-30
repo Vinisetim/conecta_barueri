@@ -102,72 +102,12 @@ body {
     letter-spacing: -0.04em;
 }
 
-.system-name {
-    margin-top: 26px;
-    margin-bottom: 34px;
 
-    font-size: 1.28rem;
-    font-weight: 800;
-    color: var(--text-main);
-    white-space: nowrap;
-}
 
-.system-name span {
-    color: var(--primary);
-}
 
-.sidebar-menu {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
 
-}
 
-.menu-link {
-    min-height: 52px;
 
-    display: flex;
-    align-items: center;
-    gap: 13px;
-
-    padding: 0 15px;
-
-    border-radius: 12px;
-
-    color: #253858;
-    text-decoration: none;
-
-    font-size: 0.95rem;
-    font-weight: 500;
-
-    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
-}
-
-.menu-link i {
-    font-size: 1.25rem;
-    color: #516282;
-    min-width: 22px;
-    text-align: center;
-}
-
-.menu-link:hover {
-    background: #f2f6ff;
-    color: var(--primary);
-    transform: translateX(2px);
-}
-
-.menu-link:hover i {
-    color: var(--primary);
-}
-
-.menu-link.active {
-    background: var(--primary-soft);
-    color: var(--primary);
-}
-
-.menu-link.active i {
-    color: var(--primary);
-}
 
 .sidebar-bottom {
     margin-top: auto;
@@ -175,9 +115,7 @@ body {
     border-top: 1px solid var(--border-soft);
 }
 
-.logout-link {
-    color: #344054;
-}
+
 
 /* Estado recolhido */
 .sidebar.collapsed .brand-text,
