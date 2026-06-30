@@ -24,7 +24,7 @@ def login():
 
             #Se o usuário tentou acessar uma página protegida, redireciona para ela, se não vai para main
             next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('main.index'))
+            return redirect(next_page) if next_page else redirect(url_for('app.index'))
 
         flash('Credenciais inválidas. Tente novamente', 'danger')
     return render_template('auth/login.html', form=form)
@@ -34,6 +34,15 @@ def login():
 def logout():
     """Encerra a sessão do usuario autenticado e redireciona para a landing page"""
     logout_user()
-    return redirect(url_for('main.index'))
+    return redirect(url_for('main.home'))
 #render_template(auth/login.html)
 
+#============================================================
+#ROTA TEMPORÁRIA - NÃO LEVAR PARA A PRODUÇÃO
+#Permite acesso à home sem autenticação (desenvolvimento)
+#============================================================
+
+@auth_bp.route('/dev-login')
+def dev_login():
+    """Rota de desenvolvimento - bypassa autenticação"""
+    return redirect(url_for('inicial.home'))

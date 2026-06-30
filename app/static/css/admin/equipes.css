@@ -557,3 +557,27 @@ body {
     text-align: end;
 
 }
+
+
+/* Remove as bordas padrão do dialog */
+dialog {
+  border: none;
+  border-radius: 8px;
+  padding: 0;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+/* Fundo escuro atrás da modal */
+dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-conteudo {
+  padding: 24px;
+  text-align: center;
+  font-family: sans-serif;
+}
+
+.modal-conteudo h2 {
+  margin-top: 0;
+}

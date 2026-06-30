@@ -1,21 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Funcionários | Conecta Barueri{% endblock %}
+
 {% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/funcionarios.css') }}">
 {% endblock %}
 
 {% block content %}
 
+<section class="funcionarios-page">
 
-      <div>
-    </div>
+    <!-- CABEÇALHO -->
+    <header class="funcionarios-header">
+        <div>
+            <h1>Funcionários</h1>
+            <p>Gerencie os funcionários da plataforma</p>
+        </div>
+    </header>
 
-        <i class="bi bi-search"></i>
-      </div>
-    </div>
+    <!-- FILTROS -->
+    <section class="funcionarios-filters">
 
-      </div>
+        <div class="funcionarios-search">
+            <i class="bi bi-search"></i>
+            <input type="text" placeholder="Pesquisar funcionário...">
+        </div>
+
+        <select class="funcionarios-select">
+            <option>Todos os perfis</option>
+            <option>Administrador</option>
+            <option>Editor</option>
+            <option>Visualizador</option>
+        </select>
+
+        <select class="funcionarios-select">
+            <option>Todos os status</option>
+            <option>Ativo</option>
+            <option>Inativo</option>
+        </select>
+
+        <button class="funcionarios-add" type="button" aria-label="Adicionar funcionário">
+            <i class="bi bi-plus-lg"></i>
+        </button>
+
+    </section>
+
+    <!-- TABELA -->
+    <section class="funcionarios-card">
+
+        <div class="funcionarios-table-wrap">
+
+            <table class="funcionarios-table">
+
+                <thead>
+                    <tr>
+                        <th>Funcionário</th>
+                        <th>E-mail</th>
+                        <th>Perfil</th>
+                        <th>Equipe</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td><strong>Mariana Lima</strong></td>
+                        <td>mariana.lima@barueri.sp.gov.br</td>
+                        <td><span class="funcionarios-badge perfil-editor">Editor</span></td>
+                        <td>Saúde</td>
+                        <td><span class="funcionarios-badge status-ativo">Ativo</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Ricardo Castro</strong></td>
+                        <td>ricardo.castro@barueri.sp.gov.br</td>
+                        <td><span class="funcionarios-badge perfil-visualizador">Visualizador</span></td>
+                        <td>Finanças</td>
+                        <td><span class="funcionarios-badge status-ativo">Ativo</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Ana Ferreira</strong></td>
+                        <td>ana.ferreira@barueri.sp.gov.br</td>
+                        <td><span class="funcionarios-badge perfil-admin">Administrador</span></td>
+                        <td>TI</td>
+                        <td><span class="funcionarios-badge status-ativo">Ativo</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>João Silva</strong></td>
+                        <td>joao.silva@barueri.sp.gov.br</td>
+                        <td><span class="funcionarios-badge perfil-editor">Editor</span></td>
+                        <td>Educação</td>
+                        <td><span class="funcionarios-badge status-inativo">Inativo</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Camila Pereira</strong></td>
+                        <td>camila.pereira@barueri.sp.gov.br</td>
+                        <td><span class="funcionarios-badge perfil-visualizador">Visualizador</span></td>
+                        <td>Saúde</td>
+                        <td><span class="funcionarios-badge status-ativo">Ativo</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Carlos Souza</strong></td>
+                        <td>carlos.souza@barueri.sp.gov.br</td>
+                        <td><span class="funcionarios-badge perfil-editor">Editor</span></td>
+                        <td>Planejamento</td>
+                        <td><span class="funcionarios-badge status-ativo">Ativo</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Juliana Santos</strong></td>
+                        <td>juliana.santos@barueri.sp.gov.br</td>
+                        <td><span class="funcionarios-badge perfil-visualizador">Visualizador</span></td>
+                        <td>Finanças</td>
+                        <td><span class="funcionarios-badge status-ativo">Ativo</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Paulo Mendes</strong></td>
+                        <td>paulo.mendes@barueri.sp.gov.br</td>
+                        <td><span class="funcionarios-badge perfil-editor">Editor</span></td>
+                        <td>TI</td>
+                        <td><span class="funcionarios-badge status-inativo">Inativo</span></td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <!-- PAGINAÇÃO -->
+
+                <div class="funcionarios-pagination">
+            <span>1-6 de 24</span>
+
+            <div class="fontes-pages">
+                <a href="#"><i class="bi bi-chevron-left"></i></a>
+                <a href="#" class="active">1</a>
+                <a href="#">2</a>
+                <a href="#">3</a>
+                <a href="#">4</a>
+                <a href="#"><i class="bi bi-chevron-right"></i></a>
+            </div>
         </div>
 
     </section>
 
-    </section>
+</section>
 
-{%endblock%}
+{% endblock %}

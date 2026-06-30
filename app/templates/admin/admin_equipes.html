@@ -1,3 +1,5 @@
+{% extends "base.html" %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/equipes.css') }}">
 {% endblock %}
@@ -14,7 +16,19 @@
         </div>
 
         <div class="bota-equipe">
-            <button class="btn btn-primary"><i class="bi bi-plus-lg"></i> Nova equipe</button>
+            <button id="abrirmodal" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Nova equipes</button>
+            <dialog id="meuModal">
+              <div class="modal-conteudo">
+                <h2>Adicionar equipe</h2>
+                <div class="formulario">
+                    <div class="search-box">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="searchInput" placeholder="Buscar projetos..." oninput="filterCards()"/>
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="fecharModal">Fechar</button>
+              </div>
+            </dialog>
         </div>
     </div>
 
@@ -55,7 +69,7 @@
 
     </div>
 
-
+     <script src="{{ url_for('static', filename='js/equipe.js') }}"></script>
 
 
 {%endblock%}
