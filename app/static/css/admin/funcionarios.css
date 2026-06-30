@@ -387,3 +387,25 @@
         font-size: 1.75rem;
     }
 }
+
+.func-btn-edit,
+.func-btn-delete {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-right: 8px;
+}
+
+.func-btn-edit {
+    color: #0d6efd;
+}
+
+.func-btn-delete {
+    color: #dc3545;
+}
+
+.func-btn-edit:hover,
+.func-btn-delete:hover {
+    transform: scale(1.1);
+}
