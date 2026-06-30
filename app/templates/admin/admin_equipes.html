@@ -17,18 +17,90 @@
 
         <div class="bota-equipe">
             <button id="abrirmodal" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Nova equipes</button>
-            <dialog id="meuModal">
-              <div class="modal-conteudo">
-                <h2>Adicionar equipe</h2>
-                <div class="formulario">
-                    <div class="search-box">
-                        <i class="bi bi-search"></i>
-                        <input type="text" id="searchInput" placeholder="Buscar projetos..." oninput="filterCards()"/>
-                    </div>
-                </div>
-                <button class="btn btn-primary" id="fecharModal">Fechar</button>
-              </div>
-            </dialog>
+          <dialog id="meuModal">
+  <div class="modal-conteudo">
+
+    <div class="modal-topo">
+      <div>
+        <h2>Nova equipe</h2>
+        <p>Preencha os dados para criar uma nova equipe</p>
+      </div>
+      <button class="btn-fechar" id="fecharModal" aria-label="Fechar">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <form id="formEquipe" novalidate>
+
+      <!-- Nome da equipe -->
+      <div class="campo">
+        <label for="nomeEquipe">Nome da equipe <span class="obrigatorio">*</span></label>
+        <input
+          type="text"
+          id="nomeEquipe"
+          placeholder="Ex: Equipe de Saúde Pública"
+          required
+        />
+        <span class="erro-campo" id="erroNome"></span>
+      </div>
+
+      <!-- Módulo responsável -->
+      <div class="campo">
+        <label for="moduloEquipe">Módulo responsável <span class="obrigatorio">*</span></label>
+        <select id="moduloEquipe" required>
+          <option value="" disabled selected>Selecione um módulo</option>
+          <option value="saude">Saúde</option>
+          <option value="seguranca">Segurança</option>
+          <option value="educacao">Educação</option>
+          <option value="mobilidade">Mobilidade</option>
+          <option value="meio-ambiente">Meio Ambiente</option>
+          <option value="social">Assistência Social</option>
+        </select>
+        <span class="erro-campo" id="erroModulo"></span>
+      </div>
+
+      <!-- Descrição -->
+      <div class="campo">
+        <label for="descEquipe">Descrição</label>
+        <textarea
+          id="descEquipe"
+          rows="3"
+          placeholder="Descreva o objetivo desta equipe..."
+        ></textarea>
+      </div>
+
+      <!-- Líder da equipe -->
+      <div class="campo">
+        <label for="liderEquipe">Líder da equipe</label>
+        <input
+          type="text"
+          id="liderEquipe"
+          placeholder="Nome do responsável"
+        />
+      </div>
+
+      <!-- Membros -->
+      <div class="campo">
+        <label for="membrosEquipe">Membros <span class="dica">(separe por vírgula)</span></label>
+        <input
+          type="text"
+          id="membrosEquipe"
+          placeholder="Ex: Ana Lima, Carlos Silva, Maria Souza"
+        />
+      </div>
+
+      <div class="modal-rodape">
+        <button type="button" class="btn btn-outline-secondary" id="cancelarModal">
+          Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-check-lg"></i> Criar equipe
+        </button>
+      </div>
+
+    </form>
+  </div>
+</dialog>
         </div>
     </div>
 

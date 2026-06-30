@@ -559,25 +559,126 @@ body {
 }
 
 
-/* Remove as bordas padrão do dialog */
+/* ══════════════════════════════════════
+   DIALOG / MODAL
+   ══════════════════════════════════════ */
 dialog {
   border: none;
-  border-radius: 8px;
+  border-radius: 14px;
   padding: 0;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 20px 60px rgba(15,23,42,.16);
 }
 
-/* Fundo escuro atrás da modal */
 dialog::backdrop {
-  background-color: rgba(0, 0, 0, 0.5);
+  background: rgba(0,0,0,.45);
+  backdrop-filter: blur(2px);
 }
 
 .modal-conteudo {
-  padding: 24px;
-  text-align: center;
-  font-family: sans-serif;
+  padding: 28px 28px 24px;
+  font-family: 'Inter', sans-serif;
 }
 
-.modal-conteudo h2 {
-  margin-top: 0;
+.modal-topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.modal-topo h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  color: #0b1f4d;
+}
+
+.modal-topo p {
+  font-size: 13px;
+  color: #667085;
+  margin: 0;
+}
+
+.btn-fechar {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #667085;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition: background .15s, color .15s;
+  line-height: 1;
+}
+
+.btn-fechar:hover {
+  background: #f1f3f5;
+  color: #0b1f4d;
+}
+
+/* ── Campos ── */
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 16px;
+}
+
+.campo label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0b1f4d;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  padding: 9px 12px;
+  border: 1.5px solid #e6ebf5;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-family: 'Inter', sans-serif;
+  color: #0b1f4d;
+  background: #fff;
+  transition: border-color .15s;
+  resize: vertical;
+}
+
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus {
+  outline: none;
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 3px rgba(13,110,253,.1);
+}
+
+.campo input::placeholder,
+.campo textarea::placeholder {
+  color: #adb5bd;
+}
+
+.obrigatorio { color: #ef4444; margin-left: 2px; }
+
+.dica {
+  font-size: 11px;
+  font-weight: 400;
+  color: #667085;
+}
+
+.erro-campo {
+  font-size: 12px;
+  color: #ef4444;
+  min-height: 16px;
+}
+
+/* ── Rodapé ── */
+.modal-rodape {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid #e6ebf5;
 }
