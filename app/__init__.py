@@ -19,9 +19,10 @@ def create_app():
     # SECRET_KEY string para assinar cookies de sessão, protege dados do usuário
     app.config['SECRET_KEY'] = 'chave_temporaria_dev'
     #URI do banco de dados
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://usuario:senha@localhost/conecta_barueri'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:conecta123!@db.gzfefwbmhafiuybiislx.supabase.co:5432/postgres'
 
-    #Conecta extensões ao app
+    app.config['SQLALCHEMY_ECHO'] = True
+
     bcrypt.init_app(app)
     login_manager.init_app(app)
 
