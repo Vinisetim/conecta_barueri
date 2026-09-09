@@ -336,8 +336,20 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+    let slides = [
+        {
+            id: 1,
+            template: "capa",
+            titulo: "Capa",
+            subtitulo: "Apresentação Executiva - Indicadores Municipais",
+            ods: false,
+            qr: false
+        }
+    ];
+    let activeSlideId = 1;
+    let slideCounter = 1;
+
     const selectTemplate = document.getElementById("selectTemplate");
-    
     const layoutCapa = document.querySelector(".layout-capa");
     const layoutImgTexto = document.querySelector(".layout-imagem-texto");
     const layoutIndicadores = document.querySelector(".layout-indicadores");
@@ -359,22 +371,71 @@ document.addEventListener("DOMContentLoaded", function() {
     const slotQRCode = document.getElementById("slotQRCode");
     const toggleODS = document.getElementById("toggleODS");
     const toggleQR = document.getElementById("toggleQR");
+    const btnNovoSlide = document.getElementById("btnNovoSlide");
+    const slidesThumbsList = document.getElementById("slidesThumbsList");
 
-    function updatePreviewTexts() {
-        document.querySelectorAll(".preview-titulo").forEach(el => el.textContent = inputTitulo.value || "Título");
-        document.querySelectorAll(".preview-subtitulo").forEach(el => el.textContent = inputSubtitulo.value || "Subtítulo");
+    function renderThumbnails() {
+        slidesThumbsList.innerHTML = "";
+        slides.forEach((slide, index) => {
+            let miniClass = "capa-mini";
+            if (slide.template === "imagem_texto") miniClass = "split-mini";
+            if (slide.template === "indicadores") miniClass = "metric-mini";
+            if (slide.template === "grafico") miniClass = "chart-mini";
+
+            const div = document.createElement("div");
+            div.className = `slide-thumb-item ${slide.id === activeSlideId ? 'active' : ''}`;
+            div.setAttribute("data-slide-id", slide.id);
+            div.innerHTML = `
+                <span class="slide-index">${index + 1}</span>
+                <div class="thumb-card">
+                    <div class="thumb-canvas-mini ${miniClass}">
+                        <span class="mini-tag">Barueri</span>
+                        <div class="mini-title-bar"></div>
+                    </div>
+                    <span class="thumb-label">Slide ${index + 1}</span>
+                </div>
+            `;
+            div.addEventListener("click", () => {
+                activeSlideId = slide.id;
+                renderThumbnails();
+                renderActiveSlide();
+            });
+            slidesThumbsList.appendChild(div);
+        });
     }
 
-    inputTitulo.addEventListener("input", updatePreviewTexts);
-    inputSubtitulo.addEventListener("input", updatePreviewTexts);
+    function renderActiveSlide() {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (!slide) return;
 
-    toggleODS.addEventListener("change", e => slotODS.style.display = e.target.checked ? "flex" : "none");
-    toggleQR.addEventListener("change", e => slotQRCode.style.display = e.target.checked ? "flex" : "none");
+        selectTemplate.value = slide.template;
+        inputTitulo.value = slide.titulo;
+        inputSubtitulo.value = slide.subtitulo;
+        toggleODS.checked = slide.ods;
+        toggleQR.checked = slide.qr;
+
+        switchTemplate();
+        updatePreviewTexts();
+        updateSlotsVisibility();
+    }
+
+    function updatePreviewTexts() {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (!slide) return;
+        document.querySelectorAll(".preview-titulo").forEach(el => el.textContent = slide.titulo || "Título");
+        document.querySelectorAll(".preview-subtitulo").forEach(el => el.textContent = slide.subtitulo || "Subtítulo");
+    }
+
+    function updateSlotsVisibility() {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (!slide) return;
+        slotODS.style.display = slide.ods ? "flex" : "none";
+        slotQRCode.style.display = slide.qr ? "flex" : "none";
+    }
 
     function switchTemplate() {
         const val = selectTemplate.value;
         
-        // Hide all layouts & config fields
         layoutCapa.style.display = "none";
         layoutImgTexto.style.display = "none";
         layoutIndicadores.style.display = "none";
@@ -400,7 +461,6 @@ document.addEventListener("DOMContentLoaded", function() {
             labelSubtitulo.textContent = "Texto de Apoio";
             fgSubtitulo.style.display = "flex";
             
-            // Reposition slots for this template
             document.querySelector(".it-ods-slot").appendChild(slotODS);
             document.querySelector(".it-qr-slot").appendChild(slotQRCode);
         } else if(val === "indicadores") {
@@ -410,7 +470,6 @@ document.addEventListener("DOMContentLoaded", function() {
             labelSubtitulo.textContent = "Texto Introdutório";
             fgSubtitulo.style.display = "flex";
             
-            // Global slots at bottom
             document.querySelector(".global-slots-container").appendChild(slotODS);
             document.querySelector(".global-slots-container").appendChild(slotQRCode);
         } else if(val === "grafico") {
@@ -425,8 +484,55 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    selectTemplate.addEventListener("change", switchTemplate);
-    switchTemplate(); // init
+    inputTitulo.addEventListener("input", (e) => {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (slide) slide.titulo = e.target.value;
+        updatePreviewTexts();
+    });
+
+    inputSubtitulo.addEventListener("input", (e) => {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (slide) slide.subtitulo = e.target.value;
+        updatePreviewTexts();
+    });
+
+    selectTemplate.addEventListener("change", (e) => {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (slide) slide.template = e.target.value;
+        switchTemplate();
+        renderThumbnails();
+    });
+
+    toggleODS.addEventListener("change", (e) => {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (slide) slide.ods = e.target.checked;
+        updateSlotsVisibility();
+    });
+
+    toggleQR.addEventListener("change", (e) => {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (slide) slide.qr = e.target.checked;
+        updateSlotsVisibility();
+    });
+
+    btnNovoSlide.addEventListener("click", () => {
+        slideCounter++;
+        slides.push({
+            id: slideCounter,
+            template: "capa",
+            titulo: "Novo Slide",
+            subtitulo: "Subtítulo do novo slide",
+            ods: false,
+            qr: false
+        });
+        activeSlideId = slideCounter;
+        renderThumbnails();
+        renderActiveSlide();
+        slidesThumbsList.scrollTop = slidesThumbsList.scrollHeight;
+    });
+
+    renderThumbnails();
+    renderActiveSlide();
 });
 </script>
 {% endblock %}
