@@ -1,0 +1,432 @@
+{% extends "base.html" %}
+
+{% block title %}Editor de Apresentações | Conecta Barueri{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/apresentacao/criar-apresentacao.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="editor-container">
+
+    <header class="editor-header">
+        <div class="editor-header-info">
+            <h1 class="editor-title" id="displayApresentacaoTitulo">Apresentação Executiva</h1>
+            <p class="editor-subtitle">Edite e organize os slides da sua apresentação institucional.</p>
+        </div>
+
+        <div class="editor-header-actions">
+            <button type="button" class="btn-editor-visualizar" id="btnVisualizar">
+                <i class="bi bi-eye"></i>
+                <span>Visualizar</span>
+            </button>
+            <button type="button" class="btn-editor-salvar" id="btnSalvar">
+                <i class="bi bi-floppy"></i>
+                <span>Salvar</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="editor-workspace">
+
+        <!-- NAVEGADOR -->
+        <aside class="panel-card slides-nav-panel">
+            <div class="panel-header">
+                <h2>Navegador de Slides</h2>
+                <span class="panel-badge-count">SLIDES</span>
+            </div>
+            <div class="slides-thumbs-list" id="slidesThumbsList">
+                <div class="slide-thumb-item active" data-slide-id="1">
+                    <span class="slide-index">1</span>
+                    <div class="thumb-card">
+                        <div class="thumb-canvas-mini capa-mini">
+                            <span class="mini-tag">Barueri</span>
+                            <div class="mini-title-bar"></div>
+                        </div>
+                        <span class="thumb-label">Slide 1</span>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn-novo-slide" id="btnNovoSlide">
+                <i class="bi bi-plus-lg"></i>
+                <span>Novo Slide</span>
+            </button>
+        </aside>
+
+        <!-- CANVAS -->
+        <main class="panel-card slide-canvas-panel">
+            <div class="panel-header">
+                <h2>Canvas do Slide</h2>
+            </div>
+            <div class="canvas-stage">
+                <div class="slide-surface template-capa" id="activeSlideSurface">
+                    
+                    <!-- CAPA LAYOUT -->
+                    <div class="layout-capa">
+                        <div class="slide-top-brand">
+                            <img src="{{ url_for('static', filename='img/logo-barueri.jpeg') }}" alt="Logo Barueri" class="slide-logo">
+                            <div class="slide-brand-text">
+                                <span>Prefeitura de</span>
+                                <strong>Barueri</strong>
+                            </div>
+                        </div>
+                        <div class="slide-main-content">
+                            <h1 class="slide-title-preview preview-titulo">Capa</h1>
+                            <h2 class="slide-subtitle-preview preview-subtitulo">Apresentação Executiva - Indicadores Municipais</h2>
+                        </div>
+                    </div>
+
+                    <!-- IMAGEM + TEXTO LAYOUT -->
+                    <div class="layout-imagem-texto" style="display: none;">
+                        <div class="it-left">
+                            <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb" alt="Imagem" class="it-img">
+                            <div class="it-qr-slot"></div>
+                        </div>
+                        <div class="it-right">
+                            <div class="it-ods-slot"></div>
+                            <div class="it-text-content">
+                                <span class="it-label">Título do Slide</span>
+                                <h1 class="slide-title-preview preview-titulo">Visão Geral dos Indicadores</h1>
+                                <span class="it-label">Texto de Apoio</span>
+                                <p class="slide-subtitle-preview preview-subtitulo">Resumo comparativo dos principais dados socioeconômicos.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- INDICADORES LAYOUT -->
+                    <div class="layout-indicadores" style="display: none;">
+                        <div class="ind-header">
+                            <h1 class="slide-title-preview preview-titulo">Principais Indicadores Municipais</h1>
+                            <p class="slide-subtitle-preview preview-subtitulo">Plataforma integrada de dados da cidade.</p>
+                        </div>
+                        <div class="ind-grid">
+                            <div class="ind-card">
+                                <i class="bi bi-heart-pulse ind-icon" style="color: #3b82f6;"></i>
+                                <div class="ind-info">
+                                    <h3>3.237</h3>
+                                    <span>Saúde</span>
+                                </div>
+                            </div>
+                            <div class="ind-card">
+                                <i class="bi bi-shield-check ind-icon" style="color: #a855f7;"></i>
+                                <div class="ind-info">
+                                    <h3>3.847</h3>
+                                    <span>Segurança</span>
+                                </div>
+                            </div>
+                            <div class="ind-card">
+                                <i class="bi bi-car-front ind-icon" style="color: #f59e0b;"></i>
+                                <div class="ind-info">
+                                    <h3>3.755</h3>
+                                    <span>Educação</span>
+                                </div>
+                            </div>
+                            <div class="ind-card">
+                                <i class="bi bi-car-front ind-icon" style="color: #f59e0b;"></i>
+                                <div class="ind-info">
+                                    <h3>4.687</h3>
+                                    <span>Mobilidade</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GRÁFICO LAYOUT -->
+                    <div class="layout-grafico" style="display: none;">
+                        <div class="gra-header">
+                            <div>
+                                <span class="gra-tag">Saúde</span>
+                                <h1 class="slide-title-preview preview-titulo">Atendimentos médicos</h1>
+                                <p class="slide-subtitle-preview preview-subtitulo">Evolução no número de atendimentos médicos nos últimos 12 meses.</p>
+                            </div>
+                            <div class="slide-top-brand">
+                                <img src="{{ url_for('static', filename='img/logo-barueri.jpeg') }}" alt="Logo" class="slide-logo">
+                                <div class="slide-brand-text">
+                                    <span>Prefeitura de</span><strong>Barueri</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gra-content">
+                            <div class="gra-main-chart">
+                                <h4>Total de atendimentos</h4>
+                                <div class="fake-chart-area">
+                                    <!-- Um gráfico placeholder -->
+                                    <svg viewBox="0 0 100 40" class="fake-line-chart">
+                                        <polyline fill="none" stroke="#3b82f6" stroke-width="2" points="0,30 20,25 40,28 60,15 80,10 100,5"/>
+                                        <circle cx="0" cy="30" r="2" fill="#3b82f6"/>
+                                        <circle cx="20" cy="25" r="2" fill="#3b82f6"/>
+                                        <circle cx="40" cy="28" r="2" fill="#3b82f6"/>
+                                        <circle cx="60" cy="15" r="2" fill="#3b82f6"/>
+                                        <circle cx="80" cy="10" r="2" fill="#3b82f6"/>
+                                        <circle cx="100" cy="5" r="2" fill="#3b82f6"/>
+                                    </svg>
+                                </div>
+                                <h4>Distribuição dos atendimentos</h4>
+                                <div class="fake-pie-area">
+                                    <div class="fake-pie"></div>
+                                    <ul class="fake-legend">
+                                        <li><span style="background:#3b82f6"></span> Consultas</li>
+                                        <li><span style="background:#60a5fa"></span> Exames</li>
+                                        <li><span style="background:#93c5fd"></span> Procedimentos</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="gra-side">
+                                <div class="gra-dropdown">Últimos 12 meses <i class="bi bi-chevron-down"></i></div>
+                                <div class="gra-stat">
+                                    <i class="bi bi-heart-pulse"></i>
+                                    <div>
+                                        <small>Consultas</small>
+                                        <strong>6.421</strong>
+                                    </div>
+                                </div>
+                                <div class="gra-stat">
+                                    <i class="bi bi-file-medical"></i>
+                                    <div>
+                                        <small>Exames</small>
+                                        <strong>1.842</strong>
+                                    </div>
+                                </div>
+                                <div class="gra-stat">
+                                    <i class="bi bi-file-earmark-text"></i>
+                                    <div>
+                                        <small>Procedimentos</small>
+                                        <strong>472</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SLOTS (Global posicionado absoluto ou no rodapé) -->
+                    <div class="global-slots-container">
+                        <div class="slide-slot-item" id="slotODS" style="display: none;">
+                            <div class="ods-badge-box">
+                                <span class="ods-number">11</span>
+                                <div class="ods-desc">
+                                    <small>CIDADES E COMUNIDADES</small>
+                                    <small>SUSTENTÁVEIS</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slide-slot-item" id="slotQRCode" style="display: none;">
+                            <div class="qr-code-box"><i class="bi bi-qr-code"></i></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+
+        <!-- CONFIGURAÇÃO -->
+        <aside class="panel-card slide-config-panel">
+            <div class="panel-header">
+                <h2>Configuração do Slide</h2>
+            </div>
+            <form class="config-form" id="slideConfigForm" onsubmit="return false;">
+
+                <div class="form-group-ap">
+                    <label for="selectTemplate">Tipo de Template</label>
+                    <div class="select-wrapper">
+                        <select id="selectTemplate" class="form-control-ap">
+                            <option value="capa" selected>Capa / Abertura</option>
+                            <option value="imagem_texto">Imagem + Texto</option>
+                            <option value="indicadores">Indicadores</option>
+                            <option value="grafico">Gráfico</option>
+                        </select>
+                        <i class="bi bi-chevron-down select-chevron"></i>
+                    </div>
+                </div>
+
+                <div class="form-group-ap fg-titulo">
+                    <label for="inputTitulo" id="labelTitulo">Título</label>
+                    <input type="text" id="inputTitulo" class="form-control-ap" value="Capa">
+                </div>
+
+                <div class="form-group-ap fg-subtitulo">
+                    <label for="inputSubtitulo" id="labelSubtitulo">Texto Introdutório</label>
+                    <textarea id="inputSubtitulo" class="form-control-ap" rows="3">Apresentação Executiva - Indicadores Municipais</textarea>
+                </div>
+
+                <!-- Capa específicos -->
+                <div class="form-group-ap tpl-capa">
+                    <label>Imagem do background</label>
+                    <div class="media-upload-preview">
+                        <div class="media-thumb-box"><img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb" alt="BG"></div>
+                        <button type="button" class="btn-media-action"><i class="bi bi-image"></i></button>
+                    </div>
+                </div>
+
+                <!-- Imagem+Texto específicos -->
+                <div class="form-group-ap tpl-imgtexto" style="display: none;">
+                    <label>Upload de Imagem</label>
+                    <div class="media-upload-preview">
+                        <button type="button" class="btn-editor-visualizar" style="flex:1;">Upload + Thumbnail</button>
+                        <div class="media-thumb-box" style="width: 40px; flex: none;"><img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb" alt="IMG"></div>
+                    </div>
+                </div>
+
+                <!-- Indicadores específicos -->
+                <div class="form-group-ap tpl-indicadores" style="display: none;">
+                    <label>Indicadores</label>
+                    <div class="ind-list-edit">
+                        <div class="ind-edit-item">
+                            <i class="bi bi-heart-pulse"></i> <span>Saúde</span>
+                            <div class="ind-actions"><i class="bi bi-plus"></i> <i class="bi bi-trash text-danger"></i></div>
+                        </div>
+                        <div class="ind-edit-item">
+                            <i class="bi bi-shield-check"></i> <span>Segurança</span>
+                            <div class="ind-actions"><i class="bi bi-plus"></i> <i class="bi bi-trash text-danger"></i></div>
+                        </div>
+                        <div class="ind-edit-item">
+                            <i class="bi bi-car-front"></i> <span>Mobilidade</span>
+                            <div class="ind-actions"><i class="bi bi-plus"></i> <i class="bi bi-trash text-danger"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráfico específicos -->
+                <div class="form-group-ap tpl-grafico" style="display: none;">
+                    <label>Tipo de gráfico</label>
+                    <div class="chart-type-selector">
+                        <button class="active"><i class="bi bi-graph-up"></i> Linha</button>
+                        <button><i class="bi bi-bar-chart"></i> Barras</button>
+                        <button><i class="bi bi-pie-chart"></i> Pizza</button>
+                    </div>
+                    <label class="mt-2">Dados</label>
+                    <div class="d-flex gap-3 mb-2" style="font-size:0.75rem;">
+                        <label><input type="radio" name="fonte" checked> Manual</label>
+                        <label><input type="radio" name="fonte"> Dado do sistema</label>
+                    </div>
+                    <label>Período</label>
+                    <select class="form-control-ap"><option>Últimos 12 meses</option></select>
+                </div>
+
+                <div class="config-slots-section mt-3">
+                    <div class="slots-header">
+                        <h4>Elementos extras</h4>
+                    </div>
+                    <div class="slot-toggle-row">
+                        <div class="slot-row-label">
+                            <img src="https://sdgs.un.org/sites/default/files/2023-08/SDG_logo_without_UN_emblem_Square_Transparent_WEB.png" style="width:16px;">
+                            <span>ODS</span>
+                        </div>
+                        <label class="switch-ap">
+                            <input type="checkbox" id="toggleODS">
+                            <span class="slider-ap"></span>
+                        </label>
+                    </div>
+                    <div class="slot-toggle-row">
+                        <div class="slot-row-label">
+                            <i class="bi bi-qr-code"></i>
+                            <span>QR Code</span>
+                        </div>
+                        <label class="switch-ap">
+                            <input type="checkbox" id="toggleQR">
+                            <span class="slider-ap"></span>
+                        </label>
+                    </div>
+                </div>
+
+            </form>
+        </aside>
+
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const selectTemplate = document.getElementById("selectTemplate");
+    
+    const layoutCapa = document.querySelector(".layout-capa");
+    const layoutImgTexto = document.querySelector(".layout-imagem-texto");
+    const layoutIndicadores = document.querySelector(".layout-indicadores");
+    const layoutGrafico = document.querySelector(".layout-grafico");
+
+    const tplCapa = document.querySelectorAll(".tpl-capa");
+    const tplImgTexto = document.querySelectorAll(".tpl-imgtexto");
+    const tplIndicadores = document.querySelectorAll(".tpl-indicadores");
+    const tplGrafico = document.querySelectorAll(".tpl-grafico");
+    
+    const labelTitulo = document.getElementById("labelTitulo");
+    const labelSubtitulo = document.getElementById("labelSubtitulo");
+    const fgSubtitulo = document.querySelector(".fg-subtitulo");
+
+    const inputTitulo = document.getElementById("inputTitulo");
+    const inputSubtitulo = document.getElementById("inputSubtitulo");
+
+    const slotODS = document.getElementById("slotODS");
+    const slotQRCode = document.getElementById("slotQRCode");
+    const toggleODS = document.getElementById("toggleODS");
+    const toggleQR = document.getElementById("toggleQR");
+
+    function updatePreviewTexts() {
+        document.querySelectorAll(".preview-titulo").forEach(el => el.textContent = inputTitulo.value || "Título");
+        document.querySelectorAll(".preview-subtitulo").forEach(el => el.textContent = inputSubtitulo.value || "Subtítulo");
+    }
+
+    inputTitulo.addEventListener("input", updatePreviewTexts);
+    inputSubtitulo.addEventListener("input", updatePreviewTexts);
+
+    toggleODS.addEventListener("change", e => slotODS.style.display = e.target.checked ? "flex" : "none");
+    toggleQR.addEventListener("change", e => slotQRCode.style.display = e.target.checked ? "flex" : "none");
+
+    function switchTemplate() {
+        const val = selectTemplate.value;
+        
+        // Hide all layouts & config fields
+        layoutCapa.style.display = "none";
+        layoutImgTexto.style.display = "none";
+        layoutIndicadores.style.display = "none";
+        layoutGrafico.style.display = "none";
+
+        tplCapa.forEach(el => el.style.display = "none");
+        tplImgTexto.forEach(el => el.style.display = "none");
+        tplIndicadores.forEach(el => el.style.display = "none");
+        tplGrafico.forEach(el => el.style.display = "none");
+        
+        document.getElementById("activeSlideSurface").className = "slide-surface template-" + val;
+
+        if(val === "capa") {
+            layoutCapa.style.display = "block";
+            tplCapa.forEach(el => el.style.display = "flex");
+            labelTitulo.textContent = "Título";
+            labelSubtitulo.textContent = "Subtítulo";
+            fgSubtitulo.style.display = "flex";
+        } else if(val === "imagem_texto") {
+            layoutImgTexto.style.display = "flex";
+            tplImgTexto.forEach(el => el.style.display = "flex");
+            labelTitulo.textContent = "Título do Slide";
+            labelSubtitulo.textContent = "Texto de Apoio";
+            fgSubtitulo.style.display = "flex";
+            
+            // Reposition slots for this template
+            document.querySelector(".it-ods-slot").appendChild(slotODS);
+            document.querySelector(".it-qr-slot").appendChild(slotQRCode);
+        } else if(val === "indicadores") {
+            layoutIndicadores.style.display = "block";
+            tplIndicadores.forEach(el => el.style.display = "block");
+            labelTitulo.textContent = "Título";
+            labelSubtitulo.textContent = "Texto Introdutório";
+            fgSubtitulo.style.display = "flex";
+            
+            // Global slots at bottom
+            document.querySelector(".global-slots-container").appendChild(slotODS);
+            document.querySelector(".global-slots-container").appendChild(slotQRCode);
+        } else if(val === "grafico") {
+            layoutGrafico.style.display = "block";
+            tplGrafico.forEach(el => el.style.display = "block");
+            labelTitulo.textContent = "Título";
+            labelSubtitulo.textContent = "Texto Introdutório";
+            fgSubtitulo.style.display = "flex";
+            
+            document.querySelector(".global-slots-container").appendChild(slotODS);
+            document.querySelector(".global-slots-container").appendChild(slotQRCode);
+        }
+    }
+
+    selectTemplate.addEventListener("change", switchTemplate);
+    switchTemplate(); // init
+});
+</script>
+{% endblock %}
