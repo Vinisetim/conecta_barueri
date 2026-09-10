@@ -13,7 +13,7 @@
 .hero-text-col h1 {
     font-size: 3.25rem;
     line-height: 1.2;
-    color: var(--dark-slate);
+    color: var(--primary);
 }
 
 .hero-img {

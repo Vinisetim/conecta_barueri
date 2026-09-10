@@ -316,3 +316,34 @@
         border-radius: 10px;
     }
 }
+
+.fonte-edit,
+.fonte-delete {
+
+    border: none;
+    background: transparent;
+
+    cursor: pointer;
+
+    font-size: 1rem;
+
+    margin-right: 10px;
+}
+
+.fonte-edit {
+    color: #0d6efd;
+}
+
+.fonte-delete {
+    color: #dc3545;
+}
+
+.fonte-edit:hover,
+.fonte-delete:hover {
+    transform: scale(1.1);
+}
+
+.fontes-pagination-info {
+    color: #26324f;
+    font-weight: 700;
+}
