@@ -36,22 +36,22 @@
                     <label for="password">Senha</label>
                     <div class="input-icon-wrapper">
                         {{ form.senha(id="password", class="form-control", placeholder="Digite sua senha") }}
-                        {% for erro in form.senha.errors %}
-                             <span class="field-error">{{ erro }}</span>
-                        {% endfor %}
-                            <i class="bi bi-lock-fill"></i>
+                        <i class="bi bi-lock-fill"></i>
                     </div>
+                    {% for erro in form.senha.errors %}
+                        <span class="field-error">{{ erro }}</span>
+                    {% endfor %}
                 </div>
 
                 <div class="form-utilities">
                     <label class="checkbox-container">
-                            {{ form.lembrar() }}
+                        {{ form.lembrar() }}
                         <span>Lembrar de mim</span>
                     </label>
                 </div>
 
                 <button type="submit" class="btn-submit">Entrar</button>
-                <a href="{{ url_for('main.home')}}" class="dev-link"> Entrar sem login (desenvolvedor)</a>
+                <a href="{{ url_for('auth.dev_login') }}" class="dev-link">Entrar sem login (desenvolvedor)</a>
             </form>
         </div>
     </div>

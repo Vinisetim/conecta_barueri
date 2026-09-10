@@ -19,7 +19,7 @@ def create_app():
     # SECRET_KEY string para assinar cookies de sessão, protege dados do usuário
     app.config['SECRET_KEY'] = 'chave_temporaria_dev'
     #URI do banco de dados
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://usuario:senha@localhost/conecta_barueri'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:conecta123!@db.gzfefwbmhafiuybiislx.supabase.co:5432/postgres'
 
     #Conecta extensões ao app
     bcrypt.init_app(app)
@@ -29,8 +29,14 @@ def create_app():
     db.init_app(app)
 
 
-    #qual rota o Flask_login redireciona ao acessar sem estar logado:
+    # Configurações do Flask-Login para controle de sessão e segurança
+    # Define a rota de login padrão para redirecionamento de usuários não autenticados
     login_manager.login_view = 'auth.login'
+    # Mensagem exibida via flash() ao ser barrado por @login_required
+    login_manager.login_message = 'Por favor, realize o login para acessar esta página.'
+    login_manager.login_message_category = 'warning'
+    # Proteção de sessão forte: invalida cookies em caso de alterações anômalas no IP ou User-Agent (mitigação de Session Hijacking)
+    login_manager.session_protection = 'strong'
 
     # Registro do Blueprint da Landing Page
     from app.routes.main import main_bp
