@@ -458,14 +458,156 @@ document.addEventListener("DOMContentLoaded", function() {
     const activeSlideSurface = document.getElementById("activeSlideSurface");
     const imgTextoCanvasImg = document.querySelector(".it-img"); // a imagem no template Imagem+Texto
 
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function renderMiniSlidePreview(slide) {
+        const tpl = slide.template || 'capa';
+        const title = escapeHtml(slide.titulo || '');
+        const subtitle = escapeHtml(slide.subtitulo || '');
+
+        const odsBadge = slide.ods ? `
+            <div style="position: absolute; bottom: 2px; right: ${slide.qr ? '14px' : '3px'}; background: #f97316; color: #fff; font-size: 3px; font-weight: 900; padding: 1px 2px; border-radius: 1px; display: flex; align-items: center; gap: 1px; z-index: 2; line-height: 1;">
+                <span>11</span><span style="font-size: 2px;">ODS</span>
+            </div>` : '';
+        
+        const qrBadge = slide.qr ? `
+            <div style="position: absolute; bottom: 2px; right: 2px; width: 9px; height: 9px; background: #fff; border: 0.5px solid #cbd5e1; border-radius: 1px; display: flex; align-items: center; justify-content: center; font-size: 6px; color: #0f172a; z-index: 2; line-height: 1;">
+                <i class="bi bi-qr-code" style="font-size: 6px;"></i>
+            </div>` : '';
+
+        if (tpl === 'capa') {
+            const hasBg = !!slide.bgCapa;
+            const textColor = hasBg ? '#ffffff' : '#0f172a';
+            const subColor = hasBg ? 'rgba(255,255,255,0.85)' : '#64748b';
+            return `
+                <div style="width:100%; height:100%; position:relative; padding: 4px 6px; display:flex; flex-direction:column; justify-content:space-between; ${hasBg ? `background: url(${slide.bgCapa}) center/cover no-repeat;` : 'background:#ffffff;'} box-sizing: border-box; overflow:hidden;">
+                    ${hasBg ? '<div style="position:absolute; inset:0; background:rgba(0,0,0,0.35); z-index:0;"></div>' : ''}
+                    <div style="position:relative; z-index:1; display:flex; align-items:center; gap:3px;">
+                        <img src="/static/img/logo-barueri.jpeg" style="width:8px; height:8px; object-fit:contain; border-radius:1px;">
+                        <span style="font-size:4.5px; font-weight:700; color:${hasBg ? '#ffffff' : '#0284c7'}; line-height:1;">Barueri</span>
+                    </div>
+                    <div style="position:relative; z-index:1; margin-bottom:2px;">
+                        <div style="font-size:7px; font-weight:800; color:${textColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.1;">${title || 'Capa'}</div>
+                        <div style="font-size:4.5px; color:${subColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.1;">${subtitle || 'Apresentação Executiva'}</div>
+                    </div>
+                    ${odsBadge}
+                    ${qrBadge}
+                </div>
+            `;
+        }
+
+        if (tpl === 'imagem_texto') {
+            const imgSrc = slide.imgTexto || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb';
+            return `
+                <div style="width:100%; height:100%; position:relative; padding:3px; display:flex; gap:4px; align-items:center; background:#ffffff; box-sizing:border-box; overflow:hidden;">
+                    <div style="width:45%; height:100%; border-radius:2px; overflow:hidden; flex-shrink:0; background:#f1f5f9; position:relative;">
+                        <img src="${imgSrc}" style="width:100%; height:100%; object-fit:cover; display:block;">
+                    </div>
+                    <div style="flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; gap:2px;">
+                        <div style="font-size:3.5px; font-weight:700; color:#64748b; text-transform:uppercase; line-height:1;">TÍTULO</div>
+                        <div style="font-size:6px; font-weight:800; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1;">${title || 'Título'}</div>
+                        <div style="font-size:4.5px; color:#64748b; line-height:1.1; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${subtitle || 'Texto de apoio'}</div>
+                    </div>
+                    ${odsBadge}
+                    ${qrBadge}
+                </div>
+            `;
+        }
+
+        if (tpl === 'indicadores') {
+            return `
+                <div style="width:100%; height:100%; position:relative; padding:3px 4px; display:flex; flex-direction:column; justify-content:space-between; background:#ffffff; box-sizing:border-box; overflow:hidden;">
+                    <div style="text-align:center;">
+                        <div style="font-size:5.5px; font-weight:800; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1;">${title || 'Indicadores'}</div>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:2px; margin-bottom:1px;">
+                        <div style="background:#f8fafc; border:0.5px solid #e2e8f0; border-radius:2px; padding:1.5px 2px; text-align:center;">
+                            <div style="font-size:5px; font-weight:800; color:#0f172a; line-height:1;">3.237</div>
+                            <div style="font-size:3px; color:#64748b; text-transform:uppercase; line-height:1;">Saúde</div>
+                        </div>
+                        <div style="background:#f8fafc; border:0.5px solid #e2e8f0; border-radius:2px; padding:1.5px 2px; text-align:center;">
+                            <div style="font-size:5px; font-weight:800; color:#0f172a; line-height:1;">3.847</div>
+                            <div style="font-size:3px; color:#64748b; text-transform:uppercase; line-height:1;">Segurança</div>
+                        </div>
+                        <div style="background:#f8fafc; border:0.5px solid #e2e8f0; border-radius:2px; padding:1.5px 2px; text-align:center;">
+                            <div style="font-size:5px; font-weight:800; color:#0f172a; line-height:1;">3.755</div>
+                            <div style="font-size:3px; color:#64748b; text-transform:uppercase; line-height:1;">Educação</div>
+                        </div>
+                        <div style="background:#f8fafc; border:0.5px solid #e2e8f0; border-radius:2px; padding:1.5px 2px; text-align:center;">
+                            <div style="font-size:5px; font-weight:800; color:#0f172a; line-height:1;">4.687</div>
+                            <div style="font-size:3px; color:#64748b; text-transform:uppercase; line-height:1;">Mobilidade</div>
+                        </div>
+                    </div>
+                    ${odsBadge}
+                    ${qrBadge}
+                </div>
+            `;
+        }
+
+        if (tpl === 'grafico') {
+            const cType = slide.chartType || 'line';
+            let chartSvg = '';
+            if (cType === 'pie') {
+                chartSvg = `<div style="width:18px; height:18px; border-radius:50%; background:conic-gradient(#3b82f6 0% 45%, #60a5fa 45% 80%, #93c5fd 80% 100%);"></div>`;
+            } else if (cType === 'bar') {
+                chartSvg = `
+                    <svg viewBox="0 0 60 22" style="width:80%; height:80%;">
+                        <rect x="3" y="11" width="6" height="11" fill="#3b82f6" rx="1"/>
+                        <rect x="13" y="5" width="6" height="17" fill="#3b82f6" rx="1"/>
+                        <rect x="23" y="9" width="6" height="13" fill="#3b82f6" rx="1"/>
+                        <rect x="33" y="2" width="6" height="20" fill="#3b82f6" rx="1"/>
+                        <rect x="43" y="6" width="6" height="16" fill="#3b82f6" rx="1"/>
+                        <rect x="53" y="1" width="6" height="21" fill="#3b82f6" rx="1"/>
+                    </svg>`;
+            } else {
+                chartSvg = `
+                    <svg viewBox="0 0 60 22" style="width:85%; height:85%;">
+                        <path d="M 2,16 Q 12,12 20,14 T 38,6 T 58,2 L 58,22 L 2,22 Z" fill="rgba(59,130,246,0.15)"/>
+                        <polyline fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" points="2,16 12,11 20,14 30,8 38,6 50,8 58,2"/>
+                        <circle cx="20" cy="14" r="1.5" fill="#3b82f6"/>
+                        <circle cx="38" cy="6" r="1.5" fill="#3b82f6"/>
+                        <circle cx="58" cy="2" r="1.5" fill="#3b82f6"/>
+                    </svg>`;
+            }
+
+            return `
+                <div style="width:100%; height:100%; position:relative; padding:3px 4px; display:flex; flex-direction:column; justify-content:space-between; background:#ffffff; box-sizing:border-box; overflow:hidden;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div style="font-size:5.5px; font-weight:800; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:65%; line-height:1;">${title || 'Gráfico'}</div>
+                        <div style="font-size:3px; background:#eff6ff; color:#2563eb; border:0.5px solid #bfdbfe; border-radius:3px; padding:0.5px 2px; font-weight:600; line-height:1;">${slide.periodo || '12 meses'}</div>
+                    </div>
+                    <div style="flex:1; min-height:0; display:flex; align-items:center; justify-content:center; background:#f8fafc; border:0.5px solid #e2e8f0; border-radius:2px; margin-top:2px;">
+                        ${chartSvg}
+                    </div>
+                    ${odsBadge}
+                    ${qrBadge}
+                </div>
+            `;
+        }
+
+        return '';
+    }
+
+    function updateActiveThumbnail() {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (!slide) return;
+        const thumbCanvas = slidesThumbsList.querySelector(`.slide-thumb-item[data-slide-id="${slide.id}"] .thumb-canvas-mini`);
+        if (thumbCanvas) {
+            thumbCanvas.innerHTML = renderMiniSlidePreview(slide);
+        }
+    }
+
     function renderThumbnails() {
         slidesThumbsList.innerHTML = "";
         slides.forEach((slide, index) => {
-            let miniClass = "capa-mini";
-            if (slide.template === "imagem_texto") miniClass = "split-mini";
-            if (slide.template === "indicadores") miniClass = "metric-mini";
-            if (slide.template === "grafico") miniClass = "chart-mini";
-
             const div = document.createElement("div");
             div.className = `slide-thumb-item ${slide.id === activeSlideId ? 'active' : ''}`;
             div.setAttribute("data-slide-id", slide.id);
@@ -476,9 +618,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 <span class="slide-index">${index + 1}</span>
                 <div class="thumb-card" style="position:relative;">
                     ${deleteBtnHtml}
-                    <div class="thumb-canvas-mini ${miniClass}">
-                        <span class="mini-tag">Barueri</span>
-                        <div class="mini-title-bar"></div>
+                    <div class="thumb-canvas-mini" style="height:62px; aspect-ratio:16/9; width:100%; padding:0; overflow:hidden; border-radius:4px; border:1px solid #e2e8f0; background:#fff;">
+                        ${renderMiniSlidePreview(slide)}
                     </div>
                     <span class="thumb-label">Slide ${index + 1}</span>
                 </div>
@@ -700,12 +841,14 @@ document.addEventListener("DOMContentLoaded", function() {
         const slide = slides.find(s => s.id === activeSlideId);
         if (slide) slide.titulo = e.target.value;
         updatePreviewTexts();
+        updateActiveThumbnail();
     });
 
     inputSubtitulo.addEventListener("input", (e) => {
         const slide = slides.find(s => s.id === activeSlideId);
         if (slide) slide.subtitulo = e.target.value;
         updatePreviewTexts();
+        updateActiveThumbnail();
     });
 
     selectTemplate.addEventListener("change", (e) => {
@@ -720,12 +863,14 @@ document.addEventListener("DOMContentLoaded", function() {
         const slide = slides.find(s => s.id === activeSlideId);
         if (slide) slide.ods = e.target.checked;
         updateSlotsVisibility();
+        updateActiveThumbnail();
     });
 
     toggleQR.addEventListener("change", (e) => {
         const slide = slides.find(s => s.id === activeSlideId);
         if (slide) slide.qr = e.target.checked;
         updateSlotsVisibility();
+        updateActiveThumbnail();
     });
     
     // Upload de Imagem de Fundo para Capa
@@ -742,6 +887,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (slide) {
                     slide.bgCapa = event.target.result;
                     updatePreviewMedia();
+                    updateActiveThumbnail();
                 }
             };
             reader.readAsDataURL(file);
@@ -762,18 +908,20 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (slide) {
                     slide.imgTexto = event.target.result;
                     updatePreviewMedia();
+                    updateActiveThumbnail();
                 }
             };
             reader.readAsDataURL(file);
         }
     });
 
-        document.querySelectorAll(".btn-chart-type").forEach(btn => {
+    document.querySelectorAll(".btn-chart-type").forEach(btn => {
         btn.addEventListener("click", (e) => {
             const slide = slides.find(s => s.id === activeSlideId);
             if (slide && slide.template === "grafico") {
                 slide.chartType = e.currentTarget.dataset.type;
                 renderChart(slide);
+                updateActiveThumbnail();
             }
         });
     });
@@ -786,6 +934,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 slide.periodo = e.target.value;
                 const previewPeriodo = document.getElementById("previewPeriodo");
                 if(previewPeriodo) previewPeriodo.textContent = slide.periodo;
+                updateActiveThumbnail();
             }
         });
     }
