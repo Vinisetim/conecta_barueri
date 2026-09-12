@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Editor de ApresentaÃ§Ãµes | Conecta Barueri{% endblock %}
+{% block title %}Editor de Apresentações | Conecta Barueri{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/apresentacao/criar-apresentacao.css') }}">
@@ -12,7 +12,7 @@
     <header class="editor-header">
         <div class="editor-header-info">
             <h1 class="editor-title" id="displayApresentacaoTitulo">Apresentação Executiva</h1>
-            <p class="editor-subtitle">Edite e organize os slides da sua apresentaÃ§Ã£o institucional.</p>
+            <p class="editor-subtitle">Edite e organize os slides da sua apresentação institucional.</p>
         </div>
 
         <div class="editor-header-actions">
@@ -86,9 +86,9 @@
                             <div class="it-ods-slot"></div>
                             <div class="it-text-content">
                                 <span class="it-label">Título do Slide</span>
-                                <h1 class="slide-title-preview preview-titulo">VisÃ£o Geral dos Indicadores</h1>
+                                <h1 class="slide-title-preview preview-titulo">Visão Geral dos Indicadores</h1>
                                 <span class="it-label">Texto de Apoio</span>
-                                <p class="slide-subtitle-preview preview-subtitulo">Resumo comparativo dos principais dados socioeconÃ´micos.</p>
+                                <p class="slide-subtitle-preview preview-subtitulo">Resumo comparativo dos principais dados socioeconômicos.</p>
                             </div>
                         </div>
                     </div>
@@ -131,11 +131,10 @@
                         </div>
                     </div>
 
-                    <!-- GRÃ FICO LAYOUT -->
+                    <!-- GRÁFICO LAYOUT -->
                     <div class="layout-grafico" style="display: none;">
                         <div class="gra-header">
                             <div>
-                                <span class="gra-tag" id="previewPeriodo">Últimos 12 meses</span>
                                 <h1 class="slide-title-preview preview-titulo">Atendimentos médicos</h1>
                                 <p class="slide-subtitle-preview preview-subtitulo">Evolução no número de atendimentos médicos.</p>
                             </div>
@@ -148,7 +147,10 @@
                         </div>
                         <div class="gra-content">
                             <div class="gra-main-chart" style="flex:1; width:100%; position:relative; min-height:0; display:flex; flex-direction:column; background: #fff; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-                                <h4>Total de atendimentos</h4>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <h4 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: #1e293b;">Total de atendimentos</h4>
+                                    <span class="gra-tag" id="previewPeriodo">Últimos 12 meses</span>
+                                </div>
                                 <div class="fake-chart-area" style="flex:1; position:relative; width:100%; height:100%; border: none; padding: 0; background: transparent;">
                                     <canvas id="slideChart"></canvas>
                                 </div>
@@ -180,14 +182,14 @@
                         </div>
                     </div>
 
-                    <!-- SLOTS (Global posicionado absoluto ou no rodapÃ©) -->
+                    <!-- SLOTS (Global posicionado absoluto ou no rodapé) -->
                     <div class="global-slots-container">
                         <div class="slide-slot-item" id="slotODS" style="display: none;">
                             <div class="ods-badge-box">
                                 <span class="ods-number">11</span>
                                 <div class="ods-desc">
                                     <small>CIDADES E COMUNIDADES</small>
-                                    <small>SUSTENTÃVEIS</small>
+                                    <small>SUSTENTÁVEIS</small>
                                 </div>
                             </div>
                         </div>
@@ -200,7 +202,7 @@
             </div>
         </main>
 
-        <!-- CONFIGURAÃ‡ÃƒO -->
+        <!-- CONFIGURAÇÃO -->
         <aside class="panel-card slide-config-panel">
             <div class="panel-header">
                 <h2>Configuração do Slide</h2>
@@ -230,7 +232,7 @@
                     <textarea id="inputSubtitulo" class="form-control-ap" rows="3">Apresentação Executiva - Indicadores Municipais</textarea>
                 </div>
 
-                <!-- Capa especÃ­ficos -->
+                <!-- Capa específicos -->
                 <div class="form-group-ap tpl-capa">
                     <label>Imagem do background</label>
                     <div class="media-upload-preview">
@@ -240,7 +242,7 @@
                     </div>
                 </div>
 
-                <!-- Imagem+Texto especÃ­ficos -->
+                <!-- Imagem+Texto específicos -->
                 <div class="form-group-ap tpl-imgtexto" style="display: none;">
                     <label>Upload de Imagem</label>
                     <div class="media-upload-preview">
@@ -250,7 +252,7 @@
                     </div>
                 </div>
 
-                <!-- Indicadores especÃ­ficos -->
+                <!-- Indicadores específicos -->
                 <div class="form-group-ap tpl-indicadores" style="display: none;">
                     <label>Indicadores</label>
                     <div class="ind-list-edit">
@@ -269,9 +271,9 @@
                     </div>
                 </div>
 
-                <!-- Gráfico especÃ­ficos -->
+                <!-- Gráfico específicos -->
                 <div class="form-group-ap tpl-grafico" style="display: none;">
-                    <label>Tipo de grÃ¡fico</label>
+                    <label>Tipo de gráfico</label>
                     <div class="chart-type-selector">
                         <button type="button" class="btn-chart-type active" data-type="line"><i class="bi bi-graph-up"></i> Linha</button>
                         <button type="button" class="btn-chart-type" data-type="bar"><i class="bi bi-bar-chart"></i> Barras</button>
@@ -331,13 +333,13 @@
         </div>
         <div style="display:flex; gap:12px;">
             <button id="btnPrevSlide" style="padding:8px 16px; background:#3b82f6; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer;"><i class="bi bi-chevron-left"></i> Anterior</button>
-            <button id="btnNextSlide" style="padding:8px 16px; background:#3b82f6; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">PrÃ³ximo <i class="bi bi-chevron-right"></i></button>
+            <button id="btnNextSlide" style="padding:8px 16px; background:#3b82f6; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">Próximo <i class="bi bi-chevron-right"></i></button>
             <button id="btnClosePreview" style="padding:8px 16px; background:#ef4444; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer;"><i class="bi bi-x-lg"></i> Fechar</button>
         </div>
     </div>
 
     <div id="previewContainer" style="width:100%; max-width:1000px; max-height: calc(100vh - 120px); aspect-ratio:16/9; background:#fff; border-radius:12px; overflow:hidden; display:flex; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
-        <!-- Clone do slide irÃ¡ aqui -->
+        <!-- Clone do slide irá aqui -->
     </div>
 </div>
 
@@ -383,8 +385,19 @@
     /* Gráficos */
     .slide-surface .gra-header h1 { font-size: 3.5cqw !important; margin-bottom: 1cqw !important; }
     .slide-surface .gra-header p { font-size: 1.8cqw !important; }
-    .slide-surface .gra-main-chart h4 { font-size: 2.2cqw !important; margin-bottom: 2cqw !important; }
-    .slide-surface .gra-tag { font-size: 1.5cqw !important; margin-bottom: 0.5cqw !important; }
+    .slide-surface .gra-main-chart h4 { font-size: 2.2cqw !important; margin: 0 !important; }
+    .slide-surface .gra-tag {
+        font-size: 1.3cqw !important;
+        background: #eff6ff !important;
+        color: #2563eb !important;
+        border: 1px solid #bfdbfe !important;
+        padding: 0.3cqw 1cqw !important;
+        border-radius: 9999px !important;
+        font-weight: 600 !important;
+        margin: 0 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+    }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -797,7 +810,7 @@ document.addEventListener("DOMContentLoaded", function() {
         slidesThumbsList.scrollTop = slidesThumbsList.scrollHeight;
     });
 
-    // --- LÃ³gica de Salvar ---
+    // --- Lógica de Salvar ---
     const btnSalvar = document.getElementById("btnSalvar");
     const saveToast = document.getElementById("saveToast");
     btnSalvar.addEventListener("click", () => {
@@ -808,7 +821,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }, 3000);
     });
 
-    // --- LÃ³gica de Visualizar (Apresentação Tela Cheia) ---
+    // --- Lógica de Visualizar (Apresentação Tela Cheia) ---
     const btnVisualizar = document.getElementById("btnVisualizar");
     const previewModal = document.getElementById("previewModal");
     const previewContainer = document.getElementById("previewContainer");
