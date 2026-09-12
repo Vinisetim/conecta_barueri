@@ -1,7 +1,7 @@
-/* ==========================================================================
-   CONECTA BARUERI — CSS DO EDITOR DE APRESENTAÇÕES INSTITUCIONAIS
-   Design Responsivo e Ajustável para telas com Zoom Padrão / Laptops
-   Compatível com sidebar.css e Bootstrap 5
+﻿/* ==========================================================================
+   CONECTA BARUERI â€” CSS DO EDITOR DE APRESENTAÃ‡Ã•ES INSTITUCIONAIS
+   Design Responsivo e AjustÃ¡vel para telas com Zoom PadrÃ£o / Laptops
+   CompatÃ­vel com sidebar.css e Bootstrap 5
    ========================================================================== */
 
 :root {
@@ -28,7 +28,7 @@
 }
 
 /* ==========================================================================
-   CONTAINER GERAL DO EDITOR (AJUSTE À VIEWPORT)
+   CONTAINER GERAL DO EDITOR (AJUSTE Ã€ VIEWPORT)
    ========================================================================== */
 .editor-container {
     width: 100%;
@@ -40,7 +40,7 @@
     gap: 10px;
 }
 
-/* Reduz o respiro padrão do layout principal para dar mais tela útil ao editor */
+/* Reduz o respiro padrÃ£o do layout principal para dar mais tela Ãºtil ao editor */
 @media (min-width: 781px) {
     .content {
         padding: 4px 28px 16px !important;
@@ -81,7 +81,7 @@
     gap: 8px;
 }
 
-/* Botões do Topo */
+/* BotÃµes do Topo */
 .btn-editor-visualizar {
     display: inline-flex;
     align-items: center;
@@ -294,7 +294,7 @@
     text-align: center;
 }
 
-/* Botão Novo Slide fixo na base */
+/* BotÃ£o Novo Slide fixo na base */
 .btn-novo-slide {
     width: 100%;
     display: inline-flex;
@@ -319,7 +319,7 @@
 }
 
 /* ==========================================================================
-   COLUNA 2: CANVAS DO SLIDE (CENTRO - FIT PROPORCIONAL À TELA)
+   COLUNA 2: CANVAS DO SLIDE (CENTRO - FIT PROPORCIONAL Ã€ TELA)
    ========================================================================== */
 .slide-canvas-panel {
     height: 100%;
@@ -341,7 +341,7 @@
     min-height: 0;
 }
 
-/* Superfície Proporcional 16:9 ajustada à altura disponível */
+/* SuperfÃ­cie Proporcional 16:9 ajustada Ã  altura disponÃ­vel */
 .slide-surface {
     width: 100%;
     max-width: 660px;
@@ -389,7 +389,7 @@
     font-weight: 800;
 }
 
-/* Bloco de Título Principal */
+/* Bloco de TÃ­tulo Principal */
 .slide-main-content {
     margin-top: 4px;
 }
@@ -436,7 +436,7 @@
     margin: 0;
 }
 
-/* Faixa de Slots Flexíveis */
+/* Faixa de Slots FlexÃ­veis */
 .slide-slots-container {
     display: flex;
     align-items: center;
@@ -513,7 +513,7 @@
     color: var(--text-muted);
 }
 
-/* Rodapé do Slide */
+/* RodapÃ© do Slide */
 .slide-footer-bar {
     padding-top: 6px;
     border-top: 1px solid #f1f5f9;
@@ -523,7 +523,7 @@
 }
 
 /* ==========================================================================
-   COLUNA 3: CONFIGURAÇÃO DO SLIDE (DIREITA - SCROLL INDEPENDENTE)
+   COLUNA 3: CONFIGURAÃ‡ÃƒO DO SLIDE (DIREITA - SCROLL INDEPENDENTE)
    ========================================================================== */
 .slide-config-panel {
     height: 100%;
@@ -632,14 +632,14 @@
     background: var(--primary-dark);
 }
 
-/* Input com Ícone Embutido */
+/* Input com Ãcone Embutido */
 .input-with-action {
     display: flex;
     align-items: center;
     gap: 6px;
 }
 
-/* Seção de Switches de Slots Flexíveis */
+/* SeÃ§Ã£o de Switches de Slots FlexÃ­veis */
 .config-slots-section {
     padding-top: 8px;
     border-top: 1px solid var(--border-soft);
@@ -733,7 +733,7 @@ input:checked + .slider-ap:before {
 }
 
 /* ==========================================================================
-   RESPONSIVIDADE E ADAPTAÇÃO PARA TELAS MENORES / ZOOM
+   RESPONSIVIDADE E ADAPTAÃ‡ÃƒO PARA TELAS MENORES / ZOOM
    ========================================================================== */
 @media (max-width: 1366px) {
     .editor-workspace {
@@ -785,70 +785,61 @@ input:checked + .slider-ap:before {
         overflow: visible;
     }
 }
- / *   A D I � � E S   A O   C S S   D O   E D I T O R   P A R A   S U P O R T A R   N O V O S   T E M P L A T E S   * / 
- 
- / *   L a y o u t   C a p a   * / 
- . l a y o u t - c a p a   {   d i s p l a y :   f l e x ;   f l e x - d i r e c t i o n :   c o l u m n ;   h e i g h t :   1 0 0 % ;   j u s t i f y - c o n t e n t :   s p a c e - b e t w e e n ;   } 
- 
- / *   L a y o u t   I m a g e m   +   T e x t o   * / 
- . l a y o u t - i m a g e m - t e x t o   {   d i s p l a y :   f l e x ;   h e i g h t :   1 0 0 % ;   w i d t h :   1 0 0 % ;   b a c k g r o u n d :   # f f f ;   b o r d e r - r a d i u s :   8 p x ;   o v e r f l o w :   h i d d e n ;   b o x - s h a d o w :   0   4 p x   1 2 p x   r g b a ( 0 , 0 , 0 , 0 . 0 5 ) ;   } 
- . i t - l e f t   {   w i d t h :   5 0 % ;   p o s i t i o n :   r e l a t i v e ;   } 
- . i t - i m g   {   w i d t h :   1 0 0 % ;   h e i g h t :   1 0 0 % ;   o b j e c t - f i t :   c o v e r ;   } 
- . i t - q r - s l o t   {   p o s i t i o n :   a b s o l u t e ;   b o t t o m :   1 6 p x ;   l e f t :   1 6 p x ;   } 
- . i t - r i g h t   {   w i d t h :   5 0 % ;   p a d d i n g :   2 4 p x ;   d i s p l a y :   f l e x ;   f l e x - d i r e c t i o n :   c o l u m n ;   p o s i t i o n :   r e l a t i v e ;   j u s t i f y - c o n t e n t :   c e n t e r ;   } 
- . i t - o d s - s l o t   {   p o s i t i o n :   a b s o l u t e ;   t o p :   1 6 p x ;   r i g h t :   1 6 p x ;   } 
- . i t - l a b e l   {   f o n t - s i z e :   0 . 6 r e m ;   c o l o r :   # 6 4 7 4 8 b ;   f o n t - w e i g h t :   7 0 0 ;   t e x t - t r a n s f o r m :   u p p e r c a s e ;   m a r g i n - b o t t o m :   4 p x ;   } 
- . i t - t e x t - c o n t e n t   {   m a r g i n - t o p :   2 0 p x ;   } 
- . i t - t e x t - c o n t e n t   h 1   {   f o n t - s i z e :   1 . 4 r e m ;   f o n t - w e i g h t :   8 0 0 ;   c o l o r :   # 0 f 1 7 2 a ;   m a r g i n - b o t t o m :   1 2 p x ;   } 
- . i t - t e x t - c o n t e n t   p   {   f o n t - s i z e :   0 . 8 5 r e m ;   c o l o r :   # 4 7 5 5 6 9 ;   l i n e - h e i g h t :   1 . 5 ;   } 
- 
- / *   L a y o u t   I n d i c a d o r e s   * / 
- . l a y o u t - i n d i c a d o r e s   {   d i s p l a y :   f l e x ;   f l e x - d i r e c t i o n :   c o l u m n ;   h e i g h t :   1 0 0 % ;   p a d d i n g :   1 6 p x ;   j u s t i f y - c o n t e n t :   c e n t e r ;   } 
- . i n d - h e a d e r   {   t e x t - a l i g n :   c e n t e r ;   m a r g i n - b o t t o m :   2 4 p x ;   } 
- . i n d - h e a d e r   h 1   {   f o n t - s i z e :   1 . 6 r e m ;   f o n t - w e i g h t :   8 0 0 ;   c o l o r :   # 0 f 1 7 2 a ;   m a r g i n - b o t t o m :   8 p x ;   } 
- . i n d - h e a d e r   p   {   f o n t - s i z e :   0 . 9 r e m ;   c o l o r :   # 6 4 7 4 8 b ;   } 
- . i n d - g r i d   {   d i s p l a y :   g r i d ;   g r i d - t e m p l a t e - c o l u m n s :   1 f r   1 f r ;   g a p :   1 6 p x ;   m a r g i n - b o t t o m :   3 0 p x ;   } 
- . i n d - c a r d   {   b a c k g r o u n d :   # f f f ;   b o r d e r :   1 p x   s o l i d   # e 2 e 8 f 0 ;   b o r d e r - r a d i u s :   1 2 p x ;   p a d d i n g :   1 6 p x ;   d i s p l a y :   f l e x ;   a l i g n - i t e m s :   c e n t e r ;   g a p :   1 6 p x ;   b o x - s h a d o w :   0   2 p x   8 p x   r g b a ( 0 , 0 , 0 , 0 . 0 4 ) ;   } 
- . i n d - i c o n   {   f o n t - s i z e :   2 r e m ;   } 
- . i n d - i n f o   h 3   {   f o n t - s i z e :   1 . 8 r e m ;   f o n t - w e i g h t :   8 0 0 ;   c o l o r :   # 0 f 1 7 2 a ;   m a r g i n :   0 ;   l i n e - h e i g h t :   1 ;   } 
- . i n d - i n f o   s p a n   {   f o n t - s i z e :   0 . 8 5 r e m ;   c o l o r :   # 6 4 7 4 8 b ;   f o n t - w e i g h t :   6 0 0 ;   } 
- 
- / *   L a y o u t   G r � f i c o   * / 
- . l a y o u t - g r a f i c o   {   d i s p l a y :   f l e x ;   f l e x - d i r e c t i o n :   c o l u m n ;   h e i g h t :   1 0 0 % ;   p a d d i n g :   1 6 p x ;   } 
- . g r a - h e a d e r   {   d i s p l a y :   f l e x ;   j u s t i f y - c o n t e n t :   s p a c e - b e t w e e n ;   a l i g n - i t e m s :   f l e x - s t a r t ;   m a r g i n - b o t t o m :   1 6 p x ;   } 
- . g r a - t a g   {   d i s p l a y :   i n l i n e - b l o c k ;   c o l o r :   # 3 b 8 2 f 6 ;   f o n t - s i z e :   0 . 7 5 r e m ;   f o n t - w e i g h t :   7 0 0 ;   m a r g i n - b o t t o m :   4 p x ;   } 
- . g r a - h e a d e r   h 1   {   f o n t - s i z e :   1 . 4 r e m ;   f o n t - w e i g h t :   8 0 0 ;   c o l o r :   # 0 f 1 7 2 a ;   m a r g i n - b o t t o m :   4 p x ;   } 
- . g r a - h e a d e r   p   {   f o n t - s i z e :   0 . 8 r e m ;   c o l o r :   # 6 4 7 4 8 b ;   m a x - w i d t h :   6 0 % ;   } 
- . g r a - c o n t e n t   {   d i s p l a y :   f l e x ;   g a p :   1 6 p x ;   f l e x :   1 ;   m a r g i n - b o t t o m :   3 0 p x ;   } 
- . g r a - m a i n - c h a r t   {   f l e x :   2 ;   d i s p l a y :   f l e x ;   f l e x - d i r e c t i o n :   c o l u m n ;   g a p :   1 2 p x ;   } 
- . g r a - m a i n - c h a r t   h 4   {   f o n t - s i z e :   0 . 8 5 r e m ;   f o n t - w e i g h t :   7 0 0 ;   c o l o r :   # 4 7 5 5 6 9 ;   m a r g i n :   0 ;   } 
- . f a k e - c h a r t - a r e a   {   b a c k g r o u n d :   # f 8 f a f c ;   b o r d e r :   1 p x   s o l i d   # e 2 e 8 f 0 ;   b o r d e r - r a d i u s :   8 p x ;   f l e x :   1 ;   m i n - h e i g h t :   1 0 0 p x ;   d i s p l a y :   f l e x ;   a l i g n - i t e m s :   c e n t e r ;   p a d d i n g :   1 0 p x ;   } 
- . f a k e - l i n e - c h a r t   {   w i d t h :   1 0 0 % ;   h e i g h t :   1 0 0 % ;   } 
- . f a k e - p i e - a r e a   {   d i s p l a y :   f l e x ;   a l i g n - i t e m s :   c e n t e r ;   g a p :   1 6 p x ;   b a c k g r o u n d :   # f 8 f a f c ;   b o r d e r :   1 p x   s o l i d   # e 2 e 8 f 0 ;   b o r d e r - r a d i u s :   8 p x ;   p a d d i n g :   1 0 p x ;   } 
- . f a k e - p i e   {   w i d t h :   6 0 p x ;   h e i g h t :   6 0 p x ;   b o r d e r - r a d i u s :   5 0 % ;   b a c k g r o u n d :   c o n i c - g r a d i e n t ( # 3 b 8 2 f 6   0 %   6 8 % ,   # 6 0 a 5 f a   6 8 %   8 7 % ,   # 9 3 c 5 f d   8 7 %   1 0 0 % ) ;   } 
- . f a k e - l e g e n d   {   l i s t - s t y l e :   n o n e ;   p a d d i n g :   0 ;   m a r g i n :   0 ;   f o n t - s i z e :   0 . 7 r e m ;   c o l o r :   # 4 7 5 5 6 9 ;   f o n t - w e i g h t :   6 0 0 ;   } 
- . f a k e - l e g e n d   l i   {   d i s p l a y :   f l e x ;   a l i g n - i t e m s :   c e n t e r ;   g a p :   6 p x ;   m a r g i n - b o t t o m :   4 p x ;   } 
- . f a k e - l e g e n d   s p a n   {   d i s p l a y :   i n l i n e - b l o c k ;   w i d t h :   8 p x ;   h e i g h t :   8 p x ;   b o r d e r - r a d i u s :   2 p x ;   } 
- . g r a - s i d e   {   f l e x :   1 ;   d i s p l a y :   f l e x ;   f l e x - d i r e c t i o n :   c o l u m n ;   g a p :   8 p x ;   b a c k g r o u n d :   # f f f ;   b o r d e r :   1 p x   s o l i d   # e 2 e 8 f 0 ;   b o r d e r - r a d i u s :   8 p x ;   p a d d i n g :   1 2 p x ;   } 
- . g r a - d r o p d o w n   {   f o n t - s i z e :   0 . 7 5 r e m ;   f o n t - w e i g h t :   7 0 0 ;   c o l o r :   # 4 7 5 5 6 9 ;   b o r d e r :   1 p x   s o l i d   # c b d 5 e 1 ;   b o r d e r - r a d i u s :   6 p x ;   p a d d i n g :   6 p x   1 0 p x ;   d i s p l a y :   f l e x ;   j u s t i f y - c o n t e n t :   s p a c e - b e t w e e n ;   a l i g n - i t e m s :   c e n t e r ;   m a r g i n - b o t t o m :   8 p x ;   c u r s o r :   p o i n t e r ;   } 
- . g r a - s t a t   {   d i s p l a y :   f l e x ;   a l i g n - i t e m s :   c e n t e r ;   g a p :   1 2 p x ;   p a d d i n g :   8 p x ;   b a c k g r o u n d :   # f 8 f a f c ;   b o r d e r - r a d i u s :   6 p x ;   } 
- . g r a - s t a t   i   {   f o n t - s i z e :   1 . 2 r e m ;   c o l o r :   # 3 b 8 2 f 6 ;   } 
- . g r a - s t a t   d i v   {   d i s p l a y :   f l e x ;   f l e x - d i r e c t i o n :   c o l u m n ;   } 
- . g r a - s t a t   s m a l l   {   f o n t - s i z e :   0 . 6 5 r e m ;   c o l o r :   # 6 4 7 4 8 b ;   f o n t - w e i g h t :   6 0 0 ;   } 
- . g r a - s t a t   s t r o n g   {   f o n t - s i z e :   0 . 9 5 r e m ;   f o n t - w e i g h t :   8 0 0 ;   c o l o r :   # 0 f 1 7 2 a ;   } 
- 
- / *   I n d i c a d o r e s   S i d e   M e n u   * / 
- . i n d - l i s t - e d i t   {   d i s p l a y :   f l e x ;   f l e x - d i r e c t i o n :   c o l u m n ;   g a p :   8 p x ;   } 
- . i n d - e d i t - i t e m   {   d i s p l a y :   f l e x ;   a l i g n - i t e m s :   c e n t e r ;   g a p :   8 p x ;   p a d d i n g :   8 p x   1 2 p x ;   b o r d e r :   1 p x   s o l i d   # e 2 e 8 f 0 ;   b o r d e r - r a d i u s :   6 p x ;   f o n t - s i z e :   0 . 8 r e m ;   f o n t - w e i g h t :   6 0 0 ;   c o l o r :   # 4 7 5 5 6 9 ;   } 
- . i n d - e d i t - i t e m   i : f i r s t - c h i l d   {   c o l o r :   # 3 b 8 2 f 6 ;   } 
- . i n d - a c t i o n s   {   m a r g i n - l e f t :   a u t o ;   d i s p l a y :   f l e x ;   g a p :   8 p x ;   c u r s o r :   p o i n t e r ;   } 
- 
- / *   G r � f i c o   S i d e   M e n u   * / 
- . c h a r t - t y p e - s e l e c t o r   {   d i s p l a y :   f l e x ;   g a p :   4 p x ;   } 
- . c h a r t - t y p e - s e l e c t o r   b u t t o n   {   f l e x :   1 ;   p a d d i n g :   6 p x ;   b o r d e r :   1 p x   s o l i d   # c b d 5 e 1 ;   b a c k g r o u n d :   # f f f ;   b o r d e r - r a d i u s :   6 p x ;   f o n t - s i z e :   0 . 7 r e m ;   f o n t - w e i g h t :   6 0 0 ;   c o l o r :   # 4 7 5 5 6 9 ;   c u r s o r :   p o i n t e r ;   d i s p l a y :   f l e x ;   f l e x - d i r e c t i o n :   c o l u m n ;   a l i g n - i t e m s :   c e n t e r ;   g a p :   4 p x ;   } 
- . c h a r t - t y p e - s e l e c t o r   b u t t o n . a c t i v e   {   b o r d e r - c o l o r :   # 3 b 8 2 f 6 ;   c o l o r :   # 3 b 8 2 f 6 ;   b a c k g r o u n d :   # e f f 6 f f ;   } 
- 
- / *   G l o b a l   S l o t s   p o s i t i o n i n g   * / 
- . g l o b a l - s l o t s - c o n t a i n e r   {   p o s i t i o n :   a b s o l u t e ;   b o t t o m :   1 6 p x ;   r i g h t :   1 6 p x ;   d i s p l a y :   f l e x ;   g a p :   1 2 p x ;   a l i g n - i t e m s :   f l e x - e n d ;   } 
-  
- 
+/* ADIÇÕES AO CSS DO EDITOR PARA SUPORTAR NOVOS TEMPLATES */
+
+/* Layout Capa */
+.layout-capa { display: flex; flex-direction: column; height: 100%; justify-content: space-between; }
+
+/* Layout Imagem + Texto */
+.layout-imagem-texto { display: flex; height: 100%; width: 100%; gap: 16px; background: transparent; border-radius: 0; overflow: hidden; box-shadow: none; }
+.it-left { width: 45%; border-radius: 8px; overflow: hidden; position: relative; }
+.it-img { width: 100%; height: 100%; object-fit: cover; }
+.it-qr-slot { position: absolute; bottom: 12px; left: 12px; }
+.it-right { width: 55%; padding: 0; display: flex; flex-direction: column; position: relative; justify-content: center; }
+.it-ods-slot { position: absolute; top: 0; right: 0; }
+.it-label { font-size: 0.6rem; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+.it-text-content { margin-top: 0; }
+.it-text-content h1 { font-size: 1.3rem; font-weight: 800; color: #0f172a; margin-bottom: 8px; line-height: 1.2; }
+.it-text-content p { font-size: 0.75rem; color: #475569; line-height: 1.4; }
+
+/* Layout Indicadores */
+.layout-indicadores { display: flex; flex-direction: column; height: 100%; padding: 0; justify-content: center; }
+.ind-header { text-align: center; margin-bottom: 24px; }
+.ind-header h1 { font-size: 1.8rem; font-weight: 800; color: #0f172a; margin-bottom: 6px; line-height: 1.2; }
+.ind-header p { font-size: 0.9rem; color: #64748b; line-height: 1.4; }
+.ind-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+.ind-card { background: #fbfbfc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; display: flex; align-items: center; gap: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+.ind-icon { font-size: 1.6rem; padding: 12px; background: #ffffff; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+.ind-info { display: flex; flex-direction: column; }
+.ind-info h3 { font-size: 2.2rem; font-weight: 800; color: #0f172a; margin: 0; line-height: 1; letter-spacing: -0.02em; }
+.ind-info span { font-size: 0.85rem; color: #64748b; font-weight: 700; text-transform: uppercase; margin-top: 4px; }
+
+/* Layout Gráfico */
+.layout-grafico { display: flex; flex-direction: column; height: 100%; padding: 0; }
+.gra-header { display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 12px; }
+.gra-tag { display: inline-block; color: #0f172a; font-size: 0.8rem; font-weight: 400; margin-bottom: 2px; }
+.gra-header h1 { font-size: 1.6rem; font-weight: 800; color: #0f172a; margin-bottom: 2px; margin-top: 0; }
+.gra-header p { font-size: 0.75rem; color: #64748b; margin-bottom: 8px; max-width: 100%; }
+.gra-content { display: flex; gap: 0; flex: 1; margin-bottom: 0; }
+.gra-main-chart { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.gra-main-chart h4 { font-size: 1.1rem; font-weight: 400; color: #0f172a; margin: 0 0 8px 0; }
+.fake-chart-area { background: transparent; border: none; border-radius: 0; flex: 1; min-height: 0; display: flex; align-items: flex-end; padding: 0; }
+.fake-line-chart { width: 100%; height: 100%; }
+.fake-pie-area { display: none; }
+.gra-side { display: none; } /* Removido para manter a tela mais limpa conforme mockup */
+
+/* Indicadores Side Menu */
+.ind-list-edit { display: flex; flex-direction: column; gap: 8px; }
+.ind-edit-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.8rem; font-weight: 600; color: #475569; }
+.ind-edit-item i:first-child { color: #3b82f6; }
+.ind-actions { margin-left: auto; display: flex; gap: 8px; cursor: pointer; }
+
+/* Gráfico Side Menu */
+.chart-type-selector { display: flex; gap: 4px; }
+.chart-type-selector button { flex: 1; padding: 6px; border: 1px solid #cbd5e1; background: #fff; border-radius: 6px; font-size: 0.7rem; font-weight: 600; color: #475569; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.chart-type-selector button.active { border-color: #3b82f6; color: #3b82f6; background: #eff6ff; }
+
+/* Global Slots positioning */
+.global-slots-container { position: absolute; bottom: 12px; right: 12px; display: flex; gap: 10px; align-items: flex-end; }
+
+

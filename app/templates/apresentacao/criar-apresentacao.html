@@ -252,8 +252,9 @@
                 <div class="form-group-ap tpl-capa">
                     <label>Imagem do background</label>
                     <div class="media-upload-preview">
-                        <div class="media-thumb-box"><img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb" alt="BG"></div>
-                        <button type="button" class="btn-media-action"><i class="bi bi-image"></i></button>
+                        <div class="media-thumb-box"><img id="bgCapaThumbPreview" src="https://images.unsplash.com/photo-1506744038136-46273834b3fb" alt="BG"></div>
+                        <button type="button" class="btn-media-action" id="btnUploadBgCapa"><i class="bi bi-image"></i></button>
+                        <input type="file" id="inputUploadBgCapa" accept="image/*" style="display: none;">
                     </div>
                 </div>
 
@@ -261,8 +262,9 @@
                 <div class="form-group-ap tpl-imgtexto" style="display: none;">
                     <label>Upload de Imagem</label>
                     <div class="media-upload-preview">
-                        <button type="button" class="btn-editor-visualizar" style="flex:1;">Upload + Thumbnail</button>
-                        <div class="media-thumb-box" style="width: 40px; flex: none;"><img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb" alt="IMG"></div>
+                        <button type="button" class="btn-editor-visualizar" style="flex:1;" id="btnUploadImgTexto">Upload + Thumbnail</button>
+                        <input type="file" id="inputUploadImgTexto" accept="image/*" style="display: none;">
+                        <div class="media-thumb-box" style="width: 40px; flex: none;"><img id="imgTextoThumbPreview" src="https://images.unsplash.com/photo-1506744038136-46273834b3fb" alt="IMG"></div>
                     </div>
                 </div>
 
@@ -334,6 +336,30 @@
     </div>
 </div>
 
+<!-- PREVIEW MODAL -->
+<div id="previewModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.95); z-index:9999; flex-direction:column; align-items:center; justify-content:center; padding:20px;">
+    
+    <div style="width: 100%; max-width: 1000px; display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div style="color:#fff; font-size:1.2rem; font-weight:bold;">
+            Modo Apresentação
+        </div>
+        <div style="display:flex; gap:12px;">
+            <button id="btnPrevSlide" style="padding:8px 16px; background:#3b82f6; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer;"><i class="bi bi-chevron-left"></i> Anterior</button>
+            <button id="btnNextSlide" style="padding:8px 16px; background:#3b82f6; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">Próximo <i class="bi bi-chevron-right"></i></button>
+            <button id="btnClosePreview" style="padding:8px 16px; background:#ef4444; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer;"><i class="bi bi-x-lg"></i> Fechar</button>
+        </div>
+    </div>
+
+    <div id="previewContainer" style="width:100%; max-width:1000px; max-height: calc(100vh - 120px); aspect-ratio:16/9; background:#fff; border-radius:12px; overflow:hidden; display:flex; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+        <!-- Clone do slide irá aqui -->
+    </div>
+</div>
+
+<!-- TOAST SALVAR -->
+<div id="saveToast" style="display:none; position:fixed; top:20px; right:20px; background:#10b981; color:#fff; padding:12px 24px; border-radius:8px; font-weight:bold; box-shadow:0 4px 12px rgba(0,0,0,0.15); z-index:9999; align-items:center; gap:8px;">
+    <i class="bi bi-check-circle" style="font-size:1.2rem;"></i> <span>Apresentação salva com sucesso!</span>
+</div>
+
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     let slides = [
@@ -373,6 +399,17 @@ document.addEventListener("DOMContentLoaded", function() {
     const toggleQR = document.getElementById("toggleQR");
     const btnNovoSlide = document.getElementById("btnNovoSlide");
     const slidesThumbsList = document.getElementById("slidesThumbsList");
+
+    // Novos elementos para upload de imagem
+    const btnUploadBgCapa = document.getElementById("btnUploadBgCapa");
+    const inputUploadBgCapa = document.getElementById("inputUploadBgCapa");
+    const bgCapaThumbPreview = document.getElementById("bgCapaThumbPreview");
+    
+    const btnUploadImgTexto = document.getElementById("btnUploadImgTexto");
+    const inputUploadImgTexto = document.getElementById("inputUploadImgTexto");
+    const imgTextoThumbPreview = document.getElementById("imgTextoThumbPreview");
+    const activeSlideSurface = document.getElementById("activeSlideSurface");
+    const imgTextoCanvasImg = document.querySelector(".it-img"); // a imagem no template Imagem+Texto
 
     function renderThumbnails() {
         slidesThumbsList.innerHTML = "";
@@ -417,6 +454,7 @@ document.addEventListener("DOMContentLoaded", function() {
         switchTemplate();
         updatePreviewTexts();
         updateSlotsVisibility();
+        updatePreviewMedia();
     }
 
     function updatePreviewTexts() {
@@ -431,6 +469,37 @@ document.addEventListener("DOMContentLoaded", function() {
         if (!slide) return;
         slotODS.style.display = slide.ods ? "flex" : "none";
         slotQRCode.style.display = slide.qr ? "flex" : "none";
+    }
+    
+    function updatePreviewMedia() {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (!slide) return;
+        
+        // Tratar imagem de fundo para Capa
+        if (slide.template === "capa") {
+            if (slide.bgCapa) {
+                activeSlideSurface.style.backgroundImage = `url(${slide.bgCapa})`;
+                activeSlideSurface.style.backgroundSize = "cover";
+                activeSlideSurface.style.backgroundPosition = "center";
+                bgCapaThumbPreview.src = slide.bgCapa;
+            } else {
+                activeSlideSurface.style.backgroundImage = "";
+                bgCapaThumbPreview.src = "https://images.unsplash.com/photo-1506744038136-46273834b3fb";
+            }
+        } else {
+            activeSlideSurface.style.backgroundImage = "";
+        }
+        
+        // Tratar imagem para Imagem + Texto
+        if (slide.template === "imagem_texto") {
+            if (slide.imgTexto) {
+                imgTextoCanvasImg.src = slide.imgTexto;
+                imgTextoThumbPreview.src = slide.imgTexto;
+            } else {
+                imgTextoCanvasImg.src = "https://images.unsplash.com/photo-1506744038136-46273834b3fb";
+                imgTextoThumbPreview.src = "https://images.unsplash.com/photo-1506744038136-46273834b3fb";
+            }
+        }
     }
 
     function switchTemplate() {
@@ -500,6 +569,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const slide = slides.find(s => s.id === activeSlideId);
         if (slide) slide.template = e.target.value;
         switchTemplate();
+        updatePreviewMedia();
         renderThumbnails();
     });
 
@@ -514,6 +584,46 @@ document.addEventListener("DOMContentLoaded", function() {
         if (slide) slide.qr = e.target.checked;
         updateSlotsVisibility();
     });
+    
+    // Upload de Imagem de Fundo para Capa
+    btnUploadBgCapa.addEventListener("click", () => {
+        inputUploadBgCapa.click();
+    });
+    
+    inputUploadBgCapa.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const slide = slides.find(s => s.id === activeSlideId);
+                if (slide) {
+                    slide.bgCapa = event.target.result;
+                    updatePreviewMedia();
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Upload de Imagem para Imagem+Texto
+    btnUploadImgTexto.addEventListener("click", () => {
+        inputUploadImgTexto.click();
+    });
+    
+    inputUploadImgTexto.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const slide = slides.find(s => s.id === activeSlideId);
+                if (slide) {
+                    slide.imgTexto = event.target.result;
+                    updatePreviewMedia();
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    });
 
     btnNovoSlide.addEventListener("click", () => {
         slideCounter++;
@@ -523,12 +633,75 @@ document.addEventListener("DOMContentLoaded", function() {
             titulo: "Novo Slide",
             subtitulo: "Subtítulo do novo slide",
             ods: false,
-            qr: false
+            qr: false,
+            bgCapa: null,
+            imgTexto: null
         });
         activeSlideId = slideCounter;
         renderThumbnails();
         renderActiveSlide();
         slidesThumbsList.scrollTop = slidesThumbsList.scrollHeight;
+    });
+
+    // --- Lógica de Salvar ---
+    const btnSalvar = document.getElementById("btnSalvar");
+    const saveToast = document.getElementById("saveToast");
+    btnSalvar.addEventListener("click", () => {
+        console.log("Apresentação salva! Payload:", slides);
+        saveToast.style.display = "flex";
+        setTimeout(() => {
+            saveToast.style.display = "none";
+        }, 3000);
+    });
+
+    // --- Lógica de Visualizar (Apresentação Tela Cheia) ---
+    const btnVisualizar = document.getElementById("btnVisualizar");
+    const previewModal = document.getElementById("previewModal");
+    const previewContainer = document.getElementById("previewContainer");
+    const btnPrevSlide = document.getElementById("btnPrevSlide");
+    const btnNextSlide = document.getElementById("btnNextSlide");
+    const btnClosePreview = document.getElementById("btnClosePreview");
+    
+    const canvasStage = document.querySelector(".canvas-stage");
+
+    btnVisualizar.addEventListener("click", () => {
+        previewContainer.innerHTML = "";
+        previewContainer.appendChild(activeSlideSurface);
+        activeSlideSurface.style.maxWidth = "none";
+        activeSlideSurface.style.height = "100%";
+        activeSlideSurface.style.borderRadius = "0";
+        activeSlideSurface.style.boxShadow = "none";
+        
+        previewModal.style.display = "flex";
+    });
+
+    btnClosePreview.addEventListener("click", () => {
+        canvasStage.innerHTML = "";
+        canvasStage.appendChild(activeSlideSurface);
+        activeSlideSurface.style.maxWidth = "660px";
+        activeSlideSurface.style.height = "auto";
+        activeSlideSurface.style.borderRadius = "var(--radius-lg)";
+        activeSlideSurface.style.boxShadow = "0 6px 20px rgba(0, 0, 0, 0.06)";
+        
+        previewModal.style.display = "none";
+    });
+
+    btnPrevSlide.addEventListener("click", () => {
+        const currentIndex = slides.findIndex(s => s.id === activeSlideId);
+        if (currentIndex > 0) {
+            activeSlideId = slides[currentIndex - 1].id;
+            renderThumbnails();
+            renderActiveSlide();
+        }
+    });
+
+    btnNextSlide.addEventListener("click", () => {
+        const currentIndex = slides.findIndex(s => s.id === activeSlideId);
+        if (currentIndex < slides.length - 1) {
+            activeSlideId = slides[currentIndex + 1].id;
+            renderThumbnails();
+            renderActiveSlide();
+        }
     });
 
     renderThumbnails();
