@@ -360,6 +360,44 @@
     <i class="bi bi-check-circle" style="font-size:1.2rem;"></i> <span>Apresentação salva com sucesso!</span>
 </div>
 
+<style>
+    /* Redimensionamento Proporcional (Container Queries) para o Modo Apresentação */
+    #previewContainer {
+        container-type: inline-size;
+    }
+    
+    /* Textos Gerais */
+    #previewContainer .it-text-content h1 { font-size: 4cqw !important; margin-bottom: 2cqw !important; }
+    #previewContainer .it-text-content p { font-size: 2cqw !important; line-height: 1.5; }
+    #previewContainer .it-label { font-size: 1.2cqw !important; margin-bottom: 0.5cqw !important; }
+    
+    #previewContainer .preview-titulo { font-size: 4cqw !important; margin-bottom: 1cqw !important; }
+    #previewContainer .preview-subtitulo { font-size: 1.8cqw !important; line-height: 1.4; }
+    
+    /* Logos e Marcas */
+    #previewContainer .slide-brand-text span { font-size: 1cqw !important; }
+    #previewContainer .slide-brand-text strong { font-size: 1.8cqw !important; }
+    #previewContainer .slide-logo { width: 5cqw !important; height: 5cqw !important; }
+    
+    /* Elementos Extras */
+    #previewContainer .ods-badge-box { transform: scale(1.8); transform-origin: top right; }
+    #previewContainer .qr-code-box { transform: scale(1.8); transform-origin: bottom left; }
+    
+    /* Indicadores */
+    #previewContainer .ind-header h1 { font-size: 3.5cqw !important; margin-bottom: 1cqw !important; }
+    #previewContainer .ind-header p { font-size: 1.8cqw !important; }
+    #previewContainer .ind-info h3 { font-size: 5cqw !important; margin-top: 1cqw !important; }
+    #previewContainer .ind-info span { font-size: 1.5cqw !important; }
+    #previewContainer .ind-icon { font-size: 3.5cqw !important; padding: 1.5cqw !important; border-radius: 1cqw !important;}
+    #previewContainer .ind-card { padding: 3cqw !important; gap: 2cqw !important; border-radius: 1.5cqw !important; border-width: 2px !important; }
+    
+    /* Gráficos */
+    #previewContainer .gra-header h1 { font-size: 3.5cqw !important; margin-bottom: 1cqw !important; }
+    #previewContainer .gra-header p { font-size: 1.8cqw !important; }
+    #previewContainer .gra-main-chart h4 { font-size: 2.2cqw !important; margin-bottom: 2cqw !important; }
+    #previewContainer .gra-tag { font-size: 1.5cqw !important; margin-bottom: 0.5cqw !important; }
+</style>
+
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     let slides = [
@@ -422,9 +460,13 @@ document.addEventListener("DOMContentLoaded", function() {
             const div = document.createElement("div");
             div.className = `slide-thumb-item ${slide.id === activeSlideId ? 'active' : ''}`;
             div.setAttribute("data-slide-id", slide.id);
+            
+            const deleteBtnHtml = slides.length > 1 ? `<button class="btn-delete-slide" data-id="${slide.id}" style="position:absolute; top:-6px; right:-6px; width:22px; height:22px; background:#ef4444; color:#fff; border:none; border-radius:50%; font-size:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 4px rgba(0,0,0,0.2); z-index:10;"><i class="bi bi-x-lg"></i></button>` : '';
+
             div.innerHTML = `
                 <span class="slide-index">${index + 1}</span>
-                <div class="thumb-card">
+                <div class="thumb-card" style="position:relative;">
+                    ${deleteBtnHtml}
                     <div class="thumb-canvas-mini ${miniClass}">
                         <span class="mini-tag">Barueri</span>
                         <div class="mini-title-bar"></div>
@@ -432,12 +474,28 @@ document.addEventListener("DOMContentLoaded", function() {
                     <span class="thumb-label">Slide ${index + 1}</span>
                 </div>
             `;
-            div.addEventListener("click", () => {
+            
+            div.addEventListener("click", (e) => {
+                if(e.target.closest('.btn-delete-slide')) return;
                 activeSlideId = slide.id;
                 renderThumbnails();
                 renderActiveSlide();
             });
+            
             slidesThumbsList.appendChild(div);
+            
+            const deleteBtn = div.querySelector('.btn-delete-slide');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    slides = slides.filter(s => s.id !== slide.id);
+                    if (activeSlideId === slide.id) {
+                        activeSlideId = slides[0].id;
+                    }
+                    renderThumbnails();
+                    renderActiveSlide();
+                });
+            }
         });
     }
 
