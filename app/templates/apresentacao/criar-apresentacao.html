@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Editor de Apresentações | Conecta Barueri{% endblock %}
+{% block title %}Editor de ApresentaÃ§Ãµes | Conecta Barueri{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/apresentacao/criar-apresentacao.css') }}">
@@ -12,7 +12,7 @@
     <header class="editor-header">
         <div class="editor-header-info">
             <h1 class="editor-title" id="displayApresentacaoTitulo">Apresentação Executiva</h1>
-            <p class="editor-subtitle">Edite e organize os slides da sua apresentação institucional.</p>
+            <p class="editor-subtitle">Edite e organize os slides da sua apresentaÃ§Ã£o institucional.</p>
         </div>
 
         <div class="editor-header-actions">
@@ -86,9 +86,9 @@
                             <div class="it-ods-slot"></div>
                             <div class="it-text-content">
                                 <span class="it-label">Título do Slide</span>
-                                <h1 class="slide-title-preview preview-titulo">Visão Geral dos Indicadores</h1>
+                                <h1 class="slide-title-preview preview-titulo">VisÃ£o Geral dos Indicadores</h1>
                                 <span class="it-label">Texto de Apoio</span>
-                                <p class="slide-subtitle-preview preview-subtitulo">Resumo comparativo dos principais dados socioeconômicos.</p>
+                                <p class="slide-subtitle-preview preview-subtitulo">Resumo comparativo dos principais dados socioeconÃ´micos.</p>
                             </div>
                         </div>
                     </div>
@@ -131,13 +131,13 @@
                         </div>
                     </div>
 
-                    <!-- GRÁFICO LAYOUT -->
+                    <!-- GRÃ FICO LAYOUT -->
                     <div class="layout-grafico" style="display: none;">
                         <div class="gra-header">
                             <div>
-                                <span class="gra-tag">Saúde</span>
+                                <span class="gra-tag" id="previewPeriodo">Últimos 12 meses</span>
                                 <h1 class="slide-title-preview preview-titulo">Atendimentos médicos</h1>
-                                <p class="slide-subtitle-preview preview-subtitulo">Evolução no número de atendimentos médicos nos últimos 12 meses.</p>
+                                <p class="slide-subtitle-preview preview-subtitulo">Evolução no número de atendimentos médicos.</p>
                             </div>
                             <div class="slide-top-brand">
                                 <img src="{{ url_for('static', filename='img/logo-barueri.jpeg') }}" alt="Logo" class="slide-logo">
@@ -147,28 +147,10 @@
                             </div>
                         </div>
                         <div class="gra-content">
-                            <div class="gra-main-chart">
+                            <div class="gra-main-chart" style="flex:1; width:100%; position:relative; min-height:0; display:flex; flex-direction:column; background: #fff; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
                                 <h4>Total de atendimentos</h4>
-                                <div class="fake-chart-area">
-                                    <!-- Um gráfico placeholder -->
-                                    <svg viewBox="0 0 100 40" class="fake-line-chart">
-                                        <polyline fill="none" stroke="#3b82f6" stroke-width="2" points="0,30 20,25 40,28 60,15 80,10 100,5"/>
-                                        <circle cx="0" cy="30" r="2" fill="#3b82f6"/>
-                                        <circle cx="20" cy="25" r="2" fill="#3b82f6"/>
-                                        <circle cx="40" cy="28" r="2" fill="#3b82f6"/>
-                                        <circle cx="60" cy="15" r="2" fill="#3b82f6"/>
-                                        <circle cx="80" cy="10" r="2" fill="#3b82f6"/>
-                                        <circle cx="100" cy="5" r="2" fill="#3b82f6"/>
-                                    </svg>
-                                </div>
-                                <h4>Distribuição dos atendimentos</h4>
-                                <div class="fake-pie-area">
-                                    <div class="fake-pie"></div>
-                                    <ul class="fake-legend">
-                                        <li><span style="background:#3b82f6"></span> Consultas</li>
-                                        <li><span style="background:#60a5fa"></span> Exames</li>
-                                        <li><span style="background:#93c5fd"></span> Procedimentos</li>
-                                    </ul>
+                                <div class="fake-chart-area" style="flex:1; position:relative; width:100%; height:100%; border: none; padding: 0; background: transparent;">
+                                    <canvas id="slideChart"></canvas>
                                 </div>
                             </div>
                             <div class="gra-side">
@@ -198,14 +180,14 @@
                         </div>
                     </div>
 
-                    <!-- SLOTS (Global posicionado absoluto ou no rodapé) -->
+                    <!-- SLOTS (Global posicionado absoluto ou no rodapÃ©) -->
                     <div class="global-slots-container">
                         <div class="slide-slot-item" id="slotODS" style="display: none;">
                             <div class="ods-badge-box">
                                 <span class="ods-number">11</span>
                                 <div class="ods-desc">
                                     <small>CIDADES E COMUNIDADES</small>
-                                    <small>SUSTENTÁVEIS</small>
+                                    <small>SUSTENTÃVEIS</small>
                                 </div>
                             </div>
                         </div>
@@ -218,7 +200,7 @@
             </div>
         </main>
 
-        <!-- CONFIGURAÇÃO -->
+        <!-- CONFIGURAÃ‡ÃƒO -->
         <aside class="panel-card slide-config-panel">
             <div class="panel-header">
                 <h2>Configuração do Slide</h2>
@@ -248,7 +230,7 @@
                     <textarea id="inputSubtitulo" class="form-control-ap" rows="3">Apresentação Executiva - Indicadores Municipais</textarea>
                 </div>
 
-                <!-- Capa específicos -->
+                <!-- Capa especÃ­ficos -->
                 <div class="form-group-ap tpl-capa">
                     <label>Imagem do background</label>
                     <div class="media-upload-preview">
@@ -258,7 +240,7 @@
                     </div>
                 </div>
 
-                <!-- Imagem+Texto específicos -->
+                <!-- Imagem+Texto especÃ­ficos -->
                 <div class="form-group-ap tpl-imgtexto" style="display: none;">
                     <label>Upload de Imagem</label>
                     <div class="media-upload-preview">
@@ -268,7 +250,7 @@
                     </div>
                 </div>
 
-                <!-- Indicadores específicos -->
+                <!-- Indicadores especÃ­ficos -->
                 <div class="form-group-ap tpl-indicadores" style="display: none;">
                     <label>Indicadores</label>
                     <div class="ind-list-edit">
@@ -287,13 +269,13 @@
                     </div>
                 </div>
 
-                <!-- Gráfico específicos -->
+                <!-- Gráfico especÃ­ficos -->
                 <div class="form-group-ap tpl-grafico" style="display: none;">
-                    <label>Tipo de gráfico</label>
+                    <label>Tipo de grÃ¡fico</label>
                     <div class="chart-type-selector">
-                        <button class="active"><i class="bi bi-graph-up"></i> Linha</button>
-                        <button><i class="bi bi-bar-chart"></i> Barras</button>
-                        <button><i class="bi bi-pie-chart"></i> Pizza</button>
+                        <button type="button" class="btn-chart-type active" data-type="line"><i class="bi bi-graph-up"></i> Linha</button>
+                        <button type="button" class="btn-chart-type" data-type="bar"><i class="bi bi-bar-chart"></i> Barras</button>
+                        <button type="button" class="btn-chart-type" data-type="pie"><i class="bi bi-pie-chart"></i> Pizza</button>
                     </div>
                     <label class="mt-2">Dados</label>
                     <div class="d-flex gap-3 mb-2" style="font-size:0.75rem;">
@@ -301,7 +283,11 @@
                         <label><input type="radio" name="fonte"> Dado do sistema</label>
                     </div>
                     <label>Período</label>
-                    <select class="form-control-ap"><option>Últimos 12 meses</option></select>
+                    <select class="form-control-ap" id="selectPeriodo">
+                        <option value="Últimos 12 meses">Últimos 12 meses</option>
+                        <option value="Ano atual">Ano atual</option>
+                        <option value="Ano anterior">Ano anterior</option>
+                    </select>
                 </div>
 
                 <div class="config-slots-section mt-3">
@@ -345,13 +331,13 @@
         </div>
         <div style="display:flex; gap:12px;">
             <button id="btnPrevSlide" style="padding:8px 16px; background:#3b82f6; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer;"><i class="bi bi-chevron-left"></i> Anterior</button>
-            <button id="btnNextSlide" style="padding:8px 16px; background:#3b82f6; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">Próximo <i class="bi bi-chevron-right"></i></button>
+            <button id="btnNextSlide" style="padding:8px 16px; background:#3b82f6; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">PrÃ³ximo <i class="bi bi-chevron-right"></i></button>
             <button id="btnClosePreview" style="padding:8px 16px; background:#ef4444; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer;"><i class="bi bi-x-lg"></i> Fechar</button>
         </div>
     </div>
 
     <div id="previewContainer" style="width:100%; max-width:1000px; max-height: calc(100vh - 120px); aspect-ratio:16/9; background:#fff; border-radius:12px; overflow:hidden; display:flex; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
-        <!-- Clone do slide irá aqui -->
+        <!-- Clone do slide irÃ¡ aqui -->
     </div>
 </div>
 
@@ -361,43 +347,47 @@
 </div>
 
 <style>
-    /* Redimensionamento Proporcional (Container Queries) para o Modo Apresentação */
-    #previewContainer {
+    /* Redimensionamento Proporcional (Container Queries) para o Slide */
+    .slide-surface {
         container-type: inline-size;
     }
     
     /* Textos Gerais */
-    #previewContainer .it-text-content h1 { font-size: 4cqw !important; margin-bottom: 2cqw !important; }
-    #previewContainer .it-text-content p { font-size: 2cqw !important; line-height: 1.5; }
-    #previewContainer .it-label { font-size: 1.2cqw !important; margin-bottom: 0.5cqw !important; }
+    .slide-surface .it-text-content h1 { font-size: 4cqw !important; margin-bottom: 2cqw !important; }
+    .slide-surface .it-text-content p { font-size: 2cqw !important; line-height: 1.5; }
+    .slide-surface .it-label { font-size: 1.2cqw !important; margin-bottom: 0.5cqw !important; }
     
-    #previewContainer .preview-titulo { font-size: 4cqw !important; margin-bottom: 1cqw !important; }
-    #previewContainer .preview-subtitulo { font-size: 1.8cqw !important; line-height: 1.4; }
+    .slide-surface .preview-titulo { font-size: 4cqw !important; margin-bottom: 1cqw !important; }
+    .slide-surface .preview-subtitulo { font-size: 1.8cqw !important; line-height: 1.4; }
     
     /* Logos e Marcas */
-    #previewContainer .slide-brand-text span { font-size: 1cqw !important; }
-    #previewContainer .slide-brand-text strong { font-size: 1.8cqw !important; }
-    #previewContainer .slide-logo { width: 5cqw !important; height: 5cqw !important; }
+    .slide-surface .slide-brand-text span { font-size: 1cqw !important; }
+    .slide-surface .slide-brand-text strong { font-size: 1.8cqw !important; }
+    .slide-surface .slide-logo { width: 5cqw !important; height: 5cqw !important; }
     
     /* Elementos Extras */
-    #previewContainer .ods-badge-box { transform: scale(1.8); transform-origin: top right; }
-    #previewContainer .qr-code-box { transform: scale(1.8); transform-origin: bottom left; }
+    .slide-surface .ods-badge-box { transform: none !important; padding: 0.6cqw 1.2cqw !important; border-radius: 0.6cqw !important; gap: 0.9cqw !important; }
+    .slide-surface .ods-number { font-size: 2.5cqw !important; }
+    .slide-surface .ods-desc { font-size: 1cqw !important; }
+    .slide-surface .ods-desc small { font-size: 0.8cqw !important; }
+    .slide-surface .qr-code-box { transform: none !important; width: 5.2cqw !important; height: 5.2cqw !important; font-size: 3cqw !important; border-radius: 0.6cqw !important; }
     
     /* Indicadores */
-    #previewContainer .ind-header h1 { font-size: 3.5cqw !important; margin-bottom: 1cqw !important; }
-    #previewContainer .ind-header p { font-size: 1.8cqw !important; }
-    #previewContainer .ind-info h3 { font-size: 5cqw !important; margin-top: 1cqw !important; }
-    #previewContainer .ind-info span { font-size: 1.5cqw !important; }
-    #previewContainer .ind-icon { font-size: 3.5cqw !important; padding: 1.5cqw !important; border-radius: 1cqw !important;}
-    #previewContainer .ind-card { padding: 3cqw !important; gap: 2cqw !important; border-radius: 1.5cqw !important; border-width: 2px !important; }
+    .slide-surface .ind-header h1 { font-size: 3.5cqw !important; margin-bottom: 1cqw !important; }
+    .slide-surface .ind-header p { font-size: 1.8cqw !important; }
+    .slide-surface .ind-info h3 { font-size: 5cqw !important; margin-top: 1cqw !important; }
+    .slide-surface .ind-info span { font-size: 1.5cqw !important; }
+    .slide-surface .ind-icon { font-size: 3.5cqw !important; padding: 1.5cqw !important; border-radius: 1cqw !important;}
+    .slide-surface .ind-card { padding: 3cqw !important; gap: 2cqw !important; border-radius: 1.5cqw !important; border-width: 2px !important; }
     
     /* Gráficos */
-    #previewContainer .gra-header h1 { font-size: 3.5cqw !important; margin-bottom: 1cqw !important; }
-    #previewContainer .gra-header p { font-size: 1.8cqw !important; }
-    #previewContainer .gra-main-chart h4 { font-size: 2.2cqw !important; margin-bottom: 2cqw !important; }
-    #previewContainer .gra-tag { font-size: 1.5cqw !important; margin-bottom: 0.5cqw !important; }
+    .slide-surface .gra-header h1 { font-size: 3.5cqw !important; margin-bottom: 1cqw !important; }
+    .slide-surface .gra-header p { font-size: 1.8cqw !important; }
+    .slide-surface .gra-main-chart h4 { font-size: 2.2cqw !important; margin-bottom: 2cqw !important; }
+    .slide-surface .gra-tag { font-size: 1.5cqw !important; margin-bottom: 0.5cqw !important; }
 </style>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     let slides = [
@@ -406,12 +396,18 @@ document.addEventListener("DOMContentLoaded", function() {
             template: "capa",
             titulo: "Capa",
             subtitulo: "Apresentação Executiva - Indicadores Municipais",
-            ods: false,
-            qr: false
+            ods: true,
+            qr: false,
+            bgCapa: null,
+            imgTexto: null,
+            chartType: "line",
+            periodo: "Últimos 12 meses"
         }
     ];
     let activeSlideId = 1;
     let slideCounter = 1;
+    
+    let slideChartInstance = null;
 
     const selectTemplate = document.getElementById("selectTemplate");
     const layoutCapa = document.querySelector(".layout-capa");
@@ -512,7 +508,8 @@ document.addEventListener("DOMContentLoaded", function() {
         switchTemplate();
         updatePreviewTexts();
         updateSlotsVisibility();
-        updatePreviewMedia();
+                updatePreviewMedia();
+        if(slide.template === "grafico") renderChart(slide);
     }
 
     function updatePreviewTexts() {
@@ -529,6 +526,78 @@ document.addEventListener("DOMContentLoaded", function() {
         slotQRCode.style.display = slide.qr ? "flex" : "none";
     }
     
+        function renderChart(slide) {
+        if (slideChartInstance) {
+            slideChartInstance.destroy();
+        }
+        
+        document.querySelectorAll(".btn-chart-type").forEach(btn => {
+            if (btn.dataset.type === slide.chartType) {
+                btn.classList.add("active");
+            } else {
+                btn.classList.remove("active");
+            }
+        });
+        
+        const selectPeriodo = document.getElementById("selectPeriodo");
+        if(selectPeriodo) selectPeriodo.value = slide.periodo || "Últimos 12 meses";
+        
+        const previewPeriodo = document.getElementById("previewPeriodo");
+        if(previewPeriodo) previewPeriodo.textContent = slide.periodo || "Últimos 12 meses";
+
+        const ctx = document.getElementById('slideChart');
+        if(!ctx) return;
+        
+        let type = slide.chartType || "line";
+        let data, options;
+        if (type === "line" || type === "bar") {
+            data = {
+                labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                datasets: [{
+                    label: 'Atendimentos',
+                    data: [1200, 1900, 1500, 2200, 1800, 2500],
+                    borderColor: '#3b82f6',
+                    backgroundColor: type === "line" ? 'rgba(59, 130, 246, 0.1)' : '#3b82f6',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: type === "line",
+                    borderRadius: type === "bar" ? 4 : 0
+                }]
+            };
+            options = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { 
+                    y: { beginAtZero: true, grid: { color: '#f1f5f9' }, border: { display: false } },
+                    x: { grid: { display: false }, border: { display: false } }
+                }
+            };
+        } else if (type === "pie") {
+            data = {
+                labels: ['Consultas', 'Exames', 'Procedimentos'],
+                datasets: [{
+                    data: [45, 35, 20],
+                    backgroundColor: ['#3b82f6', '#60a5fa', '#93c5fd'],
+                    borderWidth: 0
+                }]
+            };
+            options = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 8, font: { size: 10 } } }
+                }
+            };
+        }
+
+        slideChartInstance = new Chart(ctx, {
+            type: type,
+            data: data,
+            options: options
+        });
+    }
+
     function updatePreviewMedia() {
         const slide = slides.find(s => s.id === activeSlideId);
         if (!slide) return;
@@ -581,6 +650,9 @@ document.addEventListener("DOMContentLoaded", function() {
             labelTitulo.textContent = "Título";
             labelSubtitulo.textContent = "Subtítulo";
             fgSubtitulo.style.display = "flex";
+            
+            document.querySelector(".global-slots-container").appendChild(slotODS);
+            document.querySelector(".global-slots-container").appendChild(slotQRCode);
         } else if(val === "imagem_texto") {
             layoutImgTexto.style.display = "flex";
             tplImgTexto.forEach(el => el.style.display = "flex");
@@ -683,6 +755,28 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
+        document.querySelectorAll(".btn-chart-type").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            const slide = slides.find(s => s.id === activeSlideId);
+            if (slide && slide.template === "grafico") {
+                slide.chartType = e.currentTarget.dataset.type;
+                renderChart(slide);
+            }
+        });
+    });
+
+    const selectPeriodo = document.getElementById("selectPeriodo");
+    if(selectPeriodo) {
+        selectPeriodo.addEventListener("change", (e) => {
+            const slide = slides.find(s => s.id === activeSlideId);
+            if (slide && slide.template === "grafico") {
+                slide.periodo = e.target.value;
+                const previewPeriodo = document.getElementById("previewPeriodo");
+                if(previewPeriodo) previewPeriodo.textContent = slide.periodo;
+            }
+        });
+    }
+
     btnNovoSlide.addEventListener("click", () => {
         slideCounter++;
         slides.push({
@@ -693,7 +787,9 @@ document.addEventListener("DOMContentLoaded", function() {
             ods: false,
             qr: false,
             bgCapa: null,
-            imgTexto: null
+            imgTexto: null,
+            chartType: "line",
+            periodo: "Últimos 12 meses"
         });
         activeSlideId = slideCounter;
         renderThumbnails();
@@ -701,7 +797,7 @@ document.addEventListener("DOMContentLoaded", function() {
         slidesThumbsList.scrollTop = slidesThumbsList.scrollHeight;
     });
 
-    // --- Lógica de Salvar ---
+    // --- LÃ³gica de Salvar ---
     const btnSalvar = document.getElementById("btnSalvar");
     const saveToast = document.getElementById("saveToast");
     btnSalvar.addEventListener("click", () => {
@@ -712,7 +808,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }, 3000);
     });
 
-    // --- Lógica de Visualizar (Apresentação Tela Cheia) ---
+    // --- LÃ³gica de Visualizar (Apresentação Tela Cheia) ---
     const btnVisualizar = document.getElementById("btnVisualizar");
     const previewModal = document.getElementById("previewModal");
     const previewContainer = document.getElementById("previewContainer");
@@ -767,3 +863,4 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 </script>
 {% endblock %}
+
