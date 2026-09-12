@@ -135,9 +135,8 @@
                     <div class="layout-grafico" style="display: none;">
                         <div class="gra-header">
                             <div>
-                                <span class="gra-tag">Saúde</span>
                                 <h1 class="slide-title-preview preview-titulo">Atendimentos médicos</h1>
-                                <p class="slide-subtitle-preview preview-subtitulo">Evolução no número de atendimentos médicos nos últimos 12 meses.</p>
+                                <p class="slide-subtitle-preview preview-subtitulo">Evolução no número de atendimentos médicos.</p>
                             </div>
                             <div class="slide-top-brand">
                                 <img src="{{ url_for('static', filename='img/logo-barueri.jpeg') }}" alt="Logo" class="slide-logo">
@@ -147,28 +146,13 @@
                             </div>
                         </div>
                         <div class="gra-content">
-                            <div class="gra-main-chart">
-                                <h4>Total de atendimentos</h4>
-                                <div class="fake-chart-area">
-                                    <!-- Um gráfico placeholder -->
-                                    <svg viewBox="0 0 100 40" class="fake-line-chart">
-                                        <polyline fill="none" stroke="#3b82f6" stroke-width="2" points="0,30 20,25 40,28 60,15 80,10 100,5"/>
-                                        <circle cx="0" cy="30" r="2" fill="#3b82f6"/>
-                                        <circle cx="20" cy="25" r="2" fill="#3b82f6"/>
-                                        <circle cx="40" cy="28" r="2" fill="#3b82f6"/>
-                                        <circle cx="60" cy="15" r="2" fill="#3b82f6"/>
-                                        <circle cx="80" cy="10" r="2" fill="#3b82f6"/>
-                                        <circle cx="100" cy="5" r="2" fill="#3b82f6"/>
-                                    </svg>
+                            <div class="gra-main-chart" style="flex:1; width:100%; position:relative; min-height:0; display:flex; flex-direction:column; background: #fff; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <h4 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: #1e293b;">Total de atendimentos</h4>
+                                    <span class="gra-tag" id="previewPeriodo">Últimos 12 meses</span>
                                 </div>
-                                <h4>Distribuição dos atendimentos</h4>
-                                <div class="fake-pie-area">
-                                    <div class="fake-pie"></div>
-                                    <ul class="fake-legend">
-                                        <li><span style="background:#3b82f6"></span> Consultas</li>
-                                        <li><span style="background:#60a5fa"></span> Exames</li>
-                                        <li><span style="background:#93c5fd"></span> Procedimentos</li>
-                                    </ul>
+                                <div class="fake-chart-area" style="flex:1; position:relative; width:100%; height:100%; border: none; padding: 0; background: transparent;">
+                                    <canvas id="slideChart"></canvas>
                                 </div>
                             </div>
                             <div class="gra-side">
@@ -252,8 +236,9 @@
                 <div class="form-group-ap tpl-capa">
                     <label>Imagem do background</label>
                     <div class="media-upload-preview">
-                        <div class="media-thumb-box"><img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb" alt="BG"></div>
-                        <button type="button" class="btn-media-action"><i class="bi bi-image"></i></button>
+                        <div class="media-thumb-box"><img id="bgCapaThumbPreview" src="https://images.unsplash.com/photo-1506744038136-46273834b3fb" alt="BG"></div>
+                        <button type="button" class="btn-media-action" id="btnUploadBgCapa"><i class="bi bi-image"></i></button>
+                        <input type="file" id="inputUploadBgCapa" accept="image/*" style="display: none;">
                     </div>
                 </div>
 
@@ -261,8 +246,9 @@
                 <div class="form-group-ap tpl-imgtexto" style="display: none;">
                     <label>Upload de Imagem</label>
                     <div class="media-upload-preview">
-                        <button type="button" class="btn-editor-visualizar" style="flex:1;">Upload + Thumbnail</button>
-                        <div class="media-thumb-box" style="width: 40px; flex: none;"><img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb" alt="IMG"></div>
+                        <button type="button" class="btn-editor-visualizar" style="flex:1;" id="btnUploadImgTexto">Upload + Thumbnail</button>
+                        <input type="file" id="inputUploadImgTexto" accept="image/*" style="display: none;">
+                        <div class="media-thumb-box" style="width: 40px; flex: none;"><img id="imgTextoThumbPreview" src="https://images.unsplash.com/photo-1506744038136-46273834b3fb" alt="IMG"></div>
                     </div>
                 </div>
 
@@ -289,9 +275,9 @@
                 <div class="form-group-ap tpl-grafico" style="display: none;">
                     <label>Tipo de gráfico</label>
                     <div class="chart-type-selector">
-                        <button class="active"><i class="bi bi-graph-up"></i> Linha</button>
-                        <button><i class="bi bi-bar-chart"></i> Barras</button>
-                        <button><i class="bi bi-pie-chart"></i> Pizza</button>
+                        <button type="button" class="btn-chart-type active" data-type="line"><i class="bi bi-graph-up"></i> Linha</button>
+                        <button type="button" class="btn-chart-type" data-type="bar"><i class="bi bi-bar-chart"></i> Barras</button>
+                        <button type="button" class="btn-chart-type" data-type="pie"><i class="bi bi-pie-chart"></i> Pizza</button>
                     </div>
                     <label class="mt-2">Dados</label>
                     <div class="d-flex gap-3 mb-2" style="font-size:0.75rem;">
@@ -299,7 +285,11 @@
                         <label><input type="radio" name="fonte"> Dado do sistema</label>
                     </div>
                     <label>Período</label>
-                    <select class="form-control-ap"><option>Últimos 12 meses</option></select>
+                    <select class="form-control-ap" id="selectPeriodo">
+                        <option value="Últimos 12 meses">Últimos 12 meses</option>
+                        <option value="Ano atual">Ano atual</option>
+                        <option value="Ano anterior">Ano anterior</option>
+                    </select>
                 </div>
 
                 <div class="config-slots-section mt-3">
@@ -334,6 +324,83 @@
     </div>
 </div>
 
+<!-- PREVIEW MODAL -->
+<div id="previewModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.95); z-index:9999; flex-direction:column; align-items:center; justify-content:center; padding:20px;">
+    
+    <div style="width: 100%; max-width: 1000px; display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div style="color:#fff; font-size:1.2rem; font-weight:bold;">
+            Modo Apresentação
+        </div>
+        <div style="display:flex; gap:12px;">
+            <button id="btnPrevSlide" style="padding:8px 16px; background:#3b82f6; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer;"><i class="bi bi-chevron-left"></i> Anterior</button>
+            <button id="btnNextSlide" style="padding:8px 16px; background:#3b82f6; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">Próximo <i class="bi bi-chevron-right"></i></button>
+            <button id="btnClosePreview" style="padding:8px 16px; background:#ef4444; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer;"><i class="bi bi-x-lg"></i> Fechar</button>
+        </div>
+    </div>
+
+    <div id="previewContainer" style="width:100%; max-width:1000px; max-height: calc(100vh - 120px); aspect-ratio:16/9; background:#fff; border-radius:12px; overflow:hidden; display:flex; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+        <!-- Clone do slide irá aqui -->
+    </div>
+</div>
+
+<!-- TOAST SALVAR -->
+<div id="saveToast" style="display:none; position:fixed; top:20px; right:20px; background:#10b981; color:#fff; padding:12px 24px; border-radius:8px; font-weight:bold; box-shadow:0 4px 12px rgba(0,0,0,0.15); z-index:9999; align-items:center; gap:8px;">
+    <i class="bi bi-check-circle" style="font-size:1.2rem;"></i> <span>Apresentação salva com sucesso!</span>
+</div>
+
+<style>
+    /* Redimensionamento Proporcional (Container Queries) para o Slide */
+    .slide-surface {
+        container-type: inline-size;
+    }
+    
+    /* Textos Gerais */
+    .slide-surface .it-text-content h1 { font-size: 4cqw !important; margin-bottom: 2cqw !important; }
+    .slide-surface .it-text-content p { font-size: 2cqw !important; line-height: 1.5; }
+    .slide-surface .it-label { font-size: 1.2cqw !important; margin-bottom: 0.5cqw !important; }
+    
+    .slide-surface .preview-titulo { font-size: 4cqw !important; margin-bottom: 1cqw !important; }
+    .slide-surface .preview-subtitulo { font-size: 1.8cqw !important; line-height: 1.4; }
+    
+    /* Logos e Marcas */
+    .slide-surface .slide-brand-text span { font-size: 1cqw !important; }
+    .slide-surface .slide-brand-text strong { font-size: 1.8cqw !important; }
+    .slide-surface .slide-logo { width: 5cqw !important; height: 5cqw !important; }
+    
+    /* Elementos Extras */
+    .slide-surface .ods-badge-box { transform: none !important; padding: 0.6cqw 1.2cqw !important; border-radius: 0.6cqw !important; gap: 0.9cqw !important; }
+    .slide-surface .ods-number { font-size: 2.5cqw !important; }
+    .slide-surface .ods-desc { font-size: 1cqw !important; }
+    .slide-surface .ods-desc small { font-size: 0.8cqw !important; }
+    .slide-surface .qr-code-box { transform: none !important; width: 5.2cqw !important; height: 5.2cqw !important; font-size: 3cqw !important; border-radius: 0.6cqw !important; }
+    
+    /* Indicadores */
+    .slide-surface .ind-header h1 { font-size: 3.5cqw !important; margin-bottom: 1cqw !important; }
+    .slide-surface .ind-header p { font-size: 1.8cqw !important; }
+    .slide-surface .ind-info h3 { font-size: 5cqw !important; margin-top: 1cqw !important; }
+    .slide-surface .ind-info span { font-size: 1.5cqw !important; }
+    .slide-surface .ind-icon { font-size: 3.5cqw !important; padding: 1.5cqw !important; border-radius: 1cqw !important;}
+    .slide-surface .ind-card { padding: 3cqw !important; gap: 2cqw !important; border-radius: 1.5cqw !important; border-width: 2px !important; }
+    
+    /* Gráficos */
+    .slide-surface .gra-header h1 { font-size: 3.5cqw !important; margin-bottom: 1cqw !important; }
+    .slide-surface .gra-header p { font-size: 1.8cqw !important; }
+    .slide-surface .gra-main-chart h4 { font-size: 2.2cqw !important; margin: 0 !important; }
+    .slide-surface .gra-tag {
+        font-size: 1.3cqw !important;
+        background: #eff6ff !important;
+        color: #2563eb !important;
+        border: 1px solid #bfdbfe !important;
+        padding: 0.3cqw 1cqw !important;
+        border-radius: 9999px !important;
+        font-weight: 600 !important;
+        margin: 0 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     let slides = [
@@ -342,12 +409,18 @@ document.addEventListener("DOMContentLoaded", function() {
             template: "capa",
             titulo: "Capa",
             subtitulo: "Apresentação Executiva - Indicadores Municipais",
-            ods: false,
-            qr: false
+            ods: true,
+            qr: false,
+            bgCapa: null,
+            imgTexto: null,
+            chartType: "line",
+            periodo: "Últimos 12 meses"
         }
     ];
     let activeSlideId = 1;
     let slideCounter = 1;
+    
+    let slideChartInstance = null;
 
     const selectTemplate = document.getElementById("selectTemplate");
     const layoutCapa = document.querySelector(".layout-capa");
@@ -374,33 +447,205 @@ document.addEventListener("DOMContentLoaded", function() {
     const btnNovoSlide = document.getElementById("btnNovoSlide");
     const slidesThumbsList = document.getElementById("slidesThumbsList");
 
+    // Novos elementos para upload de imagem
+    const btnUploadBgCapa = document.getElementById("btnUploadBgCapa");
+    const inputUploadBgCapa = document.getElementById("inputUploadBgCapa");
+    const bgCapaThumbPreview = document.getElementById("bgCapaThumbPreview");
+    
+    const btnUploadImgTexto = document.getElementById("btnUploadImgTexto");
+    const inputUploadImgTexto = document.getElementById("inputUploadImgTexto");
+    const imgTextoThumbPreview = document.getElementById("imgTextoThumbPreview");
+    const activeSlideSurface = document.getElementById("activeSlideSurface");
+    const imgTextoCanvasImg = document.querySelector(".it-img"); // a imagem no template Imagem+Texto
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function renderMiniSlidePreview(slide) {
+        const tpl = slide.template || 'capa';
+        const title = escapeHtml(slide.titulo || '');
+        const subtitle = escapeHtml(slide.subtitulo || '');
+
+        const odsBadge = slide.ods ? `
+            <div style="position: absolute; bottom: 2px; right: ${slide.qr ? '14px' : '3px'}; background: #f97316; color: #fff; font-size: 3px; font-weight: 900; padding: 1px 2px; border-radius: 1px; display: flex; align-items: center; gap: 1px; z-index: 2; line-height: 1;">
+                <span>11</span><span style="font-size: 2px;">ODS</span>
+            </div>` : '';
+        
+        const qrBadge = slide.qr ? `
+            <div style="position: absolute; bottom: 2px; right: 2px; width: 9px; height: 9px; background: #fff; border: 0.5px solid #cbd5e1; border-radius: 1px; display: flex; align-items: center; justify-content: center; font-size: 6px; color: #0f172a; z-index: 2; line-height: 1;">
+                <i class="bi bi-qr-code" style="font-size: 6px;"></i>
+            </div>` : '';
+
+        if (tpl === 'capa') {
+            const hasBg = !!slide.bgCapa;
+            const textColor = hasBg ? '#ffffff' : '#0f172a';
+            const subColor = hasBg ? 'rgba(255,255,255,0.85)' : '#64748b';
+            return `
+                <div style="width:100%; height:100%; position:relative; padding: 4px 6px; display:flex; flex-direction:column; justify-content:space-between; ${hasBg ? `background: url(${slide.bgCapa}) center/cover no-repeat;` : 'background:#ffffff;'} box-sizing: border-box; overflow:hidden;">
+                    ${hasBg ? '<div style="position:absolute; inset:0; background:rgba(0,0,0,0.35); z-index:0;"></div>' : ''}
+                    <div style="position:relative; z-index:1; display:flex; align-items:center; gap:3px;">
+                        <img src="/static/img/logo-barueri.jpeg" style="width:8px; height:8px; object-fit:contain; border-radius:1px;">
+                        <span style="font-size:4.5px; font-weight:700; color:${hasBg ? '#ffffff' : '#0284c7'}; line-height:1;">Barueri</span>
+                    </div>
+                    <div style="position:relative; z-index:1; margin-bottom:2px;">
+                        <div style="font-size:7px; font-weight:800; color:${textColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.1;">${title || 'Capa'}</div>
+                        <div style="font-size:4.5px; color:${subColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.1;">${subtitle || 'Apresentação Executiva'}</div>
+                    </div>
+                    ${odsBadge}
+                    ${qrBadge}
+                </div>
+            `;
+        }
+
+        if (tpl === 'imagem_texto') {
+            const imgSrc = slide.imgTexto || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb';
+            return `
+                <div style="width:100%; height:100%; position:relative; padding:3px; display:flex; gap:4px; align-items:center; background:#ffffff; box-sizing:border-box; overflow:hidden;">
+                    <div style="width:45%; height:100%; border-radius:2px; overflow:hidden; flex-shrink:0; background:#f1f5f9; position:relative;">
+                        <img src="${imgSrc}" style="width:100%; height:100%; object-fit:cover; display:block;">
+                    </div>
+                    <div style="flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; gap:2px;">
+                        <div style="font-size:3.5px; font-weight:700; color:#64748b; text-transform:uppercase; line-height:1;">TÍTULO</div>
+                        <div style="font-size:6px; font-weight:800; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1;">${title || 'Título'}</div>
+                        <div style="font-size:4.5px; color:#64748b; line-height:1.1; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${subtitle || 'Texto de apoio'}</div>
+                    </div>
+                    ${odsBadge}
+                    ${qrBadge}
+                </div>
+            `;
+        }
+
+        if (tpl === 'indicadores') {
+            return `
+                <div style="width:100%; height:100%; position:relative; padding:3px 4px; display:flex; flex-direction:column; justify-content:space-between; background:#ffffff; box-sizing:border-box; overflow:hidden;">
+                    <div style="text-align:center;">
+                        <div style="font-size:5.5px; font-weight:800; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1;">${title || 'Indicadores'}</div>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:2px; margin-bottom:1px;">
+                        <div style="background:#f8fafc; border:0.5px solid #e2e8f0; border-radius:2px; padding:1.5px 2px; text-align:center;">
+                            <div style="font-size:5px; font-weight:800; color:#0f172a; line-height:1;">3.237</div>
+                            <div style="font-size:3px; color:#64748b; text-transform:uppercase; line-height:1;">Saúde</div>
+                        </div>
+                        <div style="background:#f8fafc; border:0.5px solid #e2e8f0; border-radius:2px; padding:1.5px 2px; text-align:center;">
+                            <div style="font-size:5px; font-weight:800; color:#0f172a; line-height:1;">3.847</div>
+                            <div style="font-size:3px; color:#64748b; text-transform:uppercase; line-height:1;">Segurança</div>
+                        </div>
+                        <div style="background:#f8fafc; border:0.5px solid #e2e8f0; border-radius:2px; padding:1.5px 2px; text-align:center;">
+                            <div style="font-size:5px; font-weight:800; color:#0f172a; line-height:1;">3.755</div>
+                            <div style="font-size:3px; color:#64748b; text-transform:uppercase; line-height:1;">Educação</div>
+                        </div>
+                        <div style="background:#f8fafc; border:0.5px solid #e2e8f0; border-radius:2px; padding:1.5px 2px; text-align:center;">
+                            <div style="font-size:5px; font-weight:800; color:#0f172a; line-height:1;">4.687</div>
+                            <div style="font-size:3px; color:#64748b; text-transform:uppercase; line-height:1;">Mobilidade</div>
+                        </div>
+                    </div>
+                    ${odsBadge}
+                    ${qrBadge}
+                </div>
+            `;
+        }
+
+        if (tpl === 'grafico') {
+            const cType = slide.chartType || 'line';
+            let chartSvg = '';
+            if (cType === 'pie') {
+                chartSvg = `<div style="width:18px; height:18px; border-radius:50%; background:conic-gradient(#3b82f6 0% 45%, #60a5fa 45% 80%, #93c5fd 80% 100%);"></div>`;
+            } else if (cType === 'bar') {
+                chartSvg = `
+                    <svg viewBox="0 0 60 22" style="width:80%; height:80%;">
+                        <rect x="3" y="11" width="6" height="11" fill="#3b82f6" rx="1"/>
+                        <rect x="13" y="5" width="6" height="17" fill="#3b82f6" rx="1"/>
+                        <rect x="23" y="9" width="6" height="13" fill="#3b82f6" rx="1"/>
+                        <rect x="33" y="2" width="6" height="20" fill="#3b82f6" rx="1"/>
+                        <rect x="43" y="6" width="6" height="16" fill="#3b82f6" rx="1"/>
+                        <rect x="53" y="1" width="6" height="21" fill="#3b82f6" rx="1"/>
+                    </svg>`;
+            } else {
+                chartSvg = `
+                    <svg viewBox="0 0 60 22" style="width:85%; height:85%;">
+                        <path d="M 2,16 Q 12,12 20,14 T 38,6 T 58,2 L 58,22 L 2,22 Z" fill="rgba(59,130,246,0.15)"/>
+                        <polyline fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" points="2,16 12,11 20,14 30,8 38,6 50,8 58,2"/>
+                        <circle cx="20" cy="14" r="1.5" fill="#3b82f6"/>
+                        <circle cx="38" cy="6" r="1.5" fill="#3b82f6"/>
+                        <circle cx="58" cy="2" r="1.5" fill="#3b82f6"/>
+                    </svg>`;
+            }
+
+            return `
+                <div style="width:100%; height:100%; position:relative; padding:3px 4px; display:flex; flex-direction:column; justify-content:space-between; background:#ffffff; box-sizing:border-box; overflow:hidden;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div style="font-size:5.5px; font-weight:800; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:65%; line-height:1;">${title || 'Gráfico'}</div>
+                        <div style="font-size:3px; background:#eff6ff; color:#2563eb; border:0.5px solid #bfdbfe; border-radius:3px; padding:0.5px 2px; font-weight:600; line-height:1;">${slide.periodo || '12 meses'}</div>
+                    </div>
+                    <div style="flex:1; min-height:0; display:flex; align-items:center; justify-content:center; background:#f8fafc; border:0.5px solid #e2e8f0; border-radius:2px; margin-top:2px;">
+                        ${chartSvg}
+                    </div>
+                    ${odsBadge}
+                    ${qrBadge}
+                </div>
+            `;
+        }
+
+        return '';
+    }
+
+    function updateActiveThumbnail() {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (!slide) return;
+        const thumbCanvas = slidesThumbsList.querySelector(`.slide-thumb-item[data-slide-id="${slide.id}"] .thumb-canvas-mini`);
+        if (thumbCanvas) {
+            thumbCanvas.innerHTML = renderMiniSlidePreview(slide);
+        }
+    }
+
     function renderThumbnails() {
         slidesThumbsList.innerHTML = "";
         slides.forEach((slide, index) => {
-            let miniClass = "capa-mini";
-            if (slide.template === "imagem_texto") miniClass = "split-mini";
-            if (slide.template === "indicadores") miniClass = "metric-mini";
-            if (slide.template === "grafico") miniClass = "chart-mini";
-
             const div = document.createElement("div");
             div.className = `slide-thumb-item ${slide.id === activeSlideId ? 'active' : ''}`;
             div.setAttribute("data-slide-id", slide.id);
+            
+            const deleteBtnHtml = slides.length > 1 ? `<button class="btn-delete-slide" data-id="${slide.id}" style="position:absolute; top:-6px; right:-6px; width:22px; height:22px; background:#ef4444; color:#fff; border:none; border-radius:50%; font-size:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 4px rgba(0,0,0,0.2); z-index:10;"><i class="bi bi-x-lg"></i></button>` : '';
+
             div.innerHTML = `
                 <span class="slide-index">${index + 1}</span>
-                <div class="thumb-card">
-                    <div class="thumb-canvas-mini ${miniClass}">
-                        <span class="mini-tag">Barueri</span>
-                        <div class="mini-title-bar"></div>
+                <div class="thumb-card" style="position:relative;">
+                    ${deleteBtnHtml}
+                    <div class="thumb-canvas-mini" style="height:62px; aspect-ratio:16/9; width:100%; padding:0; overflow:hidden; border-radius:4px; border:1px solid #e2e8f0; background:#fff;">
+                        ${renderMiniSlidePreview(slide)}
                     </div>
                     <span class="thumb-label">Slide ${index + 1}</span>
                 </div>
             `;
-            div.addEventListener("click", () => {
+            
+            div.addEventListener("click", (e) => {
+                if(e.target.closest('.btn-delete-slide')) return;
                 activeSlideId = slide.id;
                 renderThumbnails();
                 renderActiveSlide();
             });
+            
             slidesThumbsList.appendChild(div);
+            
+            const deleteBtn = div.querySelector('.btn-delete-slide');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    slides = slides.filter(s => s.id !== slide.id);
+                    if (activeSlideId === slide.id) {
+                        activeSlideId = slides[0].id;
+                    }
+                    renderThumbnails();
+                    renderActiveSlide();
+                });
+            }
         });
     }
 
@@ -417,6 +662,8 @@ document.addEventListener("DOMContentLoaded", function() {
         switchTemplate();
         updatePreviewTexts();
         updateSlotsVisibility();
+                updatePreviewMedia();
+        if(slide.template === "grafico") renderChart(slide);
     }
 
     function updatePreviewTexts() {
@@ -431,6 +678,109 @@ document.addEventListener("DOMContentLoaded", function() {
         if (!slide) return;
         slotODS.style.display = slide.ods ? "flex" : "none";
         slotQRCode.style.display = slide.qr ? "flex" : "none";
+    }
+    
+        function renderChart(slide) {
+        if (slideChartInstance) {
+            slideChartInstance.destroy();
+        }
+        
+        document.querySelectorAll(".btn-chart-type").forEach(btn => {
+            if (btn.dataset.type === slide.chartType) {
+                btn.classList.add("active");
+            } else {
+                btn.classList.remove("active");
+            }
+        });
+        
+        const selectPeriodo = document.getElementById("selectPeriodo");
+        if(selectPeriodo) selectPeriodo.value = slide.periodo || "Últimos 12 meses";
+        
+        const previewPeriodo = document.getElementById("previewPeriodo");
+        if(previewPeriodo) previewPeriodo.textContent = slide.periodo || "Últimos 12 meses";
+
+        const ctx = document.getElementById('slideChart');
+        if(!ctx) return;
+        
+        let type = slide.chartType || "line";
+        let data, options;
+        if (type === "line" || type === "bar") {
+            data = {
+                labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                datasets: [{
+                    label: 'Atendimentos',
+                    data: [1200, 1900, 1500, 2200, 1800, 2500],
+                    borderColor: '#3b82f6',
+                    backgroundColor: type === "line" ? 'rgba(59, 130, 246, 0.1)' : '#3b82f6',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: type === "line",
+                    borderRadius: type === "bar" ? 4 : 0
+                }]
+            };
+            options = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { 
+                    y: { beginAtZero: true, grid: { color: '#f1f5f9' }, border: { display: false } },
+                    x: { grid: { display: false }, border: { display: false } }
+                }
+            };
+        } else if (type === "pie") {
+            data = {
+                labels: ['Consultas', 'Exames', 'Procedimentos'],
+                datasets: [{
+                    data: [45, 35, 20],
+                    backgroundColor: ['#3b82f6', '#60a5fa', '#93c5fd'],
+                    borderWidth: 0
+                }]
+            };
+            options = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 8, font: { size: 10 } } }
+                }
+            };
+        }
+
+        slideChartInstance = new Chart(ctx, {
+            type: type,
+            data: data,
+            options: options
+        });
+    }
+
+    function updatePreviewMedia() {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (!slide) return;
+        
+        // Tratar imagem de fundo para Capa
+        if (slide.template === "capa") {
+            if (slide.bgCapa) {
+                activeSlideSurface.style.backgroundImage = `url(${slide.bgCapa})`;
+                activeSlideSurface.style.backgroundSize = "cover";
+                activeSlideSurface.style.backgroundPosition = "center";
+                bgCapaThumbPreview.src = slide.bgCapa;
+            } else {
+                activeSlideSurface.style.backgroundImage = "";
+                bgCapaThumbPreview.src = "https://images.unsplash.com/photo-1506744038136-46273834b3fb";
+            }
+        } else {
+            activeSlideSurface.style.backgroundImage = "";
+        }
+        
+        // Tratar imagem para Imagem + Texto
+        if (slide.template === "imagem_texto") {
+            if (slide.imgTexto) {
+                imgTextoCanvasImg.src = slide.imgTexto;
+                imgTextoThumbPreview.src = slide.imgTexto;
+            } else {
+                imgTextoCanvasImg.src = "https://images.unsplash.com/photo-1506744038136-46273834b3fb";
+                imgTextoThumbPreview.src = "https://images.unsplash.com/photo-1506744038136-46273834b3fb";
+            }
+        }
     }
 
     function switchTemplate() {
@@ -454,6 +804,9 @@ document.addEventListener("DOMContentLoaded", function() {
             labelTitulo.textContent = "Título";
             labelSubtitulo.textContent = "Subtítulo";
             fgSubtitulo.style.display = "flex";
+            
+            document.querySelector(".global-slots-container").appendChild(slotODS);
+            document.querySelector(".global-slots-container").appendChild(slotQRCode);
         } else if(val === "imagem_texto") {
             layoutImgTexto.style.display = "flex";
             tplImgTexto.forEach(el => el.style.display = "flex");
@@ -488,18 +841,21 @@ document.addEventListener("DOMContentLoaded", function() {
         const slide = slides.find(s => s.id === activeSlideId);
         if (slide) slide.titulo = e.target.value;
         updatePreviewTexts();
+        updateActiveThumbnail();
     });
 
     inputSubtitulo.addEventListener("input", (e) => {
         const slide = slides.find(s => s.id === activeSlideId);
         if (slide) slide.subtitulo = e.target.value;
         updatePreviewTexts();
+        updateActiveThumbnail();
     });
 
     selectTemplate.addEventListener("change", (e) => {
         const slide = slides.find(s => s.id === activeSlideId);
         if (slide) slide.template = e.target.value;
         switchTemplate();
+        updatePreviewMedia();
         renderThumbnails();
     });
 
@@ -507,13 +863,81 @@ document.addEventListener("DOMContentLoaded", function() {
         const slide = slides.find(s => s.id === activeSlideId);
         if (slide) slide.ods = e.target.checked;
         updateSlotsVisibility();
+        updateActiveThumbnail();
     });
 
     toggleQR.addEventListener("change", (e) => {
         const slide = slides.find(s => s.id === activeSlideId);
         if (slide) slide.qr = e.target.checked;
         updateSlotsVisibility();
+        updateActiveThumbnail();
     });
+    
+    // Upload de Imagem de Fundo para Capa
+    btnUploadBgCapa.addEventListener("click", () => {
+        inputUploadBgCapa.click();
+    });
+    
+    inputUploadBgCapa.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const slide = slides.find(s => s.id === activeSlideId);
+                if (slide) {
+                    slide.bgCapa = event.target.result;
+                    updatePreviewMedia();
+                    updateActiveThumbnail();
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Upload de Imagem para Imagem+Texto
+    btnUploadImgTexto.addEventListener("click", () => {
+        inputUploadImgTexto.click();
+    });
+    
+    inputUploadImgTexto.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const slide = slides.find(s => s.id === activeSlideId);
+                if (slide) {
+                    slide.imgTexto = event.target.result;
+                    updatePreviewMedia();
+                    updateActiveThumbnail();
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    document.querySelectorAll(".btn-chart-type").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            const slide = slides.find(s => s.id === activeSlideId);
+            if (slide && slide.template === "grafico") {
+                slide.chartType = e.currentTarget.dataset.type;
+                renderChart(slide);
+                updateActiveThumbnail();
+            }
+        });
+    });
+
+    const selectPeriodo = document.getElementById("selectPeriodo");
+    if(selectPeriodo) {
+        selectPeriodo.addEventListener("change", (e) => {
+            const slide = slides.find(s => s.id === activeSlideId);
+            if (slide && slide.template === "grafico") {
+                slide.periodo = e.target.value;
+                const previewPeriodo = document.getElementById("previewPeriodo");
+                if(previewPeriodo) previewPeriodo.textContent = slide.periodo;
+                updateActiveThumbnail();
+            }
+        });
+    }
 
     btnNovoSlide.addEventListener("click", () => {
         slideCounter++;
@@ -523,7 +947,11 @@ document.addEventListener("DOMContentLoaded", function() {
             titulo: "Novo Slide",
             subtitulo: "Subtítulo do novo slide",
             ods: false,
-            qr: false
+            qr: false,
+            bgCapa: null,
+            imgTexto: null,
+            chartType: "line",
+            periodo: "Últimos 12 meses"
         });
         activeSlideId = slideCounter;
         renderThumbnails();
@@ -531,8 +959,70 @@ document.addEventListener("DOMContentLoaded", function() {
         slidesThumbsList.scrollTop = slidesThumbsList.scrollHeight;
     });
 
+    // --- Lógica de Salvar ---
+    const btnSalvar = document.getElementById("btnSalvar");
+    const saveToast = document.getElementById("saveToast");
+    btnSalvar.addEventListener("click", () => {
+        console.log("Apresentação salva! Payload:", slides);
+        saveToast.style.display = "flex";
+        setTimeout(() => {
+            saveToast.style.display = "none";
+        }, 3000);
+    });
+
+    // --- Lógica de Visualizar (Apresentação Tela Cheia) ---
+    const btnVisualizar = document.getElementById("btnVisualizar");
+    const previewModal = document.getElementById("previewModal");
+    const previewContainer = document.getElementById("previewContainer");
+    const btnPrevSlide = document.getElementById("btnPrevSlide");
+    const btnNextSlide = document.getElementById("btnNextSlide");
+    const btnClosePreview = document.getElementById("btnClosePreview");
+    
+    const canvasStage = document.querySelector(".canvas-stage");
+
+    btnVisualizar.addEventListener("click", () => {
+        previewContainer.innerHTML = "";
+        previewContainer.appendChild(activeSlideSurface);
+        activeSlideSurface.style.maxWidth = "none";
+        activeSlideSurface.style.height = "100%";
+        activeSlideSurface.style.borderRadius = "0";
+        activeSlideSurface.style.boxShadow = "none";
+        
+        previewModal.style.display = "flex";
+    });
+
+    btnClosePreview.addEventListener("click", () => {
+        canvasStage.innerHTML = "";
+        canvasStage.appendChild(activeSlideSurface);
+        activeSlideSurface.style.maxWidth = "660px";
+        activeSlideSurface.style.height = "auto";
+        activeSlideSurface.style.borderRadius = "var(--radius-lg)";
+        activeSlideSurface.style.boxShadow = "0 6px 20px rgba(0, 0, 0, 0.06)";
+        
+        previewModal.style.display = "none";
+    });
+
+    btnPrevSlide.addEventListener("click", () => {
+        const currentIndex = slides.findIndex(s => s.id === activeSlideId);
+        if (currentIndex > 0) {
+            activeSlideId = slides[currentIndex - 1].id;
+            renderThumbnails();
+            renderActiveSlide();
+        }
+    });
+
+    btnNextSlide.addEventListener("click", () => {
+        const currentIndex = slides.findIndex(s => s.id === activeSlideId);
+        if (currentIndex < slides.length - 1) {
+            activeSlideId = slides[currentIndex + 1].id;
+            renderThumbnails();
+            renderActiveSlide();
+        }
+    });
+
     renderThumbnails();
     renderActiveSlide();
 });
 </script>
 {% endblock %}
+
