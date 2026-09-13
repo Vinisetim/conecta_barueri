@@ -58,6 +58,31 @@
 
 </section>
 
+<!-- MODAL NOVA EQUIPE -->
+<div id="modalNovaEquipe" class="equipes-modal-overlay">
+    <div class="equipes-modal">
+        <div class="modal-header-eq">
+            <h2>Nova Equipe</h2>
+            <button type="button" class="btn-close-modal" id="btnCloseModal"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="modal-body-eq">
+            <div class="form-group-eq">
+                <label>Nome da Equipe</label>
+                <input type="text" id="inputNomeEquipe" placeholder="Ex: Secretaria de Saúde">
+            </div>
+            <div class="form-group-eq">
+                <label>Imagem da Equipe</label>
+                <input type="file" id="inputImagemEquipe" accept="image/*">
+                <small>Escolha uma imagem para ser o fundo do card da equipe (opcional).</small>
+            </div>
+        </div>
+        <div class="modal-footer-eq">
+            <button type="button" class="btn-cancel-eq" id="btnCancelModal">Cancelar</button>
+            <button type="button" class="btn-save-eq" id="btnSaveEquipe">Adicionar</button>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
