@@ -23,13 +23,13 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: 24px;
-    margin-bottom: 34px;
+    margin-bottom: 24px;
 }
 
 .fontes-header h1 {
-    margin: 0 0 10px;
+    margin: 0 0 8px;
     color: #07194f;
-    font-size: 2.35rem;
+    font-size: 2.2rem;
     line-height: 1.1;
     font-weight: 800;
     letter-spacing: -0.04em;
@@ -48,7 +48,7 @@
 
 .fontes-new-btn {
     min-width: 170px;
-    height: 52px;
+    height: 48px;
     padding: 0 20px;
 
     display: inline-flex;
@@ -64,19 +64,18 @@
     text-decoration: none;
 
     font-size: 0.95rem;
-    font-weight: 800;
+    font-weight: 700;
 
-    box-shadow: 0 14px 28px rgba(13, 110, 253, 0.2);
     cursor: pointer;
 
     transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .fontes-new-btn:hover {
-    background-color: #075bd8;
+    background-color: #0b5ed7;
     color: #ffffff;
     transform: translateY(-2px);
-    box-shadow: 0 18px 34px rgba(13, 110, 253, 0.28);
+    box-shadow: 0 10px 20px rgba(13, 110, 253, 0.2);
 }
 
 .fontes-new-btn i {
@@ -90,10 +89,10 @@
 .fontes-card {
     width: 100%;
     background-color: #ffffff;
-    border: 1px solid #e6ebf5;
-    border-radius: 14px;
-    padding: 34px 32px 26px;
-    box-shadow: 0 14px 35px rgba(15, 23, 42, 0.045);
+    border: 1px solid #e8edf5;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.03);
 }
 
 .fontes-table-wrap {
@@ -111,23 +110,29 @@
 }
 
 .fontes-table thead th {
-    padding: 0 0 24px;
-    color: #111c44;
-    font-size: 0.84rem;
+    padding: 16px;
+    color: #475467;
+    font-size: 0.8rem;
     font-weight: 800;
     text-align: left;
     white-space: nowrap;
+    border-bottom: 1px solid #edf1f7;
 }
 
 .fontes-table tbody tr {
-    border-top: 1px solid #e8edf5;
+    border-bottom: 1px solid #edf1f7;
+    transition: background 0.15s ease;
+}
+
+.fontes-table tbody tr:hover {
+    background: #fafcff;
 }
 
 .fontes-table tbody td {
-    padding: 25px 0;
-    color: #26324f;
-    font-size: 0.94rem;
-    font-weight: 500;
+    padding: 16px;
+    color: #344054;
+    font-size: 0.88rem;
+    font-weight: 600;
     vertical-align: middle;
 }
 
