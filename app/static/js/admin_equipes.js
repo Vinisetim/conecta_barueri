@@ -2,14 +2,58 @@ document.addEventListener("DOMContentLoaded", function() {
     const btnNovaEquipe = document.getElementById("btnNovaEquipe");
     const projectsGrid = document.getElementById("projectsGrid");
 
-    // Adicionar nova equipe
-    if (btnNovaEquipe) {
-        btnNovaEquipe.addEventListener("click", () => {
-            const nomeEquipe = prompt("Digite o nome da nova equipe:");
-            
-            if (nomeEquipe && nomeEquipe.trim() !== "") {
-                adicionarEquipe(nomeEquipe.trim());
+    // Modal elements
+    const modalNovaEquipe = document.getElementById("modalNovaEquipe");
+    const btnCloseModal = document.getElementById("btnCloseModal");
+    const btnCancelModal = document.getElementById("btnCancelModal");
+    const btnSaveEquipe = document.getElementById("btnSaveEquipe");
+    const inputNomeEquipe = document.getElementById("inputNomeEquipe");
+    const inputImagemEquipe = document.getElementById("inputImagemEquipe");
+
+    // Funções para abrir e fechar o modal
+    function openModal() {
+        inputNomeEquipe.value = "";
+        inputImagemEquipe.value = ""; // reseta o arquivo
+        modalNovaEquipe.classList.add("show");
+        inputNomeEquipe.focus();
+    }
+
+    function closeModal() {
+        modalNovaEquipe.classList.remove("show");
+    }
+
+    if (btnNovaEquipe) btnNovaEquipe.addEventListener("click", openModal);
+    if (btnCloseModal) btnCloseModal.addEventListener("click", closeModal);
+    if (btnCancelModal) btnCancelModal.addEventListener("click", closeModal);
+
+    // Fechar modal ao clicar fora
+    if (modalNovaEquipe) {
+        modalNovaEquipe.addEventListener("click", (e) => {
+            if (e.target === modalNovaEquipe) {
+                closeModal();
             }
+        });
+    }
+
+    // Salvar Nova Equipe
+    if (btnSaveEquipe) {
+        btnSaveEquipe.addEventListener("click", () => {
+            const nome = inputNomeEquipe.value.trim();
+            if (!nome) {
+                alert("Por favor, digite o nome da equipe.");
+                inputNomeEquipe.focus();
+                return;
+            }
+
+            let imageUrl = null;
+            const file = inputImagemEquipe.files[0];
+            if (file) {
+                // Cria uma URL local temporária para a imagem selecionada
+                imageUrl = URL.createObjectURL(file);
+            }
+
+            adicionarEquipe(nome, imageUrl);
+            closeModal();
         });
     }
 
@@ -40,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // Função para criar o HTML do card dinamicamente
-    function adicionarEquipe(nome) {
+    function adicionarEquipe(nome, imageUrl) {
         // Pega data atual formatada
         const dateStr = new Intl.DateTimeFormat('pt-BR', { 
             day: 'numeric', 
@@ -48,23 +92,34 @@ document.addEventListener("DOMContentLoaded", function() {
             year: 'numeric' 
         }).format(new Date()).replace(" de ", " ");
         
-        // Cores aleatórias para o gradient do thumb para dar variedade visual
-        const gradientColors = [
-            'linear-gradient(135deg, #0a1628 0%, #1a3a6e 60%, #0052ff 100%)',
-            'linear-gradient(135deg, #0a280a 0%, #1a6e2a 60%, #1aaa3a 100%)',
-            'linear-gradient(135deg, #1a0a28 0%, #3a1a6e 60%, #6a1aff 100%)',
-            'linear-gradient(135deg, #280a0a 0%, #6e1a1a 60%, #c0390e 100%)',
-            'linear-gradient(135deg, #0f2a45 0%, #1e5f8a 60%, #2196f3 100%)'
-        ];
-        const randomGradient = gradientColors[Math.floor(Math.random() * gradientColors.length)];
+        let thumbStyle = "";
+        
+        if (imageUrl) {
+            // Se tiver imagem, define como background image e adiciona classe para cobrir
+            thumbStyle = `background-image: url('${imageUrl}');`;
+        } else {
+            // Cores aleatórias para o gradient do thumb para dar variedade visual
+            const gradientColors = [
+                'linear-gradient(135deg, #0a1628 0%, #1a3a6e 60%, #0052ff 100%)',
+                'linear-gradient(135deg, #0a280a 0%, #1a6e2a 60%, #1aaa3a 100%)',
+                'linear-gradient(135deg, #1a0a28 0%, #3a1a6e 60%, #6a1aff 100%)',
+                'linear-gradient(135deg, #280a0a 0%, #6e1a1a 60%, #c0390e 100%)',
+                'linear-gradient(135deg, #0f2a45 0%, #1e5f8a 60%, #2196f3 100%)'
+            ];
+            const randomGradient = gradientColors[Math.floor(Math.random() * gradientColors.length)];
+            thumbStyle = `background: ${randomGradient};`;
+        }
 
         // Iniciais para o avatar
         const initials = nome.substring(0, 2).toUpperCase();
+        
+        // Classe adicional se tiver bg image
+        const thumbClass = imageUrl ? "card-thumb card-thumb-bg" : "card-thumb";
 
         const html = `
             <div class="project-card" data-title="${nome}" style="opacity: 0; transform: scale(0.9);">
-                <div class="card-thumb" style="background: ${randomGradient};">
-                    <div class="thumb-mock">
+                <div class="${thumbClass}" style="${thumbStyle}">
+                    <div class="thumb-mock" style="${imageUrl ? 'display:none;' : ''}">
                         <div style="display:flex;align-items:center;gap:12px;">
                             <div class="thumb-circle"></div>
                             <div class="thumb-chart">
