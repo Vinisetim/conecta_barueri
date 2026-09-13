@@ -123,7 +123,7 @@
                     </div>
 
                     <!-- GRÁFICO LAYOUT -->
-                    <div class="layout-grafico" style="display: none;">
+                    <div class="layout-grafico" style="display: none; flex: 1; min-height: 0; flex-direction: column;">
                         <div class="slide-top-brand">
                             <img src="{{ url_for('static', filename='img/logo-barueri.jpeg') }}" alt="Logo Barueri" class="slide-logo">
                             <div class="slide-brand-text">
@@ -131,17 +131,17 @@
                                 <strong>Barueri</strong>
                             </div>
                         </div>
-                        <div class="gra-header" style="margin-top: 12px;">
+                        <div class="gra-header" style="margin-top: 2cqw;">
                             <h1 class="slide-title-preview preview-titulo">Atendimentos médicos</h1>
                             <p class="slide-subtitle-preview preview-subtitulo">Evolução no número de atendimentos médicos.</p>
                         </div>
-                        <div class="gra-content">
-                            <div class="gra-main-chart" style="flex:1; width:100%; position:relative; min-height:0; display:flex; flex-direction:column; background: #fff; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                    <h4 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: #1e293b;">Total de atendimentos</h4>
+                        <div class="gra-content" style="flex: 1; min-height: 0; display: flex; flex-direction: column;">
+                            <div class="gra-main-chart" style="flex:1; width:100%; position:relative; min-height:0; display:flex; flex-direction:column; background: #fff; padding: 2cqw; border-radius: 2cqw; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2cqw;">
+                                    <h4 style="margin: 0; font-size: 2.2cqw; font-weight: 700; color: #1e293b;">Total de atendimentos</h4>
                                     <span class="gra-tag" id="previewPeriodo">Últimos 12 meses</span>
                                 </div>
-                                <div class="fake-chart-area" style="flex:1; position:relative; width:100%; height:100%; border: none; padding: 0; background: transparent;">
+                                <div class="fake-chart-area" style="display:block; flex:1; position:relative; width:100%; min-height:0; padding: 0; background: transparent;">
                                     <canvas id="slideChart"></canvas>
                                 </div>
                             </div>
@@ -863,21 +863,19 @@ document.addEventListener("DOMContentLoaded", function() {
             document.querySelector(".it-ods-slot").appendChild(slotODS);
             document.querySelector(".it-qr-slot").appendChild(slotQRCode);
         } else if(val === "indicadores") {
-            layoutIndicadores.style.display = "block";
+            layoutIndicadores.style.display = "flex";
             tplIndicadores.forEach(el => el.style.display = "block");
             labelTitulo.textContent = "Título";
             labelSubtitulo.textContent = "Texto Introdutório";
             fgSubtitulo.style.display = "flex";
-            
-            document.querySelector(".global-slots-container").appendChild(slotODS);
-            document.querySelector(".global-slots-container").appendChild(slotQRCode);
+            document.querySelector(".ind-content-wrapper").appendChild(slotODS);
+            document.querySelector(".ind-content-wrapper").appendChild(slotQRCode);
         } else if(val === "grafico") {
-            layoutGrafico.style.display = "block";
+            layoutGrafico.style.display = "flex";
             tplGrafico.forEach(el => el.style.display = "block");
             labelTitulo.textContent = "Título";
             labelSubtitulo.textContent = "Texto Introdutório";
             fgSubtitulo.style.display = "flex";
-            
             document.querySelector(".global-slots-container").appendChild(slotODS);
             document.querySelector(".global-slots-container").appendChild(slotQRCode);
         }
