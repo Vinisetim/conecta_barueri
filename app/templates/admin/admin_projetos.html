@@ -42,343 +42,55 @@
             </div>
 
             <div class="projects-grid">
-                  <!-- CARD 1 -->
-                      <div class="project-card" data-status="published" data-title="Indicadores de Educação">
-                        <div class="card-thumb educacao">
-                          <div class="thumb-mock">
-                            <div style="display:flex;align-items:center;gap:12px;">
-                              <div class="thumb-circle"></div>
-                              <div class="thumb-chart">
-                                <div class="thumb-bar" style="height:40px;"></div>
-                                <div class="thumb-bar" style="height:55px;"></div>
-                                <div class="thumb-bar" style="height:30px;"></div>
-                                <div class="thumb-bar" style="height:48px;"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="card-body-proj">
-                          <h5 class="card-title">Indicadores de Educação</h5>
-                          <p class="card-updated">Atualizado há 2 dias</p>
-                          <div class="card-creator">
-                            <div class="creator-avatar" style="background:#0052ff;">MA</div>
-                            <div class="creator-info">
-                              <div class="creator-name">Maria Aparecida</div>
-                              <div class="creator-date"><i class="bi bi-calendar3" style="font-size:10px;"></i> Criado em 12 mai. 2026</div>
-                            </div>
-                          </div>
-                          <div class="card-footer-proj">
-                            <span class="badge-status published"><i class="bi bi-globe2"></i> Publicada</span>
-                          </div>
-                        </div>
+              {% for ap in apresentacoes %}
+              <!-- CARD APRESENTACAO -->
+              <div class="project-card" data-status="published" data-title="{{ ap.nome }}" onclick="window.location.href='{{ url_for('apresentacao.editar_apresentacao', id=ap.id) }}'" style="cursor: pointer;">
+                <div class="card-thumb educacao">
+                  <div class="thumb-mock">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                      <div class="thumb-circle"></div>
+                      <div class="thumb-chart">
+                        <div class="thumb-bar" style="height:40px;"></div>
+                        <div class="thumb-bar" style="height:55px;"></div>
+                        <div class="thumb-bar" style="height:30px;"></div>
+                        <div class="thumb-bar" style="height:48px;"></div>
                       </div>
-                       <div class="project-card" data-status="published" data-title="Indicadores de Educação">
-                        <div class="card-thumb educacao">
-                          <div class="thumb-mock">
-                            <div style="display:flex;align-items:center;gap:12px;">
-                              <div class="thumb-circle"></div>
-                              <div class="thumb-chart">
-                                <div class="thumb-bar" style="height:40px;"></div>
-                                <div class="thumb-bar" style="height:55px;"></div>
-                                <div class="thumb-bar" style="height:30px;"></div>
-                                <div class="thumb-bar" style="height:48px;"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="card-body-proj">
-                          <h5 class="card-title">Indicadores de Educação</h5>
-                          <p class="card-updated">Atualizado há 2 dias</p>
-                          <div class="card-creator">
-                            <div class="creator-avatar" style="background:#0052ff;">MA</div>
-                            <div class="creator-info">
-                              <div class="creator-name">Maria Aparecida</div>
-                              <div class="creator-date"><i class="bi bi-calendar3" style="font-size:10px;"></i> Criado em 12 mai. 2026</div>
-                            </div>
-                          </div>
-                          <div class="card-footer-proj">
-                            <span class="badge-status published"><i class="bi bi-globe2"></i> Publicada</span>
-                          </div>
-                        </div>
-                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-body-proj">
+                  <h5 class="card-title">{{ ap.nome }}</h5>
+                  <p class="card-updated">Criado em {{ ap.data_criacao.strftime('%d/%m/%Y') if ap.data_criacao else 'Recente' }} • {{ ap.slides|length }} slide(s)</p>
+                  <div class="card-creator">
+                    <div class="creator-avatar" style="background:#0052ff;">{{ current_user.nome[:2].upper() if current_user.nome else 'CB' }}</div>
+                    <div class="creator-info">
+                      <div class="creator-name">{{ current_user.nome or 'Servidor' }}</div>
+                      <div class="creator-date"><i class="bi bi-folder2" style="font-size:10px;"></i> {{ ap.projeto.nome if ap.projeto else 'Projeto Geral' }}</div>
+                    </div>
+                  </div>
+                  <div class="card-footer-proj">
+                    <span class="badge-status published"><i class="bi bi-pencil-square"></i> Editar Apresentação</span>
+                  </div>
+                </div>
+              </div>
+              {% else %}
+              <div class="no-projects-box" style="grid-column: 1 / -1; padding: 48px 24px; text-align: center; background: #ffffff; border-radius: 12px; border: 1px dashed #cbd5e1; margin-bottom: 20px;">
+                <i class="bi bi-folder-x" style="font-size: 3rem; color: #94a3b8; display: block; margin-bottom: 12px;"></i>
+                <h4 style="margin: 0 0 8px 0; color: #1e293b; font-weight: 600;">Nenhuma apresentação encontrada</h4>
+                <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 20px;">Você ainda não possui apresentações salvas no sistema. Comece criando uma agora mesmo!</p>
+                <a href="{{ url_for('apresentacao.criar_apresentacao') }}" class="btn btn-primary" style="background: #0052ff; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: #fff;">
+                  <i class="bi bi-plus-lg"></i> Criar Nova Apresentação
+                </a>
+              </div>
+              {% endfor %}
 
-                       <div class="project-card" data-status="published" data-title="Indicadores de Educação">
-                        <div class="card-thumb educacao">
-                          <div class="thumb-mock">
-                            <div style="display:flex;align-items:center;gap:12px;">
-                              <div class="thumb-circle"></div>
-                              <div class="thumb-chart">
-                                <div class="thumb-bar" style="height:40px;"></div>
-                                <div class="thumb-bar" style="height:55px;"></div>
-                                <div class="thumb-bar" style="height:30px;"></div>
-                                <div class="thumb-bar" style="height:48px;"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="card-body-proj">
-                          <h5 class="card-title">Indicadores de Educação</h5>
-                          <p class="card-updated">Atualizado há 2 dias</p>
-                          <div class="card-creator">
-                            <div class="creator-avatar" style="background:#0052ff;">MA</div>
-                            <div class="creator-info">
-                              <div class="creator-name">Maria Aparecida</div>
-                              <div class="creator-date"><i class="bi bi-calendar3" style="font-size:10px;"></i> Criado em 12 mai. 2026</div>
-                            </div>
-                          </div>
-                          <div class="card-footer-proj">
-                            <span class="badge-status published"><i class="bi bi-globe2"></i> Publicada</span>
-                          </div>
-                        </div>
-                      </div>
-
-                       <div class="project-card" data-status="published" data-title="Indicadores de Educação">
-                        <div class="card-thumb educacao">
-                          <div class="thumb-mock">
-                            <div style="display:flex;align-items:center;gap:12px;">
-                              <div class="thumb-circle"></div>
-                              <div class="thumb-chart">
-                                <div class="thumb-bar" style="height:40px;"></div>
-                                <div class="thumb-bar" style="height:55px;"></div>
-                                <div class="thumb-bar" style="height:30px;"></div>
-                                <div class="thumb-bar" style="height:48px;"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="card-body-proj">
-                          <h5 class="card-title">Indicadores de Educação</h5>
-                          <p class="card-updated">Atualizado há 2 dias</p>
-                          <div class="card-creator">
-                            <div class="creator-avatar" style="background:#0052ff;">MA</div>
-                            <div class="creator-info">
-                              <div class="creator-name">Maria Aparecida</div>
-                              <div class="creator-date"><i class="bi bi-calendar3" style="font-size:10px;"></i> Criado em 12 mai. 2026</div>
-                            </div>
-                          </div>
-                          <div class="card-footer-proj">
-                            <span class="badge-status published"><i class="bi bi-globe2"></i> Publicada</span>
-                          </div>
-                        </div>
-                      </div>
-
-                       <div class="project-card" data-status="published" data-title="Indicadores de Educação">
-                        <div class="card-thumb educacao">
-                          <div class="thumb-mock">
-                            <div style="display:flex;align-items:center;gap:12px;">
-                              <div class="thumb-circle"></div>
-                              <div class="thumb-chart">
-                                <div class="thumb-bar" style="height:40px;"></div>
-                                <div class="thumb-bar" style="height:55px;"></div>
-                                <div class="thumb-bar" style="height:30px;"></div>
-                                <div class="thumb-bar" style="height:48px;"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="card-body-proj">
-                          <h5 class="card-title">Indicadores de Educação</h5>
-                          <p class="card-updated">Atualizado há 2 dias</p>
-                          <div class="card-creator">
-                            <div class="creator-avatar" style="background:#0052ff;">MA</div>
-                            <div class="creator-info">
-                              <div class="creator-name">Maria Aparecida</div>
-                              <div class="creator-date"><i class="bi bi-calendar3" style="font-size:10px;"></i> Criado em 12 mai. 2026</div>
-                            </div>
-                          </div>
-                          <div class="card-footer-proj">
-                            <span class="badge-status published"><i class="bi bi-globe2"></i> Publicada</span>
-                          </div>
-                        </div>
-                      </div>
-
-                       <div class="project-card" data-status="published" data-title="Indicadores de Educação">
-                        <div class="card-thumb educacao">
-                          <div class="thumb-mock">
-                            <div style="display:flex;align-items:center;gap:12px;">
-                              <div class="thumb-circle"></div>
-                              <div class="thumb-chart">
-                                <div class="thumb-bar" style="height:40px;"></div>
-                                <div class="thumb-bar" style="height:55px;"></div>
-                                <div class="thumb-bar" style="height:30px;"></div>
-                                <div class="thumb-bar" style="height:48px;"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="card-body-proj">
-                          <h5 class="card-title">Indicadores de Educação</h5>
-                          <p class="card-updated">Atualizado há 2 dias</p>
-                          <div class="card-creator">
-                            <div class="creator-avatar" style="background:#0052ff;">MA</div>
-                            <div class="creator-info">
-                              <div class="creator-name">Maria Aparecida</div>
-                              <div class="creator-date"><i class="bi bi-calendar3" style="font-size:10px;"></i> Criado em 12 mai. 2026</div>
-                            </div>
-                          </div>
-                          <div class="card-footer-proj">
-                            <span class="badge-status published"><i class="bi bi-globe2"></i> Publicada</span>
-                          </div>
-                        </div>
-                      </div>
-
-                       <div class="project-card" data-status="published" data-title="Indicadores de Educação">
-                        <div class="card-thumb educacao">
-                          <div class="thumb-mock">
-                            <div style="display:flex;align-items:center;gap:12px;">
-                              <div class="thumb-circle"></div>
-                              <div class="thumb-chart">
-                                <div class="thumb-bar" style="height:40px;"></div>
-                                <div class="thumb-bar" style="height:55px;"></div>
-                                <div class="thumb-bar" style="height:30px;"></div>
-                                <div class="thumb-bar" style="height:48px;"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="card-body-proj">
-                          <h5 class="card-title">Indicadores de Educação</h5>
-                          <p class="card-updated">Atualizado há 2 dias</p>
-                          <div class="card-creator">
-                            <div class="creator-avatar" style="background:#0052ff;">MA</div>
-                            <div class="creator-info">
-                              <div class="creator-name">Maria Aparecida</div>
-                              <div class="creator-date"><i class="bi bi-calendar3" style="font-size:10px;"></i> Criado em 12 mai. 2026</div>
-                            </div>
-                          </div>
-                          <div class="card-footer-proj">
-                            <span class="badge-status published"><i class="bi bi-globe2"></i> Publicada</span>
-                          </div>
-                        </div>
-                      </div>
-
-                       <div class="project-card" data-status="published" data-title="Indicadores de Educação">
-                        <div class="card-thumb educacao">
-                          <div class="thumb-mock">
-                            <div style="display:flex;align-items:center;gap:12px;">
-                              <div class="thumb-circle"></div>
-                              <div class="thumb-chart">
-                                <div class="thumb-bar" style="height:40px;"></div>
-                                <div class="thumb-bar" style="height:55px;"></div>
-                                <div class="thumb-bar" style="height:30px;"></div>
-                                <div class="thumb-bar" style="height:48px;"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="card-body-proj">
-                          <h5 class="card-title">Indicadores de Educação</h5>
-                          <p class="card-updated">Atualizado há 2 dias</p>
-                          <div class="card-creator">
-                            <div class="creator-avatar" style="background:#0052ff;">MA</div>
-                            <div class="creator-info">
-                              <div class="creator-name">Maria Aparecida</div>
-                              <div class="creator-date"><i class="bi bi-calendar3" style="font-size:10px;"></i> Criado em 12 mai. 2026</div>
-                            </div>
-                          </div>
-                          <div class="card-footer-proj">
-                            <span class="badge-status published"><i class="bi bi-globe2"></i> Publicada</span>
-                          </div>
-                        </div>
-                      </div>
-
-                       <div class="project-card" data-status="published" data-title="Indicadores de Educação">
-                        <div class="card-thumb educacao">
-                          <div class="thumb-mock">
-                            <div style="display:flex;align-items:center;gap:12px;">
-                              <div class="thumb-circle"></div>
-                              <div class="thumb-chart">
-                                <div class="thumb-bar" style="height:40px;"></div>
-                                <div class="thumb-bar" style="height:55px;"></div>
-                                <div class="thumb-bar" style="height:30px;"></div>
-                                <div class="thumb-bar" style="height:48px;"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="card-body-proj">
-                          <h5 class="card-title">Indicadores de Educação</h5>
-                          <p class="card-updated">Atualizado há 2 dias</p>
-                          <div class="card-creator">
-                            <div class="creator-avatar" style="background:#0052ff;">MA</div>
-                            <div class="creator-info">
-                              <div class="creator-name">Maria Aparecida</div>
-                              <div class="creator-date"><i class="bi bi-calendar3" style="font-size:10px;"></i> Criado em 12 mai. 2026</div>
-                            </div>
-                          </div>
-                          <div class="card-footer-proj">
-                            <span class="badge-status published"><i class="bi bi-globe2"></i> Publicada</span>
-                          </div>
-                        </div>
-                      </div>
-
-                       <div class="project-card" data-status="published" data-title="Indicadores de Educação">
-                        <div class="card-thumb educacao">
-                          <div class="thumb-mock">
-                            <div style="display:flex;align-items:center;gap:12px;">
-                              <div class="thumb-circle"></div>
-                              <div class="thumb-chart">
-                                <div class="thumb-bar" style="height:40px;"></div>
-                                <div class="thumb-bar" style="height:55px;"></div>
-                                <div class="thumb-bar" style="height:30px;"></div>
-                                <div class="thumb-bar" style="height:48px;"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="card-body-proj">
-                          <h5 class="card-title">Indicadores de Educação</h5>
-                          <p class="card-updated">Atualizado há 2 dias</p>
-                          <div class="card-creator">
-                            <div class="creator-avatar" style="background:#0052ff;">MA</div>
-                            <div class="creator-info">
-                              <div class="creator-name">Maria Aparecida</div>
-                              <div class="creator-date"><i class="bi bi-calendar3" style="font-size:10px;"></i> Criado em 12 mai. 2026</div>
-                            </div>
-                          </div>
-                          <div class="card-footer-proj">
-                            <span class="badge-status published"><i class="bi bi-globe2"></i> Publicada</span>
-                          </div>
-                        </div>
-                      </div>
-
-                       <div class="project-card" data-status="published" data-title="Indicadores de Educação">
-                        <div class="card-thumb educacao">
-                          <div class="thumb-mock">
-                            <div style="display:flex;align-items:center;gap:12px;">
-                              <div class="thumb-circle"></div>
-                              <div class="thumb-chart">
-                                <div class="thumb-bar" style="height:40px;"></div>
-                                <div class="thumb-bar" style="height:55px;"></div>
-                                <div class="thumb-bar" style="height:30px;"></div>
-                                <div class="thumb-bar" style="height:48px;"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="card-body-proj">
-                          <h5 class="card-title">Indicadores de Educação</h5>
-                          <p class="card-updated">Atualizado há 2 dias</p>
-                          <div class="card-creator">
-                            <div class="creator-avatar" style="background:#0052ff;">MA</div>
-                            <div class="creator-info">
-                              <div class="creator-name">Maria Aparecida</div>
-                              <div class="creator-date"><i class="bi bi-calendar3" style="font-size:10px;"></i> Criado em 12 mai. 2026</div>
-                            </div>
-                          </div>
-                          <div class="card-footer-proj">
-                            <span class="badge-status published"><i class="bi bi-globe2"></i> Publicada</span>
-                          </div>
-                        </div>
-                      </div>
-
-          <!-- CARD NOVO PROJETO -->
-          <div class="new-project-card" onclick="openModal()">
-            <div class="new-project-icon"><i class="bi bi-graph-up-arrow"></i></div>
-            <h6>Novo projeto</h6>
-            <p>Comece do zero com um projeto em branco.</p>
-            <a class="link-criar" href="#">Criar projeto →</a>
-          </div>
+              <!-- CARD NOVO PROJETO / NOVA APRESENTACAO -->
+              <div class="new-project-card" onclick="window.location.href='{{ url_for('apresentacao.criar_apresentacao') }}'" style="cursor: pointer;">
+                <div class="new-project-icon"><i class="bi bi-plus-circle"></i></div>
+                <h6>Nova Apresentação</h6>
+                <p>Comece do zero criando uma apresentação oficial com slides institucionais.</p>
+                <span class="link-criar">Criar apresentação →</span>
+              </div>
 
         </div><!-- /projects-grid -->
 

@@ -101,7 +101,7 @@ class Apresentacao(db.Model):
 
     data_criacao = db.Column(db.DateTime, default=db.func.current_timestamp())
 
-    slides = db.relationship('Slide', backref='apresentacao_pai', lazy=True)
+    slides = db.relationship('Slide', backref='apresentacao_pai', lazy=True, cascade='all, delete-orphan')
 
 
 class Templates(db.Model):
@@ -145,7 +145,7 @@ class Slide(db.Model):
     #numero da página (para definir ordem)
     ordem = db.Column(db.Integer, nullable=False)
 
-    campos = db.relationship('CampoPreenchido', backref='slide_pai', lazy=True)
+    campos = db.relationship('CampoPreenchido', backref='slide_pai', lazy=True, cascade='all, delete-orphan')
 
 class CampoPreenchido(db.Model):
     """
