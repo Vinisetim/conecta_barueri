@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    CONECTA BARUERI â€” CSS DO EDITOR DE APRESENTAÃ‡Ã•ES INSTITUCIONAIS
    Design Responsivo e AjustÃ¡vel para telas com Zoom PadrÃ£o / Laptops
    CompatÃ­vel com sidebar.css e Bootstrap 5
@@ -785,13 +785,209 @@ input:checked + .slider-ap:before {
         overflow: visible;
     }
 }
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.media-thumb-box {
+    flex: 1;
+    height: 40px;
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: #f1f5f9;
+}
+
+.media-thumb-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.btn-media-action,
+.btn-input-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--primary);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s;
+}
+
+.btn-media-action:hover,
+.btn-input-icon:hover {
+    background: var(--primary-dark);
+}
+
+/* Input com Ã cone Embutido */
+.input-with-action {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* SeÃ§Ã£o de Switches de Slots FlexÃ­veis */
+.config-slots-section {
+    padding-top: 8px;
+    border-top: 1px solid var(--border-soft);
+    margin-top: 2px;
+}
+
+.slots-header h4 {
+    font-size: 0.76rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin: 0 0 1px 0;
+}
+
+.slots-header p {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    margin: 0 0 8px 0;
+}
+
+.slot-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 0;
+}
+
+.slot-row-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--text-main);
+    min-width: 70px;
+}
+
+.slot-row-label i {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.slot-pos-tag {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+}
+
+/* Switch Toggle Compacto */
+.switch-ap {
+    position: relative;
+    display: inline-block;
+    width: 32px;
+    height: 18px;
+}
+
+.switch-ap input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider-ap {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #cbd5e1;
+    transition: 0.2s;
+    border-radius: 18px;
+}
+
+.slider-ap:before {
+    position: absolute;
+    content: "";
+    height: 12px;
+    width: 12px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.2s;
+    border-radius: 50%;
+}
+
+input:checked + .slider-ap {
+    background-color: var(--primary);
+}
+
+input:checked + .slider-ap:before {
+    transform: translateX(14px);
+}
+
+/* ==========================================================================
+   RESPONSIVIDADE E ADAPTAÃ‡ÃƒO PARA TELAS MENORES / ZOOM
+   ========================================================================== */
+@media (max-width: 1366px) {
+    .editor-workspace {
+        grid-template-columns: 185px minmax(0, 1fr) 265px;
+        gap: 10px;
+    }
+
+    .slide-surface {
+        padding: 14px 18px;
+    }
+}
+
+@media (max-height: 720px) {
+    .editor-workspace {
+        height: calc(100vh - 130px);
+    }
+
+    .editor-header {
+        padding-bottom: 2px;
+    }
+
+    .editor-title {
+        font-size: 1.15rem;
+    }
+}
+
+@media (max-width: 1080px) {
+    .editor-workspace {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+
+    .slides-nav-panel {
+        max-height: 180px;
+    }
+
+    .slides-thumbs-list {
+        flex-direction: row;
+        overflow-x: auto;
+    }
+
+    .slide-thumb-item {
+        min-width: 120px;
+    }
+
+    .slide-canvas-panel,
+    .slide-config-panel {
+        height: auto;
+        overflow: visible;
+    }
+}
 /* ADIÇÕES AO CSS DO EDITOR PARA SUPORTAR NOVOS TEMPLATES */
 
 /* Layout Capa */
 .layout-capa { display: flex; flex-direction: column; height: 100%; justify-content: space-between; }
 
 /* Layout Imagem + Texto */
-.layout-imagem-texto { display: flex; height: 100%; width: 100%; gap: 16px; background: transparent; border-radius: 0; overflow: hidden; box-shadow: none; }
+.layout-imagem-texto { display: flex; flex-direction: column; height: 100%; width: 100%; background: transparent; border-radius: 0; overflow: hidden; box-shadow: none; }
+.it-content-wrapper { display: flex; flex: 1; width: 100%; gap: 16px; min-height: 0; margin-top: 12px; }
 .it-left { width: 45%; border-radius: 8px; overflow: hidden; position: relative; }
 .it-img { width: 100%; height: 100%; object-fit: cover; }
 .it-qr-slot { position: absolute; bottom: 12px; left: 12px; }
@@ -803,7 +999,8 @@ input:checked + .slider-ap:before {
 .it-text-content p { font-size: 0.75rem; color: #475569; line-height: 1.4; }
 
 /* Layout Indicadores */
-.layout-indicadores { display: flex; flex-direction: column; height: 100%; padding: 0; justify-content: center; }
+.layout-indicadores { display: flex; flex-direction: column; height: 100%; padding: 0; justify-content: flex-start; }
+.ind-content-wrapper { display: flex; flex-direction: column; flex: 1; justify-content: center; }
 .ind-header { text-align: center; margin-bottom: 24px; }
 .ind-header h1 { font-size: 1.8rem; font-weight: 800; color: #0f172a; margin-bottom: 6px; line-height: 1.2; }
 .ind-header p { font-size: 0.9rem; color: #64748b; line-height: 1.4; }
