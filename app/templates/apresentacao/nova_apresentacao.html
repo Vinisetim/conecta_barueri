@@ -1,86 +1,9 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Nova Apresentação | Conecta Barueri{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/apresentacao/apresentacao.css') }}">
-<style>
-    .form-nova-container {
-        max-width: 720px;
-        margin: 20px auto 40px;
-    }
-    .form-card {
-        background: #ffffff;
-        border: 1px solid #e6ebf5;
-        border-radius: 16px;
-        box-shadow: 0 14px 35px rgba(15, 23, 42, 0.05);
-        padding: 32px;
-    }
-    .form-card-header {
-        margin-bottom: 24px;
-        padding-bottom: 18px;
-        border-bottom: 1px solid #f1f5f9;
-    }
-    .form-card-header h2 {
-        font-size: 1.4rem;
-        font-weight: 700;
-        color: #0b1f4d;
-        margin: 0 0 6px 0;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    .form-card-header p {
-        color: #667085;
-        font-size: 0.92rem;
-        margin: 0;
-    }
-    .form-label {
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: #1e293b;
-        margin-bottom: 6px;
-    }
-    .form-control, .form-select {
-        border-radius: 10px;
-        border: 1px solid #cbd5e1;
-        padding: 10px 14px;
-        font-size: 0.95rem;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    .form-control:focus, .form-select:focus {
-        border-color: #0052ff;
-        box-shadow: 0 0 0 3px rgba(0, 82, 255, 0.15);
-    }
-    .btn-criar-submit {
-        background-color: #0052ff;
-        color: #ffffff;
-        border: none;
-        border-radius: 10px;
-        padding: 11px 24px;
-        font-weight: 600;
-        font-size: 0.95rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        transition: background-color 0.2s ease, transform 0.1s ease;
-    }
-    .btn-criar-submit:hover {
-        background-color: #0040cc;
-        color: #ffffff;
-    }
-    .btn-cancelar {
-        border-radius: 10px;
-        padding: 11px 20px;
-        font-weight: 600;
-        font-size: 0.95rem;
-    }
-    .invalid-feedback-custom {
-        color: #dc3545;
-        font-size: 0.85rem;
-        margin-top: 4px;
-    }
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/apresentacao/nova_apresentacao.css') }}">
 {% endblock %}
 
 {% block content %}
