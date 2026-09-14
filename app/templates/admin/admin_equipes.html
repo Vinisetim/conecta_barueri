@@ -9,55 +9,82 @@
 {% block content %}
 
 
-    <div class="parte-cima">
+<section class="equipes-page">
+
+    <div class="equipes-header">
         <div>
             <h1>Equipes</h1>
             <p>Gerencie as equipes da plataforma</p>
         </div>
 
-        <div class="bota-equipe">
-            <button class="btn btn-primary"><i class="bi bi-plus-lg"></i> Nova equipe</button>
-        </div>
+        <button id="btnNovaEquipe" class="equipes-new-btn" type="button">
+            <i class="bi bi-plus-lg"></i>
+            Nova equipe
+        </button>
     </div>
 
-
-
-
-       <div class="projeto" id="projectsGrid">
-
-
-            <div class="projects-grid">
-                  <!-- CARD 1 -->
-                      <div class="project-card" data-status="published" data-title="Indicadores de Educação">
-                        <div class="card-thumb saude">
-                          <div class="thumb-mock">
-                            <div style="display:flex;align-items:center;gap:12px;">
-                              <div class="thumb-circle"></div>
-                              <div class="thumb-chart">
+    <section class="equipes-card">
+        <div class="projects-grid" id="projectsGrid">
+            <!-- CARD 1 -->
+            <div class="project-card" data-title="Uber">
+                <div class="card-thumb saude">
+                    <div class="thumb-mock">
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <div class="thumb-circle"></div>
+                            <div class="thumb-chart">
                                 <div class="thumb-bar" style="height:40px;"></div>
                                 <div class="thumb-bar" style="height:55px;"></div>
                                 <div class="thumb-bar" style="height:30px;"></div>
                                 <div class="thumb-bar" style="height:48px;"></div>
-                              </div>
                             </div>
-                          </div>
                         </div>
-                        <div class="card-body-proj">
-                          <div class="card-creator">
-                            <div class="creator-avatar" style="background:#0052ff;">UB</div>
-                            <div class="creator-info">
-                              <div class="creator-name">Uber</div>
-                              <div class="creator-date"><i class="bi bi-calendar3" style="font-size:10px;"></i> Criado em 12 mai. 2026</div>
-                            </div>
-                          </div>
+                    </div>
+                </div>
+                <div class="card-body-proj">
+                    <div class="card-creator">
+                        <div class="creator-avatar" style="background:#0052ff;">UB</div>
+                        <div class="creator-info">
+                            <div class="creator-name">Uber</div>
+                            <div class="creator-date"><i class="bi bi-calendar3" style="font-size:10px;"></i> Criado em 12 mai. 2026</div>
                         </div>
-                      </div>
-
+                        <div class="creator-actions">
+                            <button class="btn-delete-equipe" title="Remover equipe"><i class="bi bi-trash text-danger"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div><!-- /projects-grid -->
+    </section>
 
+</section>
+
+<!-- MODAL NOVA EQUIPE -->
+<div id="modalNovaEquipe" class="equipes-modal-overlay">
+    <div class="equipes-modal">
+        <div class="modal-header-eq">
+            <h2>Nova Equipe</h2>
+            <button type="button" class="btn-close-modal" id="btnCloseModal"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="modal-body-eq">
+            <div class="form-group-eq">
+                <label>Nome da Equipe</label>
+                <input type="text" id="inputNomeEquipe" placeholder="Ex: Secretaria de Saúde">
+            </div>
+            <div class="form-group-eq">
+                <label>Imagem da Equipe</label>
+                <input type="file" id="inputImagemEquipe" accept="image/*">
+                <small>Escolha uma imagem para ser o fundo do card da equipe (opcional).</small>
+            </div>
+        </div>
+        <div class="modal-footer-eq">
+            <button type="button" class="btn-cancel-eq" id="btnCancelModal">Cancelar</button>
+            <button type="button" class="btn-save-eq" id="btnSaveEquipe">Adicionar</button>
+        </div>
     </div>
+</div>
 
+{% endblock %}
 
-
-
-{%endblock%}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/admin_equipes.js') }}"></script>
+{% endblock %}
