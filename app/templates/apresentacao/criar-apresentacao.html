@@ -173,15 +173,9 @@
                     </div>
 
                     <!-- SLOTS (Global posicionado absoluto ou no rodapé) -->
-                    <div class="global-slots-container">
-                        <div class="slide-slot-item" id="slotODS" style="display: none;">
-                            <div class="ods-badge-box">
-                                <span class="ods-number">11</span>
-                                <div class="ods-desc">
-                                    <small>CIDADES E COMUNIDADES</small>
-                                    <small>SUSTENTÁVEIS</small>
-                                </div>
-                            </div>
+                    <div class="global-slots-container" style="z-index: 1000; position: absolute; bottom: 12px; right: 12px; display: flex; gap: 10px; align-items: flex-end;">
+                        <div class="slide-slot-item" id="slotODS" style="display: none; flex-direction: row; gap: 3px; flex-wrap: nowrap; flex-shrink: 0;">
+                            <!-- badges gerados pelo JS -->
                         </div>
                         <div class="slide-slot-item" id="slotQRCode" style="display: none;">
                             <div class="qr-code-box" style="padding:0; overflow:hidden; display:flex; align-items:center; justify-content:center;">
@@ -299,6 +293,24 @@
                             <span class="slider-ap"></span>
                         </label>
                     </div>
+                    <div id="fgODSSelect" style="display: none; margin-top: 8px; display:flex; flex-direction:column; gap:6px;">
+                        <div class="form-group" style="margin:0;">
+                            <label style="font-size:0.82rem; color:var(--text-muted); margin-bottom:2px; display:block;">ODS 1</label>
+                            <select id="selectODS1" class="form-control ods-select" style="font-size:0.82rem; padding:6px 10px;"><option value="">Nenhum</option></select>
+                        </div>
+                        <div class="form-group" style="margin:0;">
+                            <label style="font-size:0.82rem; color:var(--text-muted); margin-bottom:2px; display:block;">ODS 2</label>
+                            <select id="selectODS2" class="form-control ods-select" style="font-size:0.82rem; padding:6px 10px;"><option value="">Nenhum</option></select>
+                        </div>
+                        <div class="form-group" style="margin:0;">
+                            <label style="font-size:0.82rem; color:var(--text-muted); margin-bottom:2px; display:block;">ODS 3</label>
+                            <select id="selectODS3" class="form-control ods-select" style="font-size:0.82rem; padding:6px 10px;"><option value="">Nenhum</option></select>
+                        </div>
+                        <div class="form-group" style="margin:0;">
+                            <label style="font-size:0.82rem; color:var(--text-muted); margin-bottom:2px; display:block;">ODS 4</label>
+                            <select id="selectODS4" class="form-control ods-select" style="font-size:0.82rem; padding:6px 10px;"><option value="">Nenhum</option></select>
+                        </div>
+                    </div>
                     <div class="slot-toggle-row">
                         <div class="slot-row-label">
                             <i class="bi bi-qr-code"></i>
@@ -400,6 +412,26 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+    const ODS_OPTIONS = {
+        "1":  { num: "1",  label: "Erradicação da Pobreza",            color: "#E5243B" },
+        "2":  { num: "2",  label: "Fome Zero",                          color: "#DDA63A" },
+        "3":  { num: "3",  label: "Saúde e Bem-Estar",                  color: "#4C9F38" },
+        "4":  { num: "4",  label: "Educação de Qualidade",              color: "#C5192D" },
+        "5":  { num: "5",  label: "Igualdade de Género",                color: "#FF3A21" },
+        "6":  { num: "6",  label: "Água Potável e Saneamento",          color: "#26BDE2" },
+        "7":  { num: "7",  label: "Energia Acessível e Limpa",          color: "#FCC30B" },
+        "8":  { num: "8",  label: "Trabalho e Crescimento",             color: "#A21942" },
+        "9":  { num: "9",  label: "Inovação e Infraestrutura",          color: "#FD6925" },
+        "10": { num: "10", label: "Redução das Desigualdades",          color: "#DD1367" },
+        "11": { num: "11", label: "Cidades Sustentáveis",               color: "#FD9D24" },
+        "12": { num: "12", label: "Consumo Responsável",                color: "#BF8B2E" },
+        "13": { num: "13", label: "Ação Climática",                     color: "#3F7E44" },
+        "14": { num: "14", label: "Vida na Água",                       color: "#0A97D9" },
+        "15": { num: "15", label: "Vida Terrestre",                     color: "#56C02B" },
+        "16": { num: "16", label: "Paz e Instituições Eficazes",        color: "#00689D" },
+        "17": { num: "17", label: "Parcerias e Meios de Implementação", color: "#19486A" }
+    };
+
     let slides = [
         {
             id: 1,
@@ -407,6 +439,7 @@ document.addEventListener("DOMContentLoaded", function() {
             titulo: "Capa",
             subtitulo: "Apresentação Executiva - Indicadores Municipais",
             ods: true,
+            odsNums: ["11"],
             qr: false,
             qrLink: "",
             bgCapa: null,
@@ -443,6 +476,13 @@ document.addEventListener("DOMContentLoaded", function() {
     const slotQRCode = document.getElementById("slotQRCode");
     const toggleODS = document.getElementById("toggleODS");
     const toggleQR = document.getElementById("toggleQR");
+    const fgODSSelect = document.getElementById("fgODSSelect");
+    const odsSelects = [
+        document.getElementById("selectODS1"),
+        document.getElementById("selectODS2"),
+        document.getElementById("selectODS3"),
+        document.getElementById("selectODS4")
+    ];
     const fgQRLink = document.getElementById("fgQRLink");
     const inputQRLink = document.getElementById("inputQRLink");
     const qrCodeImg = document.getElementById("qrCodeImg");
@@ -477,15 +517,23 @@ document.addEventListener("DOMContentLoaded", function() {
         const title = escapeHtml(slide.titulo || '');
         const subtitle = escapeHtml(slide.subtitulo || '');
 
-        const odsBadge = slide.ods ? `
-            <div style="position: absolute; bottom: 2px; right: ${slide.qr ? '14px' : '3px'}; background: #f97316; color: #fff; font-size: 3px; font-weight: 900; padding: 1px 2px; border-radius: 1px; display: flex; align-items: center; gap: 1px; z-index: 2; line-height: 1;">
-                <span>11</span><span style="font-size: 2px;">ODS</span>
-            </div>` : '';
+        let odsBadge = '';
+        if (slide.ods && slide.odsNums && slide.odsNums.length > 0) {
+            const qrOffset = slide.qr ? 14 : 3;
+            const badgesHtml = slide.odsNums.map((num, i) => {
+                const opt = ODS_OPTIONS[num];
+                if(!opt) return '';
+                const right = qrOffset + (slide.odsNums.length - 1 - i) * 9;
+                return `<div style="position:absolute; bottom:2px; right:${right}px; width:8px; height:8px; background:${opt.color}; color:#fff; font-size:3.5px; font-weight:900; border-radius:1px; display:flex; align-items:center; justify-content:center; z-index:2; line-height:1;">${opt.num}</div>`;
+            }).join('');
+            odsBadge = badgesHtml;
+        }
         
         const qrBadge = slide.qr ? `
             <div style="position: absolute; bottom: 2px; right: 2px; width: 10px; height: 10px; background: #fff; border: 0.5px solid #cbd5e1; border-radius: 1px; display: flex; align-items: center; justify-content: center; font-size: 6px; color: #0f172a; z-index: 2; line-height: 1; overflow:hidden; padding: 0.5px;">
                 ${(slide.qrLink && slide.qrLink.trim() !== '') ? `<img src="https://api.qrserver.com/v1/create-qr-code/?size=50x50&data=${encodeURIComponent(slide.qrLink)}" style="width:100%; height:100%; object-fit:contain;">` : `<i class="bi bi-qr-code" style="font-size: 6px;"></i>`}
             </div>` : '';
+
 
         if (tpl === 'capa') {
             const hasBg = !!slide.bgCapa;
@@ -678,9 +726,103 @@ document.addEventListener("DOMContentLoaded", function() {
         switchTemplate();
         updatePreviewTexts();
         updateSlotsVisibility();
+        syncOdsSelects(slide);
         updatePreviewMedia();
         if(slide.template === "grafico") renderChart(slide);
         if(slide.template === "indicadores") renderIndicadores(slide);
+    }
+
+    // --- ODS SELECTS ---
+    function populateOdsSelects() {
+        odsSelects.forEach(sel => {
+            if(!sel) return;
+            sel.innerHTML = '<option value="">Nenhum</option>';
+            Object.values(ODS_OPTIONS).forEach(opt => {
+                const o = document.createElement("option");
+                o.value = opt.num;
+                o.textContent = `ODS ${opt.num} — ${opt.label}`;
+                sel.appendChild(o);
+            });
+            sel.addEventListener("change", () => {
+                const slide = slides.find(s => s.id === activeSlideId);
+                if(!slide) return;
+                slide.odsNums = odsSelects.map(s => s ? s.value : "").filter(v => v !== "");
+                updateSlotsVisibility();
+                updateActiveThumbnail();
+            });
+        });
+    }
+
+    function syncOdsSelects(slide) {
+        const nums = slide.odsNums || [];
+        odsSelects.forEach((sel, i) => {
+            if(sel) sel.value = nums[i] || "";
+        });
+    }
+
+    function renderOdsBadgesInSlot(slide) {
+        if(!slotODS) return;
+        slotODS.innerHTML = "";
+        const nums = (slide.odsNums || []).filter(v => v !== "");
+        nums.forEach(num => {
+            const opt = ODS_OPTIONS[num];
+            if(!opt) return;
+            const badge = document.createElement("div");
+            badge.style.cssText = `
+                display: flex !important;
+                align-items: center !important;
+                background-color: ${opt.color} !important;
+                color: #ffffff !important;
+                padding: 4px 8px !important;
+                border-radius: 4px !important;
+                gap: 6px !important;
+                z-index: 9999 !important;
+                flex-shrink: 0 !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+            `;
+            
+            badge.innerHTML = `
+                <span style="font-size: 16px; font-weight: 900;">${opt.num}</span>
+                <div style="display: flex; flex-direction: column; justify-content: center; line-height: 1.1;">
+                    <small style="font-size: 8px; font-weight: 700;">${opt.label.toUpperCase()}</small>
+                </div>
+            `;
+            slotODS.appendChild(badge);
+        });
+    }
+
+    function updateSlotsVisibility() {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (!slide) return;
+
+        const nums = (slide.odsNums || []).filter(v => v !== "");
+        const hasOds = slide.ods && nums.length > 0;
+        slotODS.style.setProperty('display', hasOds ? 'flex' : 'none', 'important');
+        if(hasOds) renderOdsBadgesInSlot(slide);
+
+        slotQRCode.style.display = slide.qr ? "flex" : "none";
+        
+        // ODS panel visibility
+        if(fgODSSelect) fgODSSelect.style.display = slide.ods ? "flex" : "none";
+        
+        // QR link input
+        if(fgQRLink) fgQRLink.style.display = slide.qr ? "block" : "none";
+        
+        // QR Code image/placeholder
+        if (slide.qr) {
+            if (inputQRLink) inputQRLink.value = slide.qrLink || "";
+            if (slide.qrLink && slide.qrLink.trim() !== "") {
+                if (qrCodeImg) {
+                    qrCodeImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(slide.qrLink)}`;
+                    qrCodeImg.style.display = "block";
+                }
+                if (qrCodePlaceholder) qrCodePlaceholder.style.display = "none";
+            } else {
+                if (qrCodeImg) qrCodeImg.style.display = "none";
+                if (qrCodePlaceholder) qrCodePlaceholder.style.display = "block";
+            }
+        }
     }
 
     function renderIndicadores(slide) {
@@ -737,6 +879,16 @@ document.addEventListener("DOMContentLoaded", function() {
         if (!slide) return;
         slotODS.style.display = slide.ods ? "flex" : "none";
         slotQRCode.style.display = slide.qr ? "flex" : "none";
+        
+        // ODS Select visibility and rendering
+        if(fgODSSelect) fgODSSelect.style.display = slide.ods ? "block" : "none";
+        if(slide.ods && ODS_OPTIONS[slide.odsNum]) {
+            const opt = ODS_OPTIONS[slide.odsNum];
+            if(odsBadgeBox) odsBadgeBox.style.backgroundColor = opt.color;
+            if(odsNumberText) odsNumberText.textContent = opt.num;
+            if(odsL1Text) odsL1Text.textContent = opt.l1;
+            if(odsL2Text) odsL2Text.textContent = opt.l2;
+        }
         
         // Show QR link input if QR is enabled
         if(fgQRLink) fgQRLink.style.display = slide.qr ? "block" : "none";
@@ -1085,6 +1237,7 @@ document.addEventListener("DOMContentLoaded", function() {
             titulo: "Novo Slide",
             subtitulo: "Subtítulo do novo slide",
             ods: false,
+            odsNums: [],
             qr: false,
             qrLink: "",
             bgCapa: null,
@@ -1160,6 +1313,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
+    populateOdsSelects();
     renderThumbnails();
     renderActiveSlide();
 });
