@@ -184,7 +184,10 @@
                             </div>
                         </div>
                         <div class="slide-slot-item" id="slotQRCode" style="display: none;">
-                            <div class="qr-code-box"><i class="bi bi-qr-code"></i></div>
+                            <div class="qr-code-box" style="padding:0; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+                                <img id="qrCodeImg" src="" style="width:100%; height:100%; object-fit:contain; display:none;">
+                                <i class="bi bi-qr-code" id="qrCodePlaceholder"></i>
+                            </div>
                         </div>
                     </div>
 
@@ -306,6 +309,10 @@
                             <span class="slider-ap"></span>
                         </label>
                     </div>
+                    <div class="form-group" id="fgQRLink" style="display: none; padding-left: 0; margin-top: 8px;">
+                        <label style="font-size:0.85rem; color:var(--text-muted); margin-bottom:4px; display:block;">Link do QR Code:</label>
+                        <input type="url" id="inputQRLink" class="form-control" placeholder="https://..." style="font-size:0.85rem; padding:8px 12px;">
+                    </div>
                 </div>
 
             </form>
@@ -401,6 +408,7 @@ document.addEventListener("DOMContentLoaded", function() {
             subtitulo: "Apresentação Executiva - Indicadores Municipais",
             ods: true,
             qr: false,
+            qrLink: "",
             bgCapa: null,
             imgTexto: null,
             chartType: "line",
@@ -435,6 +443,11 @@ document.addEventListener("DOMContentLoaded", function() {
     const slotQRCode = document.getElementById("slotQRCode");
     const toggleODS = document.getElementById("toggleODS");
     const toggleQR = document.getElementById("toggleQR");
+    const fgQRLink = document.getElementById("fgQRLink");
+    const inputQRLink = document.getElementById("inputQRLink");
+    const qrCodeImg = document.getElementById("qrCodeImg");
+    const qrCodePlaceholder = document.getElementById("qrCodePlaceholder");
+    
     const btnNovoSlide = document.getElementById("btnNovoSlide");
     const slidesThumbsList = document.getElementById("slidesThumbsList");
 
@@ -470,8 +483,8 @@ document.addEventListener("DOMContentLoaded", function() {
             </div>` : '';
         
         const qrBadge = slide.qr ? `
-            <div style="position: absolute; bottom: 2px; right: 2px; width: 9px; height: 9px; background: #fff; border: 0.5px solid #cbd5e1; border-radius: 1px; display: flex; align-items: center; justify-content: center; font-size: 6px; color: #0f172a; z-index: 2; line-height: 1;">
-                <i class="bi bi-qr-code" style="font-size: 6px;"></i>
+            <div style="position: absolute; bottom: 2px; right: 2px; width: 10px; height: 10px; background: #fff; border: 0.5px solid #cbd5e1; border-radius: 1px; display: flex; align-items: center; justify-content: center; font-size: 6px; color: #0f172a; z-index: 2; line-height: 1; overflow:hidden; padding: 0.5px;">
+                ${(slide.qrLink && slide.qrLink.trim() !== '') ? `<img src="https://api.qrserver.com/v1/create-qr-code/?size=50x50&data=${encodeURIComponent(slide.qrLink)}" style="width:100%; height:100%; object-fit:contain;">` : `<i class="bi bi-qr-code" style="font-size: 6px;"></i>`}
             </div>` : '';
 
         if (tpl === 'capa') {
@@ -724,6 +737,24 @@ document.addEventListener("DOMContentLoaded", function() {
         if (!slide) return;
         slotODS.style.display = slide.ods ? "flex" : "none";
         slotQRCode.style.display = slide.qr ? "flex" : "none";
+        
+        // Show QR link input if QR is enabled
+        if(fgQRLink) fgQRLink.style.display = slide.qr ? "block" : "none";
+        
+        // Render QR Code Image or Placeholder
+        if (slide.qr) {
+            if (inputQRLink) inputQRLink.value = slide.qrLink || "";
+            if (slide.qrLink && slide.qrLink.trim() !== "") {
+                if (qrCodeImg) {
+                    qrCodeImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(slide.qrLink)}`;
+                    qrCodeImg.style.display = "block";
+                }
+                if (qrCodePlaceholder) qrCodePlaceholder.style.display = "none";
+            } else {
+                if (qrCodeImg) qrCodeImg.style.display = "none";
+                if (qrCodePlaceholder) qrCodePlaceholder.style.display = "block";
+            }
+        }
     }
     
         function renderChart(slide) {
@@ -921,6 +952,17 @@ document.addEventListener("DOMContentLoaded", function() {
         updateActiveThumbnail();
     });
     
+    if (inputQRLink) {
+        inputQRLink.addEventListener("input", (e) => {
+            const slide = slides.find(s => s.id === activeSlideId);
+            if (slide) {
+                slide.qrLink = e.target.value;
+                updateSlotsVisibility();
+                updateActiveThumbnail();
+            }
+        });
+    }
+    
     // Upload de Imagem de Fundo para Capa
     btnUploadBgCapa.addEventListener("click", () => {
         inputUploadBgCapa.click();
@@ -1044,6 +1086,7 @@ document.addEventListener("DOMContentLoaded", function() {
             subtitulo: "Subtítulo do novo slide",
             ods: false,
             qr: false,
+            qrLink: "",
             bgCapa: null,
             imgTexto: null,
             chartType: "line",
