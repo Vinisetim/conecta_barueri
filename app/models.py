@@ -188,3 +188,27 @@ class Ods(db.Model):
     descricao = db.Column(db.Text)
     icone_url = db.Column(db.String(255))
     cor_hex = db.Column(db.String(10))
+
+class Apresentador(db.Model):
+    """
+    Mapeia apresentacao.apresentador.
+    Catálogo INSTITUCIONAL e COMPARTILHADO de autoridades, secretários e palestrantes.
+    Visível globalmente para todos os usuários do sistema.
+    """
+    __tablename__ = 'apresentador'
+    __table_args__ = {'schema':'apresentacao'}
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    criado_por_id = db.Column(db.Integer, db.ForeignKey('login.usuario.id'), nullable=True)
+
+    nome = db.Column(db.String(150), nullable=False)
+    cargo = db.Column(db.String(255))
+
+    biografia = db.Column(db.Text)
+    foto_url = db.Column(db.String)
+
+    #estruturas dinamicas em JSON
+    topicos = db.Column(db.JSON, default=list)
+    midias_extra = db.Column(db.JSON, default=list)
+
