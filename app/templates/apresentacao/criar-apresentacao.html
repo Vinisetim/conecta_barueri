@@ -760,70 +760,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    function renderOdsBadgesInSlot(slide) {
-        if(!slotODS) return;
-        slotODS.innerHTML = "";
-        const nums = (slide.odsNums || []).filter(v => v !== "");
-        nums.forEach(num => {
-            const opt = ODS_OPTIONS[num];
-            if(!opt) return;
-            const badge = document.createElement("div");
-            badge.style.cssText = `
-                display: flex !important;
-                align-items: center !important;
-                background-color: ${opt.color} !important;
-                color: #ffffff !important;
-                padding: 4px 8px !important;
-                border-radius: 4px !important;
-                gap: 6px !important;
-                z-index: 9999 !important;
-                flex-shrink: 0 !important;
-                visibility: visible !important;
-                opacity: 1 !important;
-            `;
-            
-            badge.innerHTML = `
-                <span style="font-size: 16px; font-weight: 900;">${opt.num}</span>
-                <div style="display: flex; flex-direction: column; justify-content: center; line-height: 1.1;">
-                    <small style="font-size: 8px; font-weight: 700;">${opt.label.toUpperCase()}</small>
-                </div>
-            `;
-            slotODS.appendChild(badge);
-        });
-    }
-
-    function updateSlotsVisibility() {
-        const slide = slides.find(s => s.id === activeSlideId);
-        if (!slide) return;
-
-        const nums = (slide.odsNums || []).filter(v => v !== "");
-        const hasOds = slide.ods && nums.length > 0;
-        slotODS.style.setProperty('display', hasOds ? 'flex' : 'none', 'important');
-        if(hasOds) renderOdsBadgesInSlot(slide);
-
-        slotQRCode.style.display = slide.qr ? "flex" : "none";
-        
-        // ODS panel visibility
-        if(fgODSSelect) fgODSSelect.style.display = slide.ods ? "flex" : "none";
-        
-        // QR link input
-        if(fgQRLink) fgQRLink.style.display = slide.qr ? "block" : "none";
-        
-        // QR Code image/placeholder
-        if (slide.qr) {
-            if (inputQRLink) inputQRLink.value = slide.qrLink || "";
-            if (slide.qrLink && slide.qrLink.trim() !== "") {
-                if (qrCodeImg) {
-                    qrCodeImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(slide.qrLink)}`;
-                    qrCodeImg.style.display = "block";
-                }
-                if (qrCodePlaceholder) qrCodePlaceholder.style.display = "none";
-            } else {
-                if (qrCodeImg) qrCodeImg.style.display = "none";
-                if (qrCodePlaceholder) qrCodePlaceholder.style.display = "block";
-            }
-        }
-    }
 
     function renderIndicadores(slide) {
         const gridPreview = document.getElementById("indGridPreview");
@@ -877,34 +813,74 @@ document.addEventListener("DOMContentLoaded", function() {
     function updateSlotsVisibility() {
         const slide = slides.find(s => s.id === activeSlideId);
         if (!slide) return;
-        slotODS.style.display = slide.ods ? "flex" : "none";
-        slotQRCode.style.display = slide.qr ? "flex" : "none";
-        
-        // ODS Select visibility and rendering
-        if(fgODSSelect) fgODSSelect.style.display = slide.ods ? "block" : "none";
-        if(slide.ods && ODS_OPTIONS[slide.odsNum]) {
-            const opt = ODS_OPTIONS[slide.odsNum];
-            if(odsBadgeBox) odsBadgeBox.style.backgroundColor = opt.color;
-            if(odsNumberText) odsNumberText.textContent = opt.num;
-            if(odsL1Text) odsL1Text.textContent = opt.l1;
-            if(odsL2Text) odsL2Text.textContent = opt.l2;
-        }
-        
-        // Show QR link input if QR is enabled
+
+        // Ensure sidebar controls match current state
+        if(fgODSSelect) fgODSSelect.style.display = slide.ods ? "flex" : "none";
         if(fgQRLink) fgQRLink.style.display = slide.qr ? "block" : "none";
-        
-        // Render QR Code Image or Placeholder
-        if (slide.qr) {
-            if (inputQRLink) inputQRLink.value = slide.qrLink || "";
-            if (slide.qrLink && slide.qrLink.trim() !== "") {
-                if (qrCodeImg) {
-                    qrCodeImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(slide.qrLink)}`;
-                    qrCodeImg.style.display = "block";
+        if (slide.qr && inputQRLink) inputQRLink.value = slide.qrLink || "";
+
+        // Build HTML for ODS
+        const nums = (slide.odsNums || []).filter(v => v !== "");
+        const hasOds = slide.ods && nums.length > 0;
+        let odsHtml = '';
+        if (hasOds) {
+            odsHtml = `<div style="display: flex; gap: 0.6cqw; z-index: 1000;">`;
+            nums.forEach(num => {
+                const opt = ODS_OPTIONS[num];
+                if(opt) {
+                    odsHtml += `
+                    <div style="display: flex; align-items: center; background-color: ${opt.color}; color: #ffffff; padding: 0.6cqw 1.2cqw; border-radius: 0.6cqw; gap: 0.9cqw; flex-shrink: 0; box-shadow: 0 0.3cqw 0.8cqw rgba(0,0,0,0.2);">
+                        <span style="font-size: 2.5cqw; font-weight: 900; line-height: 1;">${opt.num}</span>
+                        <div style="display: flex; flex-direction: column; justify-content: center; line-height: 1.1;">
+                            <small style="font-size: 1cqw; font-weight: 700;">${opt.label.toUpperCase()}</small>
+                        </div>
+                    </div>`;
                 }
-                if (qrCodePlaceholder) qrCodePlaceholder.style.display = "none";
-            } else {
-                if (qrCodeImg) qrCodeImg.style.display = "none";
-                if (qrCodePlaceholder) qrCodePlaceholder.style.display = "block";
+            });
+            odsHtml += `</div>`;
+        }
+
+        // Build HTML for QR Code
+        let qrHtml = '';
+        if (slide.qr) {
+            let qrInner = `<i class="bi bi-qr-code" style="font-size: 3cqw; color: #64748b;"></i>`;
+            if (slide.qrLink && slide.qrLink.trim() !== "") {
+                qrInner = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(slide.qrLink)}" style="width:100%; height:100%; object-fit:contain;">`;
+            }
+            qrHtml = `
+            <div style="display: flex; align-items: center; justify-content: center; width: 5.2cqw; height: 5.2cqw; background: #ffffff; border: 0.2cqw solid #cbd5e1; border-radius: 0.6cqw; padding: 0.3cqw; overflow: hidden; flex-shrink: 0; z-index: 1000; box-shadow: 0 0.3cqw 0.8cqw rgba(0,0,0,0.1);">
+                ${qrInner}
+            </div>`;
+        }
+
+        const combinedHtml = `<div style="display: flex; gap: 1.5cqw; align-items: flex-end;">${odsHtml}${qrHtml}</div>`;
+
+        // Inject into current template slots
+        const tpl = slide.template || "capa";
+        const globalContainer = document.querySelector('.global-slots-container');
+        const itOdsSlot = document.querySelector('.it-ods-slot');
+        const itQrSlot = document.querySelector('.it-qr-slot');
+        const indContent = document.querySelector('.ind-content-wrapper');
+
+        // Reset all specific slot containers
+        if(globalContainer) globalContainer.innerHTML = '';
+        if(itOdsSlot) itOdsSlot.innerHTML = '';
+        if(itQrSlot) itQrSlot.innerHTML = '';
+        const oldInd = document.getElementById('dyn-ind-slots');
+        if(oldInd) oldInd.remove();
+
+        if (tpl === "capa" || tpl === "grafico") {
+            if(globalContainer) globalContainer.innerHTML = combinedHtml;
+        } else if (tpl === "imagem_texto") {
+            if(itOdsSlot) itOdsSlot.innerHTML = odsHtml;
+            if(itQrSlot) itQrSlot.innerHTML = qrHtml;
+        } else if (tpl === "indicadores") {
+            if(indContent) {
+                const w = document.createElement("div");
+                w.id = "dyn-ind-slots";
+                w.style.cssText = "position: absolute; bottom: 1.5cqw; right: 1.5cqw; z-index: 1000;";
+                w.innerHTML = combinedHtml;
+                indContent.appendChild(w);
             }
         }
     }
@@ -1033,35 +1009,27 @@ document.addEventListener("DOMContentLoaded", function() {
             labelTitulo.textContent = "Título";
             labelSubtitulo.textContent = "Subtítulo";
             fgSubtitulo.style.display = "flex";
-            
-            document.querySelector(".global-slots-container").appendChild(slotODS);
-            document.querySelector(".global-slots-container").appendChild(slotQRCode);
         } else if(val === "imagem_texto") {
             layoutImgTexto.style.display = "flex";
             tplImgTexto.forEach(el => el.style.display = "flex");
             labelTitulo.textContent = "Título do Slide";
             labelSubtitulo.textContent = "Texto de Apoio";
             fgSubtitulo.style.display = "flex";
-            
-            document.querySelector(".it-ods-slot").appendChild(slotODS);
-            document.querySelector(".it-qr-slot").appendChild(slotQRCode);
         } else if(val === "indicadores") {
             layoutIndicadores.style.display = "flex";
             tplIndicadores.forEach(el => el.style.display = "block");
             labelTitulo.textContent = "Título";
             labelSubtitulo.textContent = "Texto Introdutório";
             fgSubtitulo.style.display = "flex";
-            document.querySelector(".ind-content-wrapper").appendChild(slotODS);
-            document.querySelector(".ind-content-wrapper").appendChild(slotQRCode);
         } else if(val === "grafico") {
             layoutGrafico.style.display = "flex";
             tplGrafico.forEach(el => el.style.display = "block");
             labelTitulo.textContent = "Título";
             labelSubtitulo.textContent = "Texto Introdutório";
             fgSubtitulo.style.display = "flex";
-            document.querySelector(".global-slots-container").appendChild(slotODS);
-            document.querySelector(".global-slots-container").appendChild(slotQRCode);
         }
+
+        updateSlotsVisibility();
     }
 
     inputTitulo.addEventListener("input", (e) => {
