@@ -260,6 +260,16 @@
 
                 <!-- Gráfico específicos -->
                 <div class="form-group-ap tpl-grafico" style="display: none;">
+                    <label for="selectChartIndicador">Indicador Base</label>
+                    <select class="form-control-ap mb-3" id="selectChartIndicador">
+                        <option value="1">Saúde</option>
+                        <option value="2">Segurança</option>
+                        <option value="3">Educação</option>
+                        <option value="4">Mobilidade</option>
+                        <option value="5">Meio Ambiente</option>
+                        <option value="6">Economia</option>
+                    </select>
+
                     <label>Tipo de gráfico</label>
                     <div class="chart-type-selector">
                         <button type="button" class="btn-chart-type active" data-type="line"><i class="bi bi-graph-up"></i> Linha</button>
@@ -1114,6 +1124,9 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
 
+        const selectChartIndicador = document.getElementById("selectChartIndicador");
+        if(selectChartIndicador) selectChartIndicador.value = slide.chartIndicador || 1;
+
         const selectPeriodo = document.getElementById("selectPeriodo");
         if(selectPeriodo) selectPeriodo.value = slide.periodo || "Últimos 12 meses";
 
@@ -1125,15 +1138,27 @@ document.addEventListener("DOMContentLoaded", function() {
 
         let type = slide.chartType || "line";
         let data, options;
+
+        const idInd = slide.chartIndicador || 1;
+        const ind = INDICADORES_PREDEFINIDOS.find(i => i.id_padrao === idInd) || INDICADORES_PREDEFINIDOS[0];
+        const baseVal = parseFloat(ind.valor.replace('.', ''));
+
         if (type === "line" || type === "bar") {
             data = {
                 labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
                 datasets: [{
-                    label: 'Atendimentos',
-                    data: [1200, 1900, 1500, 2200, 1800, 2500],
-                    borderColor: '#3b82f6',
-                    backgroundColor: type === "line" ? 'rgba(59, 130, 246, 0.1)' : '#3b82f6',
-                    borderWidth: 3,
+                    label: ind.nome,
+                    data: [
+                        Math.round(baseVal * 0.75), 
+                        Math.round(baseVal * 0.82), 
+                        Math.round(baseVal * 0.90), 
+                        Math.round(baseVal * 0.85), 
+                        Math.round(baseVal * 0.95), 
+                        baseVal
+                    ],
+                    borderColor: ind.cor,
+                    backgroundColor: type === "line" ? ind.cor + '33' : ind.cor,
+                    borderWidth: type === "line" ? 3 : 0,
                     tension: 0.4,
                     fill: type === "line",
                     borderRadius: type === "bar" ? 4 : 0
@@ -1150,10 +1175,10 @@ document.addEventListener("DOMContentLoaded", function() {
             };
         } else if (type === "pie") {
             data = {
-                labels: ['Consultas', 'Exames', 'Procedimentos'],
+                labels: ['Região Norte', 'Região Sul', 'Região Centro'],
                 datasets: [{
                     data: [45, 35, 20],
-                    backgroundColor: ['#3b82f6', '#60a5fa', '#93c5fd'],
+                    backgroundColor: [ind.cor, ind.cor + '99', ind.cor + '44'],
                     borderWidth: 0
                 }]
             };
@@ -1392,6 +1417,18 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     });
+
+    const selectChartIndicador = document.getElementById("selectChartIndicador");
+    if(selectChartIndicador) {
+        selectChartIndicador.addEventListener("change", (e) => {
+            const slide = slides.find(s => s.id === activeSlideId);
+            if (slide && slide.template === "grafico") {
+                slide.chartIndicador = parseInt(e.target.value);
+                renderChart(slide);
+                updateActiveThumbnail();
+            }
+        });
+    }
 
     const selectPeriodo = document.getElementById("selectPeriodo");
     if(selectPeriodo) {
