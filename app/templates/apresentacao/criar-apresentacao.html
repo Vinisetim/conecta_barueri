@@ -342,6 +342,41 @@
     </div>
 </div>
 
+<!-- SAVE MODAL -->
+<div id="saveModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.6); z-index:9998; flex-direction:column; align-items:center; justify-content:center; padding:20px; backdrop-filter: blur(3px);">
+    <div style="width: 100%; max-width: 500px; background: #ffffff; border-radius: 12px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+            <h3 style="margin:0; font-size:1.25rem; color:#0f172a; font-weight:700;">Salvar Apresentação</h3>
+            <button id="btnCloseSave" style="background:none; border:none; font-size:1.5rem; color:#64748b; cursor:pointer;"><i class="bi bi-x"></i></button>
+        </div>
+        
+        <div class="form-group" style="margin-bottom: 16px;">
+            <label style="font-size:0.85rem; font-weight:600; color:#334155; margin-bottom:6px; display:block;">Nome da Apresentação</label>
+            <input type="text" class="form-control" id="inputSaveNome" placeholder="Ex: Resultados Q3 2026" style="padding: 10px 14px;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 24px;">
+            <label style="font-size:0.85rem; font-weight:600; color:#334155; margin-bottom:6px; display:block;">Salvar no Projeto (Pasta)</label>
+            <select class="form-control" id="selectSaveProjeto" style="padding: 10px 14px;">
+                <option value="">Selecione um projeto...</option>
+                <option value="1">Saúde & Bem Estar</option>
+                <option value="2">Educação e Inovação</option>
+                <option value="3">Segurança Pública</option>
+                <option value="4">Obras e Infraestrutura</option>
+                <option value="5">Geral / Institucional</option>
+            </select>
+            <small style="color: #64748b; font-size: 0.75rem; display:block; margin-top: 6px;">
+                A apresentação ficará disponível dentro da pasta deste projeto.
+            </small>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:12px;">
+            <button id="btnCancelSave" style="padding:10px 20px; background:#f1f5f9; color:#475569; border:none; border-radius:6px; font-weight:600; cursor:pointer;">Cancelar</button>
+            <button id="btnConfirmSave" style="padding:10px 20px; background:#3b82f6; color:#fff; border:none; border-radius:6px; font-weight:600; cursor:pointer;"><i class="bi bi-floppy" style="margin-right: 6px;"></i> Salvar</button>
+        </div>
+    </div>
+</div>
+
 <!-- TOAST SALVAR -->
 <div id="saveToast" style="display:none; position:fixed; top:20px; right:20px; background:#10b981; color:#fff; padding:12px 24px; border-radius:8px; font-weight:bold; box-shadow:0 4px 12px rgba(0,0,0,0.15); z-index:9999; align-items:center; gap:8px;">
     <i class="bi bi-check-circle" style="font-size:1.2rem;"></i> <span>Apresentação salva com sucesso!</span>
@@ -1269,13 +1304,42 @@ document.addEventListener("DOMContentLoaded", function() {
     // --- Lógica de Salvar ---
     const btnSalvar = document.getElementById("btnSalvar");
     const saveToast = document.getElementById("saveToast");
+    const saveModal = document.getElementById("saveModal");
+    const btnCloseSave = document.getElementById("btnCloseSave");
+    const btnCancelSave = document.getElementById("btnCancelSave");
+    const btnConfirmSave = document.getElementById("btnConfirmSave");
+    const inputSaveNome = document.getElementById("inputSaveNome");
+    const selectSaveProjeto = document.getElementById("selectSaveProjeto");
+
     btnSalvar.addEventListener("click", () => {
-        console.log("Apresentação salva! Payload:", slides);
-        saveToast.style.display = "flex";
-        setTimeout(() => {
-            saveToast.style.display = "none";
-        }, 3000);
+        // Pre-fill default name based on first slide title if empty
+        if (slides.length > 0 && !inputSaveNome.value) {
+            inputSaveNome.value = slides[0].titulo || "Nova Apresentação";
+        }
+        saveModal.style.display = "flex";
     });
+
+    function fecharSaveModal() {
+        saveModal.style.display = "none";
+    }
+
+    if (btnCloseSave) btnCloseSave.addEventListener("click", fecharSaveModal);
+    if (btnCancelSave) btnCancelSave.addEventListener("click", fecharSaveModal);
+
+    if (btnConfirmSave) {
+        btnConfirmSave.addEventListener("click", () => {
+            const nomeStr = inputSaveNome.value || "Apresentação sem título";
+            const projetoStr = selectSaveProjeto.options[selectSaveProjeto.selectedIndex].text;
+            console.log(`Salvando no projeto: ${projetoStr} | Nome: ${nomeStr} | Payload:`, slides);
+            
+            fecharSaveModal();
+            
+            saveToast.style.display = "flex";
+            setTimeout(() => {
+                saveToast.style.display = "none";
+            }, 3000);
+        });
+    }
 
     // --- Lógica de Visualizar (Apresentação Tela Cheia) ---
     const btnVisualizar = document.getElementById("btnVisualizar");
