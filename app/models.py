@@ -114,7 +114,15 @@ class Slide(db.Model):
     #numero da página (para definir ordem)
     ordem = db.Column(db.Integer, nullable=False)
 
+    # Controles visuais de estilo e legibilidade
+    alinhamento_texto = db.Column(db.String(20), default='left')
+    cor_texto = db.Column(db.String(10), default='#212529')
+    filtro_fundo = db.Column(db.String(20), default='nenhum')
+    estilo_fundo = db.Column(db.String(30), default='contained')
+
+    # Relacionamentos com os filhos
     campos = db.relationship('CampoPreenchido', backref='slide_pai', lazy=True)
+    slots = db.relationship('SlotFlexivel', backref='slide_pai', lazy=True)
 
 class CampoPreenchido(db.Model):
     """
@@ -148,3 +156,19 @@ class CampoPreenchido(db.Model):
     indicador_id = db.Column(db.Integer)
 
     data_criacao = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+class SlotFlexivel(db.Model):
+    """
+    Mapeia apresentacao.slot_flexivel
+    Elemento sobrepostos e ancorados na matriz 3x3
+    """
+
+    __tablename__ = 'slot_flexivel'
+    __table_args__ = {'schema':'apresentacao'}
+
+    id = db.Column(db.Integer, primary_key=True)
+    slide_id = db.Column(db.Integer, db.ForeignKey('apresentacao.slide.id'), nullable=False)
+
+    tipo_elemento = db.Column(db.String(50), nullable=False)
+    posicao_matriz = db.Column(db.String(30), nullable=False)
+    config_json = db.Column(db.JSON, nullable=False)
