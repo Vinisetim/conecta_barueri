@@ -11,8 +11,8 @@
 
     <header class="editor-header">
         <div class="editor-header-info">
-            <h1 class="editor-title" id="displayApresentacaoTitulo">Apresentação Executiva</h1>
-            <p class="editor-subtitle">Edite e organize os slides da sua apresentação institucional.</p>
+            <h1 class="editor-title" id="displayApresentacaoTitulo" contenteditable="true" spellcheck="false" title="Clique para editar o título da apresentação" style="outline: none; border-bottom: 1px dashed rgba(0,0,0,0.15); display: inline-block; cursor: text;">{{ apresentacao.nome if apresentacao else 'Apresentação Executiva' }}</h1>
+            <p class="editor-subtitle">Edite e organize os slides da sua apresentação institucional. Clique no título para renomear.</p>
         </div>
 
         <div class="editor-header-actions">
@@ -403,22 +403,25 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    let slides = [
-        {
-            id: 1,
-            template: "capa",
-            titulo: "Capa",
-            subtitulo: "Apresentação Executiva - Indicadores Municipais",
-            ods: true,
-            qr: false,
-            bgCapa: null,
-            imgTexto: null,
-            chartType: "line",
-            periodo: "Últimos 12 meses"
-        }
-    ];
-    let activeSlideId = 1;
-    let slideCounter = 1;
+    let slides = {{ (slides_iniciais or [{
+        "id": 1,
+        "template": "capa",
+        "titulo": (apresentacao.nome if apresentacao else "Capa"),
+        "subtitulo": "Apresentação Executiva",
+        "ods": true,
+        "qr": false,
+        "bgCapa": None,
+        "imgTexto": None,
+        "chartType": "line",
+        "periodo": "Últimos 12 meses"
+    }]) | tojson }};
+
+    window.apresentacaoId = {{ apresentacao.id if apresentacao else 'null' }};
+    window.projetoId = {{ apresentacao.projeto_id if apresentacao and apresentacao.projeto_id else 'null' }};
+
+    let activeSlideId = (slides && slides.length > 0) ? slides[0].id : 1;
+    let slideCounter = (slides && slides.length > 0) ? slides.reduce((max, s) => Math.max(max, Number(s.id) || 0), 0) : 1;
+    if (slideCounter < 1) slideCounter = 1;
     
     let slideChartInstance = null;
 
@@ -959,15 +962,69 @@ document.addEventListener("DOMContentLoaded", function() {
         slidesThumbsList.scrollTop = slidesThumbsList.scrollHeight;
     });
 
-    // --- Lógica de Salvar ---
+    // --- Lógica de Salvar no Banco de Dados ---
     const btnSalvar = document.getElementById("btnSalvar");
     const saveToast = document.getElementById("saveToast");
-    btnSalvar.addEventListener("click", () => {
-        console.log("Apresentação salva! Payload:", slides);
-        saveToast.style.display = "flex";
-        setTimeout(() => {
-            saveToast.style.display = "none";
-        }, 3000);
+
+    btnSalvar.addEventListener("click", async () => {
+        const originalHtml = btnSalvar.innerHTML;
+        btnSalvar.disabled = true;
+        btnSalvar.innerHTML = `<i class="bi bi-arrow-repeat spin"></i> <span>Salvando...</span>`;
+
+        const displayTitulo = document.getElementById("displayApresentacaoTitulo");
+        let titulo = displayTitulo ? displayTitulo.innerText.trim() : "";
+        if (!titulo && slides.length > 0) {
+            titulo = slides[0].titulo;
+        }
+        if (!titulo) {
+            titulo = "Apresentação Executiva";
+        }
+
+        const payload = {
+            apresentacao_id: window.apresentacaoId,
+            projeto_id: window.projetoId,
+            titulo: titulo,
+            slides: slides
+        };
+
+        try {
+            const response = await fetch("{{ url_for('apresentacao.salvar_apresentacao') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.status === 'sucesso') {
+                if (data.apresentacao_id) {
+                    window.apresentacaoId = data.apresentacao_id;
+                    // Atualiza a URL no navegador sem recarregar a página
+                    if (!window.location.pathname.includes('/apresentacao/editar/')) {
+                        window.history.replaceState(null, '', `/apresentacao/editar/${data.apresentacao_id}`);
+                    }
+                }
+
+                if (saveToast) {
+                    const msgSpan = saveToast.querySelector('span');
+                    if (msgSpan) msgSpan.textContent = data.mensagem || "Apresentação salva com sucesso!";
+                    saveToast.style.display = "flex";
+                    setTimeout(() => {
+                        saveToast.style.display = "none";
+                    }, 3500);
+                }
+            } else {
+                alert("Erro ao salvar apresentação: " + (data.mensagem || "Falha no servidor."));
+            }
+        } catch (error) {
+            console.error("Erro na requisição ao salvar apresentação:", error);
+            alert("Erro de conexão ao salvar apresentação no banco de dados.");
+        } finally {
+            btnSalvar.disabled = false;
+            btnSalvar.innerHTML = originalHtml;
+        }
     });
 
     // --- Lógica de Visualizar (Apresentação Tela Cheia) ---

@@ -1,7 +1,8 @@
-from flask import Blueprint, render_template, request, jsonify, abort
+from flask import Blueprint, render_template, request, jsonify, abort, redirect, url_for, flash
 from flask_login import login_required, current_user
 from app import db
 from app.models import Apresentacao, Slide, CampoPreenchido, Templates, Projeto
+from app.forms import CriarApresentacaoForm
 
 apresentacao_bp = Blueprint('apresentacao', __name__)
 
@@ -11,11 +12,88 @@ def apresentacao():
     """Rota principal de apresentacao"""
     return render_template('apresentacao/apresentacao.html')
 
-@apresentacao_bp.route('/apresentacao/criar')
+@apresentacao_bp.route('/apresentacao/criar', methods=['GET', 'POST'])
 @login_required
 def criar_apresentacao():
-    """Rota para criação de novas apresentações do zero"""
-    return render_template('apresentacao/criar-apresentacao.html', apresentacao=None, slides_iniciais=None)
+    """
+    Rota para criação de uma nova apresentação vinculada a uma pasta (Projeto).
+    Utiliza CriarApresentacaoForm (Flask-WTF) com proteção CSRF.
+    Ao validar os dados, instancia Apresentacao, persiste no banco e redireciona ao editor.
+    """
+    form = CriarApresentacaoForm()
+
+    # Busca as pastas (projetos) do usuário logado (ou todas se for admin)
+    if getattr(current_user, 'admin', False):
+        projetos_usuario = Projeto.query.order_by(Projeto.nome.asc()).all()
+    else:
+        projetos_usuario = Projeto.query.filter_by(usuario_id=current_user.id).order_by(Projeto.nome.asc()).all()
+
+    # Se o usuário não possuir nenhuma pasta, cria uma pasta padrão institucional
+    if not projetos_usuario:
+        projeto_padrao = Projeto(
+            usuario_id=current_user.id,
+            nome="Projeto Geral",
+            descricao="Pasta principal de apresentações institucionais"
+        )
+        db.session.add(projeto_padrao)
+        db.session.commit()
+        projetos_usuario = [projeto_padrao]
+
+    # Popula dinamicamente as opções do select com os projetos do usuário
+    form.projeto_id.choices = [(p.id, p.nome) for p in projetos_usuario]
+
+    # Pré-seleciona a pasta caso informada via query param (?projeto_id=X)
+    if request.method == 'GET' and request.args.get('projeto_id'):
+        try:
+            form.projeto_id.data = int(request.args.get('projeto_id'))
+        except (ValueError, TypeError):
+            pass
+
+    if form.validate_on_submit():
+        nome_ap = form.nome.data.strip()
+        proj_id = form.projeto_id.data
+
+        # Criação da entidade Apresentacao apontando para a pasta (projeto_id) escolhida
+        nova_ap = Apresentacao(
+            nome=nome_ap,
+            projeto_id=proj_id
+        )
+        db.session.add(nova_ap)
+        db.session.flush()
+
+        # Adiciona o slide inicial padrão (Capa) com o título escolhido
+        template_capa = Templates.query.filter_by(codigo='capa').first()
+        if template_capa:
+            slide_inicial = Slide(
+                apresentacao_id=nova_ap.id,
+                template_id=template_capa.id,
+                ordem=1
+            )
+            db.session.add(slide_inicial)
+            db.session.flush()
+
+            campo_titulo = CampoPreenchido(
+                slide_id=slide_inicial.id,
+                chave_campo='titulo',
+                valor_manual=nome_ap
+            )
+            campo_subtitulo = CampoPreenchido(
+                slide_id=slide_inicial.id,
+                chave_campo='subtitulo',
+                valor_manual='Apresentação Executiva'
+            )
+            campo_ods = CampoPreenchido(
+                slide_id=slide_inicial.id,
+                chave_campo='ods',
+                valor_manual='true'
+            )
+            db.session.add_all([campo_titulo, campo_subtitulo, campo_ods])
+
+        db.session.commit()
+        flash(f'Apresentação "{nome_ap}" criada com sucesso na pasta selecionada!', 'success')
+        return redirect(url_for('apresentacao.editar_apresentacao', id=nova_ap.id))
+
+    return render_template('apresentacao/nova_apresentacao.html', form=form)
 
 @apresentacao_bp.route('/apresentacao/salvar', methods=['POST'])
 @login_required

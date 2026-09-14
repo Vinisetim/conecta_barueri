@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm #A classe contém automaticamente a proteção CSRF no formulário
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField
 from wtforms.validators import DataRequired, Email, Length
 
 class LoginForm(FlaskForm):
@@ -30,3 +30,23 @@ class LoginForm(FlaskForm):
 
     # Botão de submissão do formulário
     submit = SubmitField('Entrar')
+
+
+class CriarApresentacaoForm(FlaskForm):
+    """
+    Formulário para criação de nova Apresentação organizada em uma Pasta (Projeto).
+    
+    Campos:
+    - nome: Título da apresentação (string de 3 a 200 caracteres)
+    - projeto_id: Pasta (Projeto) de destino, populado dinamicamente no backend
+    """
+    nome = StringField('Nome da Apresentação', validators=[
+        DataRequired(message='Informe o nome da apresentação.'),
+        Length(min=3, max=200, message='O nome da apresentação deve ter entre 3 e 200 caracteres.')
+    ])
+
+    projeto_id = SelectField('Pasta do Projeto', coerce=int, validators=[
+        DataRequired(message='Selecione uma pasta para salvar sua apresentação.')
+    ])
+
+    submit = SubmitField('Criar e Ir para o Editor')

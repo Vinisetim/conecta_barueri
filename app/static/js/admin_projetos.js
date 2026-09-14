@@ -39,13 +39,13 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // Salvar Novo Projeto
-    if (btnSaveProjeto) {
-        btnSaveProjeto.addEventListener("click", () => {
+    // Salvar Novo Projeto via Backend
+    const formNovoProjeto = modalNovoProjeto ? modalNovoProjeto.querySelector("form") : null;
+    if (formNovoProjeto) {
+        formNovoProjeto.addEventListener("submit", async function(e) {
+            e.preventDefault();
             const nome = inputNomeProjeto.value.trim();
-            const desc = inputDescProjeto.value.trim() || "Nova pasta de projeto vazia.";
-            const categoria = selectCategoriaProjeto.value;
-            const categoriaNome = selectCategoriaProjeto.options[selectCategoriaProjeto.selectedIndex].text;
+            const desc = inputDescProjeto ? inputDescProjeto.value.trim() : "";
             
             if (!nome) {
                 alert("Por favor, digite o nome do projeto (pasta).");
@@ -53,8 +53,21 @@ document.addEventListener("DOMContentLoaded", function() {
                 return;
             }
 
-            adicionarProjeto(nome, desc, categoria, categoriaNome);
-            closeModal();
+            try {
+                const response = await fetch("/projetos/criar", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ nome: nome, descricao: desc })
+                });
+                const res = await response.json();
+                if (response.ok && res.status === "sucesso") {
+                    window.location.reload();
+                } else {
+                    alert(res.mensagem || "Erro ao criar pasta.");
+                }
+            } catch (err) {
+                formNovoProjeto.submit();
+            }
         });
     }
 
