@@ -294,22 +294,12 @@
                         </label>
                     </div>
                     <div id="fgODSSelect" style="display: none; margin-top: 8px; display:flex; flex-direction:column; gap:6px;">
-                        <div class="form-group" style="margin:0;">
-                            <label style="font-size:0.82rem; color:var(--text-muted); margin-bottom:2px; display:block;">ODS 1</label>
-                            <select id="selectODS1" class="form-control ods-select" style="font-size:0.82rem; padding:6px 10px;"><option value="">Nenhum</option></select>
+                        <div id="odsSelectsContainer" style="display:flex; flex-direction:column; gap:6px;">
+                            <!-- selects gerados pelo JS -->
                         </div>
-                        <div class="form-group" style="margin:0;">
-                            <label style="font-size:0.82rem; color:var(--text-muted); margin-bottom:2px; display:block;">ODS 2</label>
-                            <select id="selectODS2" class="form-control ods-select" style="font-size:0.82rem; padding:6px 10px;"><option value="">Nenhum</option></select>
-                        </div>
-                        <div class="form-group" style="margin:0;">
-                            <label style="font-size:0.82rem; color:var(--text-muted); margin-bottom:2px; display:block;">ODS 3</label>
-                            <select id="selectODS3" class="form-control ods-select" style="font-size:0.82rem; padding:6px 10px;"><option value="">Nenhum</option></select>
-                        </div>
-                        <div class="form-group" style="margin:0;">
-                            <label style="font-size:0.82rem; color:var(--text-muted); margin-bottom:2px; display:block;">ODS 4</label>
-                            <select id="selectODS4" class="form-control ods-select" style="font-size:0.82rem; padding:6px 10px;"><option value="">Nenhum</option></select>
-                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddOds" style="font-size:0.8rem;">
+                            <i class="bi bi-plus-circle"></i> Adicionar ODS
+                        </button>
                     </div>
                     <div class="slot-toggle-row">
                         <div class="slot-row-label">
@@ -432,12 +422,15 @@ document.addEventListener("DOMContentLoaded", function() {
         "17": { num: "17", label: "Parcerias e Meios de Implementação", color: "#19486A" }
     };
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialTemplate = urlParams.get('template') || "capa";
+
     let slides = [
         {
             id: 1,
-            template: "capa",
-            titulo: "Capa",
-            subtitulo: "Apresentação Executiva - Indicadores Municipais",
+            template: initialTemplate,
+            titulo: initialTemplate === "capa" ? "Capa" : "Novo Slide",
+            subtitulo: initialTemplate === "capa" ? "Apresentação Executiva - Indicadores Municipais" : "Subtítulo do novo slide",
             ods: true,
             odsNums: ["11"],
             qr: false,
@@ -477,12 +470,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const toggleODS = document.getElementById("toggleODS");
     const toggleQR = document.getElementById("toggleQR");
     const fgODSSelect = document.getElementById("fgODSSelect");
-    const odsSelects = [
-        document.getElementById("selectODS1"),
-        document.getElementById("selectODS2"),
-        document.getElementById("selectODS3"),
-        document.getElementById("selectODS4")
-    ];
+    const odsSelectsContainer = document.getElementById("odsSelectsContainer");
+    const btnAddOds = document.getElementById("btnAddOds");
     const fgQRLink = document.getElementById("fgQRLink");
     const inputQRLink = document.getElementById("inputQRLink");
     const qrCodeImg = document.getElementById("qrCodeImg");
@@ -519,14 +508,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
         let odsBadge = '';
         if (slide.ods && slide.odsNums && slide.odsNums.length > 0) {
-            const qrOffset = slide.qr ? 14 : 3;
-            const badgesHtml = slide.odsNums.map((num, i) => {
+            odsBadge = `<div style="position:absolute; top:4px; right:6px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; z-index: 2;">`;
+            odsBadge += slide.odsNums.map(num => {
                 const opt = ODS_OPTIONS[num];
                 if(!opt) return '';
-                const right = qrOffset + (slide.odsNums.length - 1 - i) * 9;
-                return `<div style="position:absolute; bottom:2px; right:${right}px; width:8px; height:8px; background:${opt.color}; color:#fff; font-size:3.5px; font-weight:900; border-radius:1px; display:flex; align-items:center; justify-content:center; z-index:2; line-height:1;">${opt.num}</div>`;
+                return `<div style="width:7px; height:7px; background:${opt.color}; color:#fff; font-size:3.5px; font-weight:900; border-radius:1px; display:flex; align-items:center; justify-content:center; line-height:1;">${opt.num}</div>`;
             }).join('');
-            odsBadge = badgesHtml;
+            odsBadge += `</div>`;
         }
         
         const qrBadge = slide.qr ? `
@@ -733,30 +721,81 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // --- ODS SELECTS ---
-    function populateOdsSelects() {
-        odsSelects.forEach(sel => {
-            if(!sel) return;
-            sel.innerHTML = '<option value="">Nenhum</option>';
+    function syncOdsSelects(slide) {
+        if (!odsSelectsContainer) return;
+        odsSelectsContainer.innerHTML = "";
+        const nums = slide.odsNums || [];
+        
+        nums.forEach((num, index) => {
+            const group = document.createElement("div");
+            group.className = "form-group";
+            group.style.margin = "0";
+            
+            const labelRow = document.createElement("div");
+            labelRow.style.display = "flex";
+            labelRow.style.justifyContent = "space-between";
+            labelRow.style.alignItems = "center";
+            labelRow.style.marginBottom = "2px";
+            
+            const label = document.createElement("label");
+            label.style.fontSize = "0.82rem";
+            label.style.color = "var(--text-muted)";
+            label.textContent = `ODS ${index + 1}`;
+            
+            const btnRemove = document.createElement("i");
+            btnRemove.className = "bi bi-x-circle text-danger";
+            btnRemove.style.cursor = "pointer";
+            btnRemove.style.fontSize = "0.82rem";
+            btnRemove.title = "Remover ODS";
+            btnRemove.onclick = () => {
+                slide.odsNums.splice(index, 1);
+                syncOdsSelects(slide);
+                updateSlotsVisibility();
+                updateActiveThumbnail();
+            };
+            
+            labelRow.appendChild(label);
+            labelRow.appendChild(btnRemove);
+            
+            const select = document.createElement("select");
+            select.className = "form-control ods-select";
+            select.style.fontSize = "0.82rem";
+            select.style.padding = "6px 10px";
+            
+            const defOpt = document.createElement("option");
+            defOpt.value = "";
+            defOpt.textContent = "Selecionar ODS...";
+            select.appendChild(defOpt);
+            
             Object.values(ODS_OPTIONS).forEach(opt => {
                 const o = document.createElement("option");
                 o.value = opt.num;
                 o.textContent = `ODS ${opt.num} — ${opt.label}`;
-                sel.appendChild(o);
+                select.appendChild(o);
             });
-            sel.addEventListener("change", () => {
-                const slide = slides.find(s => s.id === activeSlideId);
-                if(!slide) return;
-                slide.odsNums = odsSelects.map(s => s ? s.value : "").filter(v => v !== "");
+            
+            select.value = num || "";
+            
+            select.addEventListener("change", (e) => {
+                slide.odsNums[index] = e.target.value;
                 updateSlotsVisibility();
                 updateActiveThumbnail();
             });
+            
+            group.appendChild(labelRow);
+            group.appendChild(select);
+            odsSelectsContainer.appendChild(group);
         });
     }
 
-    function syncOdsSelects(slide) {
-        const nums = slide.odsNums || [];
-        odsSelects.forEach((sel, i) => {
-            if(sel) sel.value = nums[i] || "";
+    if (btnAddOds) {
+        btnAddOds.addEventListener("click", () => {
+            const slide = slides.find(s => s.id === activeSlideId);
+            if (slide) {
+                if (!slide.odsNums) slide.odsNums = [];
+                slide.odsNums.push("");
+                syncOdsSelects(slide);
+            }
         });
     }
 
@@ -824,16 +863,13 @@ document.addEventListener("DOMContentLoaded", function() {
         const hasOds = slide.ods && nums.length > 0;
         let odsHtml = '';
         if (hasOds) {
-            odsHtml = `<div style="display: flex; gap: 0.6cqw; z-index: 1000;">`;
+            odsHtml = `<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6cqw; z-index: 1000;">`;
             nums.forEach(num => {
                 const opt = ODS_OPTIONS[num];
                 if(opt) {
                     odsHtml += `
-                    <div style="display: flex; align-items: center; background-color: ${opt.color}; color: #ffffff; padding: 0.6cqw 1.2cqw; border-radius: 0.6cqw; gap: 0.9cqw; flex-shrink: 0; box-shadow: 0 0.3cqw 0.8cqw rgba(0,0,0,0.2);">
-                        <span style="font-size: 2.5cqw; font-weight: 900; line-height: 1;">${opt.num}</span>
-                        <div style="display: flex; flex-direction: column; justify-content: center; line-height: 1.1;">
-                            <small style="font-size: 1cqw; font-weight: 700;">${opt.label.toUpperCase()}</small>
-                        </div>
+                    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: ${opt.color}; color: #ffffff; width: 4.5cqw; height: 4.5cqw; border-radius: 0.6cqw; flex-shrink: 0; box-shadow: 0 0.3cqw 0.8cqw rgba(0,0,0,0.2); text-align: center;">
+                        <span style="font-size: 2.2cqw; font-weight: 900; line-height: 1;">${opt.num}</span>
                     </div>`;
                 }
             });
@@ -853,14 +889,24 @@ document.addEventListener("DOMContentLoaded", function() {
             </div>`;
         }
 
-        const combinedHtml = `<div style="display: flex; gap: 1.5cqw; align-items: flex-end;">${odsHtml}${qrHtml}</div>`;
+        const combinedHtml = `<div style="display: flex; gap: 1.5cqw; align-items: flex-end;">${qrHtml}</div>`;
 
-        // Inject into current template slots
+        // Inject into current template slots (for QR)
         const tpl = slide.template || "capa";
         const globalContainer = document.querySelector('.global-slots-container');
         const itOdsSlot = document.querySelector('.it-ods-slot');
         const itQrSlot = document.querySelector('.it-qr-slot');
         const indContent = document.querySelector('.ind-content-wrapper');
+
+        // Global ODS container at Top Right
+        let odsContainer = document.getElementById('global-ods-top-right');
+        if (!odsContainer) {
+            odsContainer = document.createElement('div');
+            odsContainer.id = 'global-ods-top-right';
+            odsContainer.style.cssText = "position: absolute; top: 3cqw; right: 4cqw; z-index: 1000;";
+            document.getElementById('activeSlideSurface').appendChild(odsContainer);
+        }
+        odsContainer.innerHTML = odsHtml;
 
         // Reset all specific slot containers
         if(globalContainer) globalContainer.innerHTML = '';
@@ -872,7 +918,7 @@ document.addEventListener("DOMContentLoaded", function() {
         if (tpl === "capa" || tpl === "grafico") {
             if(globalContainer) globalContainer.innerHTML = combinedHtml;
         } else if (tpl === "imagem_texto") {
-            if(itOdsSlot) itOdsSlot.innerHTML = odsHtml;
+            // itOdsSlot is no longer used for ODS, but we can leave it empty
             if(itQrSlot) itQrSlot.innerHTML = qrHtml;
         } else if (tpl === "indicadores") {
             if(indContent) {
@@ -1281,7 +1327,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    populateOdsSelects();
+
     renderThumbnails();
     renderActiveSlide();
 });
