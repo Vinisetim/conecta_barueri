@@ -172,3 +172,19 @@ class SlotFlexivel(db.Model):
     tipo_elemento = db.Column(db.String(50), nullable=False)
     posicao_matriz = db.Column(db.String(30), nullable=False)
     config_json = db.Column(db.JSON, nullable=False)
+
+
+class Ods(db.Model):
+    """
+    Mapeia a tabela apresentacao.ods
+    Catálogo estático com os 17 Objetivos de Desenvolvimento Sustentável da ONU
+    """
+    __tablename__ = 'ods'
+    __table_args__ = {'schema': 'apresentacao'}
+
+    id = db.Column(db.Integer, primary_key=True)
+    numero = db.Column(db.Integer, unique=True, nullable=True)
+    titulo = db.Column(db.String(150), nullable=False)
+    descricao = db.Column(db.Text)
+    icone_url = db.Column(db.String(255))
+    cor_hex = db.Column(db.String(10))

@@ -3,7 +3,7 @@ from sqlalchemy import text
 
 #importar os modelos para sqlalchemy ler
 
-from app.models import Usuario, Senha, Projeto, Apresentacao, Templates, Slide, CampoPreenchido, SlotFlexivel
+from app.models import Usuario, Senha, Projeto, Apresentacao, Templates, Slide, CampoPreenchido, SlotFlexivel, Ods
 
 app = create_app()
 
