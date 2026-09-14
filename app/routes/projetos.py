@@ -49,6 +49,7 @@ def criar_projeto():
 
     nome = (data.get('nome') or '').strip()
     descricao = (data.get('descricao') or '').strip()
+    cor = (data.get('cor') or '#0052ff').strip()
 
     if not nome:
         if request.is_json:
@@ -59,7 +60,8 @@ def criar_projeto():
     novo_projeto = Projeto(
         usuario_id=current_user.id,
         nome=nome,
-        descricao=descricao or 'Pasta de apresentações'
+        descricao=descricao or 'Pasta de apresentações',
+        capa_uri=cor
     )
     db.session.add(novo_projeto)
     db.session.commit()
@@ -73,4 +75,53 @@ def criar_projeto():
         })
 
     flash(f'Pasta "{nome}" criada com sucesso!', 'success')
+    return redirect(url_for('projetos.projetos'))
+
+@projetos_bp.route('/projetos/editar/<int:id>', methods=['POST'])
+@login_required
+def editar_projeto(id):
+    projeto = Projeto.query.get_or_404(id)
+    # Check permissions
+    if not getattr(current_user, 'admin', False) and projeto.usuario_id != current_user.id:
+        if request.is_json: return jsonify({'status': 'erro', 'mensagem': 'Permissão negada'}), 403
+        flash('Permissão negada.', 'danger')
+        return redirect(url_for('projetos.projetos'))
+
+    data = request.get_json(silent=True) or request.form
+    nome = (data.get('nome') or '').strip()
+    descricao = (data.get('descricao') or '').strip()
+    cor = (data.get('cor') or '#0052ff').strip()
+
+    if not nome:
+        if request.is_json: return jsonify({'status': 'erro', 'mensagem': 'O nome da pasta é obrigatório'}), 400
+        flash('O nome da pasta é obrigatório.', 'danger')
+        return redirect(url_for('projetos.projetos'))
+
+    projeto.nome = nome
+    projeto.descricao = descricao
+    projeto.capa_uri = cor
+    db.session.commit()
+
+    if request.is_json:
+        return jsonify({'status': 'sucesso', 'mensagem': 'Pasta atualizada com sucesso!'})
+    flash('Pasta atualizada com sucesso!', 'success')
+    return redirect(url_for('projetos.projetos'))
+
+@projetos_bp.route('/projetos/deletar/<int:id>', methods=['POST', 'DELETE'])
+@login_required
+def deletar_projeto(id):
+    projeto = Projeto.query.get_or_404(id)
+    if not getattr(current_user, 'admin', False) and projeto.usuario_id != current_user.id:
+        if request.is_json: return jsonify({'status': 'erro', 'mensagem': 'Permissão negada'}), 403
+        flash('Permissão negada.', 'danger')
+        return redirect(url_for('projetos.projetos'))
+
+    # Deletar apresentações filhas primeiro ou cascata
+    Apresentacao.query.filter_by(projeto_id=id).delete()
+    db.session.delete(projeto)
+    db.session.commit()
+
+    if request.is_json:
+        return jsonify({'status': 'sucesso', 'mensagem': 'Pasta deletada com sucesso!'})
+    flash('Pasta deletada com sucesso!', 'success')
     return redirect(url_for('projetos.projetos'))

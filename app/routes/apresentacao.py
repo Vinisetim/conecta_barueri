@@ -23,24 +23,28 @@ def criar_apresentacao():
     form = CriarApresentacaoForm()
 
     # Busca as pastas (projetos) do usuário logado (ou todas se for admin)
-    if getattr(current_user, 'admin', False):
-        projetos_usuario = Projeto.query.order_by(Projeto.nome.asc()).all()
-    else:
-        projetos_usuario = Projeto.query.filter_by(usuario_id=current_user.id).order_by(Projeto.nome.asc()).all()
+    try:
+        if getattr(current_user, 'admin', False):
+            projetos_usuario = Projeto.query.order_by(Projeto.nome.asc()).all()
+        else:
+            projetos_usuario = Projeto.query.filter_by(usuario_id=current_user.id).order_by(Projeto.nome.asc()).all()
 
-    # Se o usuário não possuir nenhuma pasta, cria uma pasta padrão institucional
-    if not projetos_usuario:
-        projeto_padrao = Projeto(
-            usuario_id=current_user.id,
-            nome="Projeto Geral",
-            descricao="Pasta principal de apresentações institucionais"
-        )
-        db.session.add(projeto_padrao)
-        db.session.commit()
-        projetos_usuario = [projeto_padrao]
+        # Se o usuário não possuir nenhuma pasta, cria uma pasta padrão institucional
+        if not projetos_usuario:
+            projeto_padrao = Projeto(
+                usuario_id=current_user.id,
+                nome="Projeto Geral",
+                descricao="Pasta principal de apresentações institucionais"
+            )
+            db.session.add(projeto_padrao)
+            db.session.commit()
+            projetos_usuario = [projeto_padrao]
+    except Exception:
+        db.session.rollback()
+        projetos_usuario = []
 
     # Popula dinamicamente as opções do select com os projetos do usuário
-    form.projeto_id.choices = [(p.id, p.nome) for p in projetos_usuario]
+    form.projeto_id.choices = [(p.id, p.nome) for p in projetos_usuario] if projetos_usuario else [(1, 'Projeto Geral')]
 
     # Pré-seleciona a pasta caso informada via query param (?projeto_id=X)
     if request.method == 'GET' and request.args.get('projeto_id'):
@@ -199,6 +203,24 @@ def salvar_apresentacao():
         db.session.rollback()
         print(f"[ERRO AO SALVAR APRESENTACAO]: {e}")
         return jsonify({'status': 'erro', 'mensagem': f'Erro interno ao salvar: {str(e)}'}), 500
+
+@apresentacao_bp.route('/apresentacao/deletar/<int:id>', methods=['POST', 'DELETE'])
+@login_required
+def deletar_apresentacao(id):
+    apresentacao = Apresentacao.query.get_or_404(id)
+    # Check permissions (assuming current user must own the project unless admin)
+    if not getattr(current_user, 'admin', False) and apresentacao.projeto and apresentacao.projeto.usuario_id != current_user.id:
+        if request.is_json: return jsonify({'status': 'erro', 'mensagem': 'Permissão negada'}), 403
+        flash('Permissão negada.', 'danger')
+        return redirect(url_for('projetos.projetos'))
+
+    db.session.delete(apresentacao)
+    db.session.commit()
+
+    if request.is_json:
+        return jsonify({'status': 'sucesso', 'mensagem': 'Apresentação deletada com sucesso!'})
+    flash('Apresentação deletada com sucesso!', 'success')
+    return redirect(url_for('projetos.projetos'))
 
 @apresentacao_bp.route('/apresentacao/editar/<int:id>')
 @login_required

@@ -9,16 +9,18 @@ document.addEventListener("DOMContentLoaded", function() {
     
     const inputNomeProjeto = document.getElementById("inputNomeProjeto");
     const inputDescProjeto = document.getElementById("inputDescProjeto");
+    const inputCorProjeto = document.getElementById("inputCorProjeto");
     const selectCategoriaProjeto = document.getElementById("selectCategoriaProjeto");
     const cardsGrid = document.getElementById("cardsGrid");
 
     function openModal() {
         if (!modalNovoProjeto) return;
-        inputNomeProjeto.value = "";
-        inputDescProjeto.value = "";
-        selectCategoriaProjeto.value = "saude";
+        if (inputNomeProjeto) inputNomeProjeto.value = "";
+        if (inputDescProjeto) inputDescProjeto.value = "";
+        if (inputCorProjeto) inputCorProjeto.value = "#0052ff";
+        if (selectCategoriaProjeto) selectCategoriaProjeto.value = "saude";
         modalNovoProjeto.classList.add("show");
-        inputNomeProjeto.focus();
+        if (inputNomeProjeto) inputNomeProjeto.focus();
     }
 
     function closeModal() {
@@ -46,6 +48,7 @@ document.addEventListener("DOMContentLoaded", function() {
             e.preventDefault();
             const nome = inputNomeProjeto.value.trim();
             const desc = inputDescProjeto ? inputDescProjeto.value.trim() : "";
+            const cor = inputCorProjeto ? inputCorProjeto.value : "#0052ff";
             
             if (!nome) {
                 alert("Por favor, digite o nome do projeto (pasta).");
@@ -57,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 const response = await fetch("/projetos/criar", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ nome: nome, descricao: desc })
+                    body: JSON.stringify({ nome: nome, descricao: desc, cor: cor })
                 });
                 const res = await response.json();
                 if (response.ok && res.status === "sucesso") {

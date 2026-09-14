@@ -174,7 +174,7 @@
             {% for proj in projetos %}
             <article class="ap-card-item" data-status="published" data-title="{{ proj.nome }}">
                 <!-- TOPO / ÍCONE DA PASTA -->
-                <div class="card-thumb thumb-saude" style="align-items: center; justify-content: center; padding: 20px; background: linear-gradient(135deg, #0052ff 0%, #1e40af 100%);">
+                <div class="card-thumb thumb-saude" style="align-items: center; justify-content: center; padding: 20px; background: {{ proj.capa_uri or '#0052ff' }};">
                     <i class="bi bi-folder-fill" style="font-size: 3.8rem; color: rgba(255,255,255,0.95); filter: drop-shadow(0 6px 12px rgba(0,0,0,0.18));"></i>
                 </div>
 
@@ -234,19 +234,29 @@
                     </div>
 
                     <!-- RODAPÉ DO CARD -->
-                    <div class="card-footer-ap mt-3">
+                    <div class="card-footer-ap mt-3" style="display:flex; gap:8px;">
                         <button type="button" class="btn-card-action btn-ver-projeto" 
                                 data-proj-id="{{ proj.id }}" 
                                 data-proj-nome="{{ proj.nome }}" 
-                                style="background: #0052ff; color: white; border: none;">
-                            <i class="bi bi-folder2-open"></i> Ver Projetos
+                                style="background: #0052ff; color: white; border: none; flex: 1;">
+                            <i class="bi bi-folder2-open"></i> Ver
                         </button>
-                        <a href="{{ url_for('apresentacao.criar_apresentacao', projeto_id=proj.id) }}" 
-                           class="btn-card-action" 
-                           style="background: #f8fafc; color: #0052ff; border: 1px solid #e2e8f0; flex: 0 0 auto;" 
-                           title="Adicionar Apresentação nesta Pasta">
-                            <i class="bi bi-plus-lg"></i>
-                        </a>
+                        <button type="button" class="btn-card-action btn-editar-projeto" 
+                                data-proj-id="{{ proj.id }}" 
+                                data-proj-nome="{{ proj.nome }}" 
+                                data-proj-desc="{{ proj.descricao }}"
+                                data-proj-cor="{{ proj.capa_uri or '#0052ff' }}"
+                                style="background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; flex: 0 0 auto;" 
+                                title="Editar Pasta">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button type="button" class="btn-card-action btn-delete-projeto-real" 
+                                data-proj-id="{{ proj.id }}" 
+                                data-proj-nome="{{ proj.nome }}"
+                                style="background: #fff0f2; color: #e11d48; border: 1px solid #ffe4e6; flex: 0 0 auto;" 
+                                title="Excluir Pasta">
+                            <i class="bi bi-trash"></i>
+                        </button>
                     </div>
                 </div>
             </article>
@@ -268,7 +278,7 @@
         <div class="apresentacoes-grid" id="cardsGridApresentacoes">
             {% for ap in apresentacoes %}
             <article class="ap-card-item" data-status="published" data-title="{{ ap.nome }}" onclick="window.location.href='{{ url_for('apresentacao.editar_apresentacao', id=ap.id) }}'" style="cursor: pointer;">
-                <div class="card-thumb thumb-saude" style="align-items: center; justify-content: center; padding: 20px; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">
+                <div class="card-thumb thumb-saude" style="align-items: center; justify-content: center; padding: 20px; background: {{ ap.projeto.capa_uri if ap.projeto and ap.projeto.capa_uri else '#0284c7' }};">
                     <i class="bi bi-file-earmark-slides-fill" style="font-size: 3.5rem; color: rgba(255,255,255,0.95); filter: drop-shadow(0 6px 12px rgba(0,0,0,0.18));"></i>
                 </div>
                 <div class="card-body-ap">
@@ -287,10 +297,14 @@
                             <div class="creator-date"><i class="bi bi-clock"></i> ID: #{{ ap.id }}</div>
                         </div>
                     </div>
-                    <div class="card-footer-ap">
-                        <a href="{{ url_for('apresentacao.editar_apresentacao', id=ap.id) }}" class="btn-card-action" style="background: #0052ff; color: white; border: none;">
+                    <div class="card-footer-ap" style="display:flex; gap:8px;">
+                        <a href="{{ url_for('apresentacao.editar_apresentacao', id=ap.id) }}" 
+                           class="btn-card-action" style="background: #0052ff; color: white; border: none; flex:1;">
                             <i class="bi bi-pencil-square"></i> Editar Slides
                         </a>
+                        <button type="button" class="btn-card-action btn-delete-apresentacao" data-id="{{ ap.id }}" data-nome="{{ ap.nome }}" style="background: #fff0f2; color: #e11d48; border: 1px solid #ffe4e6; flex: 0 0 auto;" title="Excluir Apresentação">
+                            <i class="bi bi-trash"></i>
+                        </button>
                     </div>
                 </div>
             </article>
@@ -335,6 +349,36 @@
     </div>
 </div>
 
+<!-- MODAL EDITAR PASTA (PROJETO) -->
+<div id="modalEditarProjeto" class="projetos-modal-overlay">
+    <div class="projetos-modal">
+        <form method="POST" id="formEditarProjeto">
+            <div class="modal-header-proj">
+                <h2>Editar Pasta de Projeto</h2>
+                <button type="button" class="btn-close-modal" id="btnCloseEditarModal"><i class="bi bi-x-lg"></i></button>
+            </div>
+            <div class="modal-body-proj">
+                <div class="form-group-proj">
+                    <label for="inputEditNomeProjeto">Nome da Pasta (Projeto) *</label>
+                    <input type="text" name="nome" id="inputEditNomeProjeto" required>
+                </div>
+                <div class="form-group-proj">
+                    <label for="inputEditDescProjeto">Descrição Opcional</label>
+                    <input type="text" name="descricao" id="inputEditDescProjeto">
+                </div>
+                <div class="form-group-proj">
+                    <label for="inputEditCorProjeto">Cor da Pasta</label>
+                    <input type="color" name="cor" id="inputEditCorProjeto" value="#0052ff" style="width: 100%; height: 40px; padding: 2px; cursor: pointer;">
+                </div>
+            </div>
+            <div class="modal-footer-proj">
+                <button type="button" class="btn-cancel-proj" id="btnCancelEditarModal">Cancelar</button>
+                <button type="submit" class="btn-save-proj" id="btnSaveEditarProjeto">Salvar Alterações</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- MODAL NOVA PASTA (PROJETO) -->
 <div id="modalNovoProjeto" class="projetos-modal-overlay">
     <div class="projetos-modal">
@@ -351,6 +395,10 @@
                 <div class="form-group-proj">
                     <label for="inputDescProjeto">Descrição Opcional</label>
                     <input type="text" name="descricao" id="inputDescProjeto" placeholder="Ex: Painéis executivos e métricas da rede municipal">
+                </div>
+                <div class="form-group-proj">
+                    <label for="inputCorProjeto">Cor da Pasta</label>
+                    <input type="color" name="cor" id="inputCorProjeto" value="#0052ff" style="width: 100%; height: 40px; padding: 2px; cursor: pointer;">
                 </div>
             </div>
             <div class="modal-footer-proj">
@@ -470,10 +518,13 @@ document.addEventListener("DOMContentLoaded", function() {
                                         <span>Criado em ${ap.data_criacao}</span>
                                     </div>
                                 </div>
-                                <div>
+                                <div style="display:flex; gap:6px;">
                                     <a href="${ap.editar_url}" class="btn btn-sm btn-primary rounded-3 px-3 d-inline-flex align-items-center gap-1" style="background: #0052ff; border:none;">
                                         <i class="bi bi-pencil-square"></i> Editar
                                     </a>
+                                    <button type="button" class="btn btn-sm btn-delete-apresentacao" data-id="${ap.id}" data-nome="${ap.nome}" style="background: #fff0f2; color: #e11d48; border: 1px solid #ffe4e6; flex: 0 0 auto;" title="Excluir Apresentação">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
                                 </div>
                             </div>
                         `;
@@ -495,6 +546,103 @@ document.addEventListener("DOMContentLoaded", function() {
             if (modalVer) modalVer.classList.add("show");
         });
     });
+
+    // Lógica Editar Pasta
+    const modalEditarProjeto = document.getElementById('modalEditarProjeto');
+    const formEditarProjeto = document.getElementById('formEditarProjeto');
+    const btnCloseEditarModal = document.getElementById('btnCloseEditarModal');
+    const btnCancelEditarModal = document.getElementById('btnCancelEditarModal');
+    const inputEditNomeProjeto = document.getElementById('inputEditNomeProjeto');
+    const inputEditDescProjeto = document.getElementById('inputEditDescProjeto');
+
+    const inputEditCorProjeto = document.getElementById('inputEditCorProjeto');
+
+    function fecharModalEditar() {
+        if (modalEditarProjeto) modalEditarProjeto.classList.remove('show');
+    }
+
+    if (btnCloseEditarModal) btnCloseEditarModal.addEventListener('click', fecharModalEditar);
+    if (btnCancelEditarModal) btnCancelEditarModal.addEventListener('click', fecharModalEditar);
+    if (modalEditarProjeto) {
+        modalEditarProjeto.addEventListener('click', e => {
+            if (e.target === modalEditarProjeto) fecharModalEditar();
+        });
+    }
+
+    // Lógica Excluir Pasta Real
+    document.body.addEventListener('click', async function(e) {
+        const btnDeleteProj = e.target.closest('.btn-delete-projeto-real');
+        if (btnDeleteProj) {
+            e.preventDefault();
+            e.stopPropagation();
+            const projId = btnDeleteProj.getAttribute('data-proj-id');
+            const projNome = btnDeleteProj.getAttribute('data-proj-nome');
+
+            if (confirm(`Atenção! Deseja realmente excluir a pasta "${projNome}" e TODAS as apresentações dentro dela?\n\nEsta ação é irreversível.`)) {
+                try {
+                    const response = await fetch(`/projetos/deletar/${projId}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    const res = await response.json();
+                    if (response.ok && res.status === 'sucesso') {
+                        window.location.reload();
+                    } else {
+                        alert(res.mensagem || "Erro ao deletar pasta.");
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert("Erro ao conectar ao servidor.");
+                }
+            }
+        }
+
+        const btnEditProj = e.target.closest('.btn-editar-projeto');
+        if (btnEditProj) {
+            e.preventDefault();
+            e.stopPropagation();
+            const projId = btnEditProj.getAttribute('data-proj-id');
+            const projNome = btnEditProj.getAttribute('data-proj-nome');
+            const projDesc = btnEditProj.getAttribute('data-proj-desc');
+            const projCor = btnEditProj.getAttribute('data-proj-cor');
+
+            if (formEditarProjeto) {
+                formEditarProjeto.action = `/projetos/editar/${projId}`;
+            }
+            if (inputEditNomeProjeto) inputEditNomeProjeto.value = projNome;
+            if (inputEditDescProjeto) inputEditDescProjeto.value = projDesc;
+            if (inputEditCorProjeto) inputEditCorProjeto.value = projCor || "#0052ff";
+
+            if (modalEditarProjeto) modalEditarProjeto.classList.add('show');
+        }
+
+        const btnDeleteAp = e.target.closest('.btn-delete-apresentacao');
+        if (btnDeleteAp) {
+            e.preventDefault();
+            e.stopPropagation();
+            const apId = btnDeleteAp.getAttribute('data-id');
+            const apNome = btnDeleteAp.getAttribute('data-nome');
+
+            if (confirm(`Atenção! Deseja excluir a apresentação "${apNome}"?\n\nEsta ação não pode ser desfeita.`)) {
+                try {
+                    const response = await fetch(`/apresentacao/deletar/${apId}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    const res = await response.json();
+                    if (response.ok && res.status === 'sucesso') {
+                        window.location.reload();
+                    } else {
+                        alert(res.mensagem || "Erro ao deletar apresentação.");
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert("Erro ao conectar ao servidor.");
+                }
+            }
+        }
+    });
+
 });
 </script>
 {% endblock %}
