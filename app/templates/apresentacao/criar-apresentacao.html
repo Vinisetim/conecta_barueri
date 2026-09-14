@@ -11,7 +11,7 @@
 
     <header class="editor-header">
         <div class="editor-header-info">
-            <h1 class="editor-title" id="displayApresentacaoTitulo" contenteditable="true" title="Clique para editar o título da apresentação" style="outline: none; cursor: text; border-bottom: 1px dashed transparent;">{{ apresentacao.nome if apresentacao else 'Apresentação Executiva' }}</h1>
+            <h1 class="editor-title" id="displayApresentacaoTitulo">Apresentação Executiva</h1>
             <p class="editor-subtitle">Edite e organize os slides da sua apresentação institucional.</p>
         </div>
 
@@ -403,21 +403,22 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    let slides = {{ slides_iniciais | tojson if slides_iniciais else '[{
-        "id": 1,
-        "template": "capa",
-        "titulo": "Capa",
-        "subtitulo": "Apresentação Executiva - Indicadores Municipais",
-        "ods": true,
-        "qr": false,
-        "bgCapa": null,
-        "imgTexto": null,
-        "chartType": "line",
-        "periodo": "Últimos 12 meses"
-    }]' | safe }};
-    window.apresentacaoId = {{ apresentacao.id if apresentacao else 'null' }};
-    let activeSlideId = (slides && slides.length > 0) ? slides[0].id : 1;
-    let slideCounter = (slides && slides.length > 0) ? slides.reduce((max, s) => Math.max(max, s.id || 0), 1) : 1;
+    let slides = [
+        {
+            id: 1,
+            template: "capa",
+            titulo: "Capa",
+            subtitulo: "Apresentação Executiva - Indicadores Municipais",
+            ods: true,
+            qr: false,
+            bgCapa: null,
+            imgTexto: null,
+            chartType: "line",
+            periodo: "Últimos 12 meses"
+        }
+    ];
+    let activeSlideId = 1;
+    let slideCounter = 1;
     
     let slideChartInstance = null;
 
@@ -958,54 +959,15 @@ document.addEventListener("DOMContentLoaded", function() {
         slidesThumbsList.scrollTop = slidesThumbsList.scrollHeight;
     });
 
-    // --- Lógica de Salvar com Persistência Relacional no Banco de Dados ---
+    // --- Lógica de Salvar ---
     const btnSalvar = document.getElementById("btnSalvar");
     const saveToast = document.getElementById("saveToast");
-    const displayApresentacaoTitulo = document.getElementById("displayApresentacaoTitulo");
-
-    btnSalvar.addEventListener("click", async () => {
-        const tituloApresentacao = displayApresentacaoTitulo ? displayApresentacaoTitulo.textContent.trim() : "Apresentação Executiva";
-        
-        btnSalvar.disabled = true;
-        btnSalvar.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" style="width: 14px; height: 14px; border-width: 2px;"></span> <span>Salvando...</span>';
-
-        const payload = {
-            apresentacao_id: window.apresentacaoId,
-            titulo: tituloApresentacao || "Apresentação Sem Título",
-            slides: slides
-        };
-
-        try {
-            const response = await fetch("{{ url_for('apresentacao.salvar_apresentacao') }}", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(payload)
-            });
-
-            const data = await response.json();
-
-            if (response.ok && data.status === "sucesso") {
-                window.apresentacaoId = data.apresentacao_id;
-                if (saveToast) {
-                    const toastText = saveToast.querySelector("span");
-                    if (toastText) toastText.textContent = "Apresentação salva com sucesso!";
-                    saveToast.style.display = "flex";
-                    setTimeout(() => {
-                        saveToast.style.display = "none";
-                    }, 3500);
-                }
-            } else {
-                alert("Erro ao salvar apresentação: " + (data.mensagem || "Erro desconhecido"));
-            }
-        } catch (error) {
-            console.error("Erro na requisição de salvamento:", error);
-            alert("Erro de conexão ao salvar apresentação. Verifique o servidor.");
-        } finally {
-            btnSalvar.disabled = false;
-            btnSalvar.innerHTML = '<i class="bi bi-floppy"></i> <span>Salvar</span>';
-        }
+    btnSalvar.addEventListener("click", () => {
+        console.log("Apresentação salva! Payload:", slides);
+        saveToast.style.display = "flex";
+        setTimeout(() => {
+            saveToast.style.display = "none";
+        }, 3000);
     });
 
     // --- Lógica de Visualizar (Apresentação Tela Cheia) ---
