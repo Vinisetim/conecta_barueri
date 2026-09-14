@@ -183,7 +183,7 @@ class Ods(db.Model):
     __table_args__ = {'schema': 'apresentacao'}
 
     id = db.Column(db.Integer, primary_key=True)
-    numero = db.Column(db.Integer, unique=True, nullable=True)
+    numero = db.Column(db.Integer, unique=True, nullable=False)
     titulo = db.Column(db.String(150), nullable=False)
     descricao = db.Column(db.Text)
     icone_url = db.Column(db.String(255))
@@ -206,9 +206,9 @@ class Apresentador(db.Model):
     cargo = db.Column(db.String(255))
 
     biografia = db.Column(db.Text)
-    foto_url = db.Column(db.String)
+    foto_url = db.Column(db.String(255))
 
-    #estruturas dinamicas em JSON
+    # Estruturas dinâmicas em JSON
     topicos = db.Column(db.JSON, default=list)
-    midias_extra = db.Column(db.JSON, default=list)
+    midias_extras = db.Column(db.JSON, default=list)
 
