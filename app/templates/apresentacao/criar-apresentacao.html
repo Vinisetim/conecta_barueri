@@ -285,6 +285,16 @@
                     </div>
                     <div class="slot-toggle-row">
                         <div class="slot-row-label">
+                            <i class="bi bi-image" style="color: #64748b;"></i>
+                            <span>Logo Barueri</span>
+                        </div>
+                        <label class="switch-ap">
+                            <input type="checkbox" id="toggleLogo" checked>
+                            <span class="slider-ap"></span>
+                        </label>
+                    </div>
+                    <div class="slot-toggle-row">
+                        <div class="slot-row-label">
                             <img src="https://sdgs.un.org/sites/default/files/2023-08/SDG_logo_without_UN_emblem_Square_Transparent_WEB.png" style="width:16px;">
                             <span>ODS</span>
                         </div>
@@ -466,6 +476,7 @@ document.addEventListener("DOMContentLoaded", function() {
             template: initialTemplate,
             titulo: initialTemplate === "capa" ? "Capa" : "Novo Slide",
             subtitulo: initialTemplate === "capa" ? "Apresentação Executiva - Indicadores Municipais" : "Subtítulo do novo slide",
+            logo: true,
             ods: true,
             odsNums: ["11"],
             qr: false,
@@ -502,6 +513,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const slotODS = document.getElementById("slotODS");
     const slotQRCode = document.getElementById("slotQRCode");
+    const toggleLogo = document.getElementById("toggleLogo");
     const toggleODS = document.getElementById("toggleODS");
     const toggleQR = document.getElementById("toggleQR");
     const fgODSSelect = document.getElementById("fgODSSelect");
@@ -562,13 +574,15 @@ document.addEventListener("DOMContentLoaded", function() {
             const hasBg = !!slide.bgCapa;
             const textColor = hasBg ? '#ffffff' : '#0f172a';
             const subColor = hasBg ? 'rgba(255,255,255,0.85)' : '#64748b';
+            const logoHtml = slide.logo !== false ? `
+                <div style="position:relative; z-index:1; display:flex; align-items:center; gap:3px;">
+                    <img src="/static/img/logo-barueri.jpeg" style="width:8px; height:8px; object-fit:contain; border-radius:1px;">
+                    <span style="font-size:4.5px; font-weight:700; color:${hasBg ? '#ffffff' : '#0284c7'}; line-height:1;">Barueri</span>
+                </div>` : '';
             return `
                 <div style="width:100%; height:100%; position:relative; padding: 4px 6px; display:flex; flex-direction:column; justify-content:space-between; ${hasBg ? `background: url(${slide.bgCapa}) center/cover no-repeat;` : 'background:#ffffff;'} box-sizing: border-box; overflow:hidden;">
                     ${hasBg ? '<div style="position:absolute; inset:0; background:rgba(0,0,0,0.35); z-index:0;"></div>' : ''}
-                    <div style="position:relative; z-index:1; display:flex; align-items:center; gap:3px;">
-                        <img src="/static/img/logo-barueri.jpeg" style="width:8px; height:8px; object-fit:contain; border-radius:1px;">
-                        <span style="font-size:4.5px; font-weight:700; color:${hasBg ? '#ffffff' : '#0284c7'}; line-height:1;">Barueri</span>
-                    </div>
+                    ${logoHtml}
                     <div style="position:relative; z-index:1; margin-bottom:2px;">
                         <div style="font-size:7px; font-weight:800; color:${textColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.1;">${title || 'Capa'}</div>
                         <div style="font-size:4.5px; color:${subColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.1;">${subtitle || 'Apresentação Executiva'}</div>
@@ -581,12 +595,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
         if (tpl === 'imagem_texto') {
             const imgSrc = slide.imgTexto || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb';
+            const logoHtml = slide.logo !== false ? `
+                <div style="display:flex; align-items:center; gap:2px; margin-bottom:2px;">
+                    <img src="/static/img/logo-barueri.jpeg" style="width:6px; height:6px; object-fit:contain; border-radius:1px;">
+                    <span style="font-size:3.5px; font-weight:700; color:#0284c7; line-height:1;">Barueri</span>
+                </div>` : '';
             return `
                 <div style="width:100%; height:100%; position:relative; padding:3px; display:flex; flex-direction:column; background:#ffffff; box-sizing:border-box; overflow:hidden;">
-                    <div style="display:flex; align-items:center; gap:2px; margin-bottom:2px;">
-                        <img src="/static/img/logo-barueri.jpeg" style="width:6px; height:6px; object-fit:contain; border-radius:1px;">
-                        <span style="font-size:3.5px; font-weight:700; color:#0284c7; line-height:1;">Barueri</span>
-                    </div>
+                    ${logoHtml}
                     <div style="display:flex; flex:1; gap:4px; align-items:center; min-height:0;">
                         <div style="width:45%; height:100%; border-radius:2px; overflow:hidden; flex-shrink:0; background:#f1f5f9; position:relative;">
                             <img src="${imgSrc}" style="width:100%; height:100%; object-fit:cover; display:block;">
@@ -612,12 +628,15 @@ document.addEventListener("DOMContentLoaded", function() {
                 </div>
             `).join("");
 
+            const logoHtml = slide.logo !== false ? `
+                <div style="display:flex; align-items:center; gap:2px; margin-bottom:1px;">
+                    <img src="/static/img/logo-barueri.jpeg" style="width:6px; height:6px; object-fit:contain; border-radius:1px;">
+                    <span style="font-size:3.5px; font-weight:700; color:#0284c7; line-height:1;">Barueri</span>
+                </div>` : '';
+
             return `
                 <div style="width:100%; height:100%; position:relative; padding:3px 4px; display:flex; flex-direction:column; background:#ffffff; box-sizing:border-box; overflow:hidden;">
-                    <div style="display:flex; align-items:center; gap:2px; margin-bottom:1px;">
-                        <img src="/static/img/logo-barueri.jpeg" style="width:6px; height:6px; object-fit:contain; border-radius:1px;">
-                        <span style="font-size:3.5px; font-weight:700; color:#0284c7; line-height:1;">Barueri</span>
-                    </div>
+                    ${logoHtml}
                     <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
                         <div style="text-align:center; margin-bottom:2px;">
                             <div style="font-size:5.5px; font-weight:800; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1;">${title || 'Indicadores'}</div>
@@ -658,12 +677,15 @@ document.addEventListener("DOMContentLoaded", function() {
                     </svg>`;
             }
 
+            const logoHtml = slide.logo !== false ? `
+                <div style="display:flex; align-items:center; gap:2px; margin-bottom:2px;">
+                    <img src="/static/img/logo-barueri.jpeg" style="width:6px; height:6px; object-fit:contain; border-radius:1px;">
+                    <span style="font-size:3.5px; font-weight:700; color:#0284c7; line-height:1;">Barueri</span>
+                </div>` : '';
+
             return `
                 <div style="width:100%; height:100%; position:relative; padding:3px 4px; display:flex; flex-direction:column; background:#ffffff; box-sizing:border-box; overflow:hidden;">
-                    <div style="display:flex; align-items:center; gap:2px; margin-bottom:2px;">
-                        <img src="/static/img/logo-barueri.jpeg" style="width:6px; height:6px; object-fit:contain; border-radius:1px;">
-                        <span style="font-size:3.5px; font-weight:700; color:#0284c7; line-height:1;">Barueri</span>
-                    </div>
+                    ${logoHtml}
                     <div style="font-size:5.5px; font-weight:800; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; line-height:1;">${title || 'Gráfico'}</div>
                     <div style="flex:1; margin-top:2px; background:#f8fafc; border:0.5px solid #e2e8f0; border-radius:2px; display:flex; flex-direction:column; padding:2px;">
                         <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
@@ -743,6 +765,7 @@ document.addEventListener("DOMContentLoaded", function() {
         selectTemplate.value = slide.template;
         inputTitulo.value = slide.titulo;
         inputSubtitulo.value = slide.subtitulo;
+        toggleLogo.checked = slide.logo !== false;
         toggleODS.checked = slide.ods;
         toggleQR.checked = slide.qr;
 
@@ -887,6 +910,11 @@ document.addEventListener("DOMContentLoaded", function() {
     function updateSlotsVisibility() {
         const slide = slides.find(s => s.id === activeSlideId);
         if (!slide) return;
+
+        // Toggle Logo visibility
+        document.querySelectorAll(".slide-top-brand").forEach(el => {
+            el.style.display = slide.logo !== false ? "flex" : "none";
+        });
 
         // Ensure sidebar controls match current state
         if(fgODSSelect) fgODSSelect.style.display = slide.ods ? "flex" : "none";
@@ -1139,6 +1167,13 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
+    toggleLogo.addEventListener("change", (e) => {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (slide) slide.logo = e.target.checked;
+        updateSlotsVisibility();
+        updateActiveThumbnail();
+    });
+
     toggleODS.addEventListener("change", (e) => {
         const slide = slides.find(s => s.id === activeSlideId);
         if (slide) slide.ods = e.target.checked;
@@ -1285,6 +1320,7 @@ document.addEventListener("DOMContentLoaded", function() {
             template: "capa",
             titulo: "Novo Slide",
             subtitulo: "Subtítulo do novo slide",
+            logo: true,
             ods: false,
             odsNums: [],
             qr: false,
