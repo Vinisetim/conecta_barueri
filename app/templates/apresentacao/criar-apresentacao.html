@@ -280,50 +280,61 @@
                 </div>
 
                 <div class="config-slots-section mt-3">
-                    <div class="slots-header">
+                    <div class="slots-header" data-bs-toggle="collapse" data-bs-target="#collapseLogos" role="button" aria-expanded="false" aria-controls="collapseLogos" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                        <h4>Logos no Slide</h4>
+                        <i class="bi bi-chevron-down" style="font-size: 0.9rem; color: #64748b;"></i>
+                    </div>
+                    <div class="collapse" id="collapseLogos">
+                        <div style="display:flex; flex-direction:column; gap:8px; margin-bottom: 16px; font-size: 0.85rem; color: #334155; padding-top: 8px;">
+                            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="chk-logo-item" value="barueri" checked> Prefeitura de Barueri</label>
+                            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="chk-logo-item" value="sit"> Sec. Inovação (SIT)</label>
+                            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="chk-logo-item" value="inovacao"> Inovação Barueri</label>
+                            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="chk-logo-item" value="tv"> TV Inovação</label>
+                            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="chk-logo-item" value="onu"> ONU BR</label>
+                            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="chkLogoCustom"> Logo Personalizada</label>
+                            <div id="fgLogoCustom" style="display:none; padding-left: 20px;">
+                                <input type="file" id="inputUploadLogoCustom" accept="image/*" class="form-control" style="font-size:0.75rem; padding:4px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slots-header" data-bs-toggle="collapse" data-bs-target="#collapseExtras" role="button" aria-expanded="false" aria-controls="collapseExtras" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
                         <h4>Elementos extras</h4>
+                        <i class="bi bi-chevron-down" style="font-size: 0.9rem; color: #64748b;"></i>
                     </div>
-                    <div class="slot-toggle-row">
-                        <div class="slot-row-label">
-                            <i class="bi bi-image" style="color: #64748b;"></i>
-                            <span>Logo Barueri</span>
+                    <div class="collapse" id="collapseExtras">
+                        <div class="slot-toggle-row" style="margin-top: 8px;">
+                            <div class="slot-row-label">
+                                <img src="https://sdgs.un.org/sites/default/files/2023-08/SDG_logo_without_UN_emblem_Square_Transparent_WEB.png" style="width:16px;">
+                                <span>ODS</span>
+                            </div>
+                            <label class="switch-ap">
+                                <input type="checkbox" id="toggleODS">
+                                <span class="slider-ap"></span>
+                            </label>
                         </div>
-                        <label class="switch-ap">
-                            <input type="checkbox" id="toggleLogo" checked>
-                            <span class="slider-ap"></span>
-                        </label>
-                    </div>
-                    <div class="slot-toggle-row">
-                        <div class="slot-row-label">
-                            <img src="https://sdgs.un.org/sites/default/files/2023-08/SDG_logo_without_UN_emblem_Square_Transparent_WEB.png" style="width:16px;">
-                            <span>ODS</span>
+                        <div id="fgODSSelect" style="display: none; margin-top: 8px; display:flex; flex-direction:column; gap:6px;">
+                            <div id="odsSelectsContainer" style="display:flex; flex-direction:column; gap:6px;">
+                                <!-- selects gerados pelo JS -->
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddOds" style="font-size:0.8rem;">
+                                <i class="bi bi-plus-circle"></i> Adicionar ODS
+                            </button>
                         </div>
-                        <label class="switch-ap">
-                            <input type="checkbox" id="toggleODS">
-                            <span class="slider-ap"></span>
-                        </label>
-                    </div>
-                    <div id="fgODSSelect" style="display: none; margin-top: 8px; display:flex; flex-direction:column; gap:6px;">
-                        <div id="odsSelectsContainer" style="display:flex; flex-direction:column; gap:6px;">
-                            <!-- selects gerados pelo JS -->
+                        <div class="slot-toggle-row">
+                            <div class="slot-row-label">
+                                <i class="bi bi-qr-code"></i>
+                                <span>QR Code</span>
+                            </div>
+                            <label class="switch-ap">
+                                <input type="checkbox" id="toggleQR">
+                                <span class="slider-ap"></span>
+                            </label>
                         </div>
-                        <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddOds" style="font-size:0.8rem;">
-                            <i class="bi bi-plus-circle"></i> Adicionar ODS
-                        </button>
-                    </div>
-                    <div class="slot-toggle-row">
-                        <div class="slot-row-label">
-                            <i class="bi bi-qr-code"></i>
-                            <span>QR Code</span>
+                        <div class="form-group" id="fgQRLink" style="display: none; padding-left: 0; margin-top: 8px;">
+                            <label style="font-size:0.85rem; color:var(--text-muted); margin-bottom:4px; display:block;">Link do QR Code:</label>
+                            <input type="url" id="inputQRLink" class="form-control" placeholder="https://..." style="font-size:0.85rem; padding:8px 12px;">
                         </div>
-                        <label class="switch-ap">
-                            <input type="checkbox" id="toggleQR">
-                            <span class="slider-ap"></span>
-                        </label>
-                    </div>
-                    <div class="form-group" id="fgQRLink" style="display: none; padding-left: 0; margin-top: 8px;">
-                        <label style="font-size:0.85rem; color:var(--text-muted); margin-bottom:4px; display:block;">Link do QR Code:</label>
-                        <input type="url" id="inputQRLink" class="form-control" placeholder="https://..." style="font-size:0.85rem; padding:8px 12px;">
                     </div>
                 </div>
 
@@ -402,6 +413,13 @@
     .slide-surface .it-text-content h1 { font-size: 4cqw !important; margin-bottom: 2cqw !important; }
     .slide-surface .it-text-content p { font-size: 2cqw !important; line-height: 1.5; }
     .slide-surface .it-label { font-size: 1.2cqw !important; margin-bottom: 0.5cqw !important; }
+
+    .slots-header[aria-expanded="true"] .bi-chevron-down {
+        transform: rotate(180deg);
+    }
+    .slots-header .bi-chevron-down {
+        transition: transform 0.3s ease;
+    }
     
     .slide-surface .preview-titulo { font-size: 4cqw !important; margin-bottom: 1cqw !important; }
     .slide-surface .preview-subtitulo { font-size: 1.8cqw !important; line-height: 1.4; }
@@ -476,7 +494,8 @@ document.addEventListener("DOMContentLoaded", function() {
             template: initialTemplate,
             titulo: initialTemplate === "capa" ? "Capa" : "Novo Slide",
             subtitulo: initialTemplate === "capa" ? "Apresentação Executiva - Indicadores Municipais" : "Subtítulo do novo slide",
-            logo: true,
+            logos: ["barueri"],
+            customLogoImg: null,
             ods: true,
             odsNums: ["11"],
             qr: false,
@@ -513,7 +532,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const slotODS = document.getElementById("slotODS");
     const slotQRCode = document.getElementById("slotQRCode");
-    const toggleLogo = document.getElementById("toggleLogo");
+    
+    const chkLogoItems = document.querySelectorAll(".chk-logo-item");
+    const chkLogoCustom = document.getElementById("chkLogoCustom");
+    const fgLogoCustom = document.getElementById("fgLogoCustom");
+    const inputUploadLogoCustom = document.getElementById("inputUploadLogoCustom");
+
     const toggleODS = document.getElementById("toggleODS");
     const toggleQR = document.getElementById("toggleQR");
     const fgODSSelect = document.getElementById("fgODSSelect");
@@ -548,6 +572,87 @@ document.addEventListener("DOMContentLoaded", function() {
             .replace(/'/g, '&#039;');
     }
 
+    function buildLogosHtml(slide, isMini = false) {
+        const logos = slide.logos || ["barueri"];
+        if (logos.length === 0) return "";
+
+        const hasBg = isMini ? !!slide.bgCapa : false; // For main canvas, css classes handle color usually, but we will force white on capa if it has bg.
+        const tpl = slide.template || 'capa';
+        const isCapaMainBg = (!isMini && tpl === 'capa' && !!slide.bgCapa);
+        const textColor = (hasBg || isCapaMainBg) ? '#ffffff' : '#0f172a';
+        const barueriColor = (hasBg || isCapaMainBg) ? '#ffffff' : '#0284c7';
+
+        // Base scales
+        const scale = isMini ? 1 : 2; // mini uses fixed px, main uses cqw (approximated here)
+
+        let html = `<div style="display:flex; align-items:center; gap:${isMini ? '6px' : '2cqw'}; flex-wrap:wrap; margin-bottom:${isMini ? '2px' : '0'};">`;
+
+        if (logos.includes('barueri')) {
+            if (isMini) {
+                html += `
+                <div style="display:flex; align-items:center; gap:2px;">
+                    <img src="/static/img/logo-barueri.jpeg" style="width:6px; height:6px; object-fit:contain; border-radius:1px;">
+                    <div style="display:flex; flex-direction:column; line-height:1;">
+                        <span style="font-size:2px; font-weight:600; color:${textColor};">Prefeitura de</span>
+                        <span style="font-size:3.5px; font-weight:700; color:${barueriColor};">Barueri</span>
+                    </div>
+                </div>`;
+            } else {
+                html += `
+                <div style="display:flex; align-items:center; gap:1cqw;">
+                    <img src="/static/img/logo-barueri.jpeg" style="width:5cqw; height:5cqw; object-fit:contain; border-radius:0.5cqw;">
+                    <div style="display:flex; flex-direction:column; line-height:1;">
+                        <span style="font-size:1.5cqw; font-weight:600; color:${textColor};">Prefeitura de</span>
+                        <span style="font-size:2.5cqw; font-weight:800; color:${barueriColor};">Barueri</span>
+                    </div>
+                </div>`;
+            }
+        }
+        if (logos.includes('sit')) {
+            html += `
+            <div style="display:flex; flex-direction:column; line-height:1; text-align:right;">
+                <span style="font-size:${isMini ? '2px' : '1.5cqw'}; font-weight:800; color:${textColor};">SECRETARIA DE</span>
+                <span style="font-size:${isMini ? '2.5px' : '2cqw'}; font-weight:900; color:${textColor};">INOVAÇÃO E TECNOLOGIA</span>
+            </div>`;
+        }
+        if (logos.includes('inovacao')) {
+            html += `
+            <div style="display:flex; align-items:center; gap:${isMini ? '1px' : '0.5cqw'};">
+                <i class="bi bi-cpu" style="font-size:${isMini ? '5px' : '3.5cqw'}; color:${textColor};"></i>
+                <div style="display:flex; flex-direction:column; line-height:1;">
+                    <span style="font-size:${isMini ? '3px' : '2cqw'}; font-weight:900; color:${textColor};">INOVAÇÃO</span>
+                    <span style="font-size:${isMini ? '2px' : '1.2cqw'}; font-weight:600; color:${textColor};">BARUERI</span>
+                </div>
+            </div>`;
+        }
+        if (logos.includes('tv')) {
+            html += `
+            <div style="display:flex; align-items:center; gap:${isMini ? '1px' : '0.5cqw'};">
+                <i class="bi bi-play-btn" style="font-size:${isMini ? '5px' : '3.5cqw'}; color:${textColor};"></i>
+                <span style="font-size:${isMini ? '3px' : '2cqw'}; font-weight:900; color:${textColor}; line-height:1;">TV INOVAÇÃO</span>
+            </div>`;
+        }
+        if (logos.includes('onu')) {
+            html += `
+            <div style="display:flex; align-items:center; gap:${isMini ? '1px' : '0.5cqw'};">
+                <i class="bi bi-globe-americas" style="font-size:${isMini ? '5px' : '3.5cqw'}; color:${textColor};"></i>
+                <div style="display:flex; flex-direction:column; line-height:1;">
+                    <span style="font-size:${isMini ? '2px' : '1.2cqw'}; font-weight:600; color:${textColor};">Projetos alinhados</span>
+                    <span style="font-size:${isMini ? '3px' : '2cqw'}; font-weight:900; color:${textColor};">ONU BR</span>
+                </div>
+            </div>`;
+        }
+        if (logos.includes('custom') && slide.customLogoImg) {
+            html += `
+            <div style="display:flex; align-items:center;">
+                <img src="${slide.customLogoImg}" style="height:${isMini ? '6px' : '4cqw'}; max-width:${isMini ? '15px' : '15cqw'}; object-fit:contain;">
+            </div>`;
+        }
+
+        html += `</div>`;
+        return html;
+    }
+
     function renderMiniSlidePreview(slide) {
         const tpl = slide.template || 'capa';
         const title = escapeHtml(slide.titulo || '');
@@ -574,11 +679,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const hasBg = !!slide.bgCapa;
             const textColor = hasBg ? '#ffffff' : '#0f172a';
             const subColor = hasBg ? 'rgba(255,255,255,0.85)' : '#64748b';
-            const logoHtml = slide.logo !== false ? `
-                <div style="position:relative; z-index:1; display:flex; align-items:center; gap:3px;">
-                    <img src="/static/img/logo-barueri.jpeg" style="width:8px; height:8px; object-fit:contain; border-radius:1px;">
-                    <span style="font-size:4.5px; font-weight:700; color:${hasBg ? '#ffffff' : '#0284c7'}; line-height:1;">Barueri</span>
-                </div>` : '';
+            const logoHtml = buildLogosHtml(slide, true);
             return `
                 <div style="width:100%; height:100%; position:relative; padding: 4px 6px; display:flex; flex-direction:column; justify-content:space-between; ${hasBg ? `background: url(${slide.bgCapa}) center/cover no-repeat;` : 'background:#ffffff;'} box-sizing: border-box; overflow:hidden;">
                     ${hasBg ? '<div style="position:absolute; inset:0; background:rgba(0,0,0,0.35); z-index:0;"></div>' : ''}
@@ -595,11 +696,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         if (tpl === 'imagem_texto') {
             const imgSrc = slide.imgTexto || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb';
-            const logoHtml = slide.logo !== false ? `
-                <div style="display:flex; align-items:center; gap:2px; margin-bottom:2px;">
-                    <img src="/static/img/logo-barueri.jpeg" style="width:6px; height:6px; object-fit:contain; border-radius:1px;">
-                    <span style="font-size:3.5px; font-weight:700; color:#0284c7; line-height:1;">Barueri</span>
-                </div>` : '';
+            const logoHtml = buildLogosHtml(slide, true);
             return `
                 <div style="width:100%; height:100%; position:relative; padding:3px; display:flex; flex-direction:column; background:#ffffff; box-sizing:border-box; overflow:hidden;">
                     ${logoHtml}
@@ -628,11 +725,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 </div>
             `).join("");
 
-            const logoHtml = slide.logo !== false ? `
-                <div style="display:flex; align-items:center; gap:2px; margin-bottom:1px;">
-                    <img src="/static/img/logo-barueri.jpeg" style="width:6px; height:6px; object-fit:contain; border-radius:1px;">
-                    <span style="font-size:3.5px; font-weight:700; color:#0284c7; line-height:1;">Barueri</span>
-                </div>` : '';
+            const logoHtml = buildLogosHtml(slide, true);
 
             return `
                 <div style="width:100%; height:100%; position:relative; padding:3px 4px; display:flex; flex-direction:column; background:#ffffff; box-sizing:border-box; overflow:hidden;">
@@ -677,11 +770,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     </svg>`;
             }
 
-            const logoHtml = slide.logo !== false ? `
-                <div style="display:flex; align-items:center; gap:2px; margin-bottom:2px;">
-                    <img src="/static/img/logo-barueri.jpeg" style="width:6px; height:6px; object-fit:contain; border-radius:1px;">
-                    <span style="font-size:3.5px; font-weight:700; color:#0284c7; line-height:1;">Barueri</span>
-                </div>` : '';
+            const logoHtml = buildLogosHtml(slide, true);
 
             return `
                 <div style="width:100%; height:100%; position:relative; padding:3px 4px; display:flex; flex-direction:column; background:#ffffff; box-sizing:border-box; overflow:hidden;">
@@ -765,7 +854,16 @@ document.addEventListener("DOMContentLoaded", function() {
         selectTemplate.value = slide.template;
         inputTitulo.value = slide.titulo;
         inputSubtitulo.value = slide.subtitulo;
-        toggleLogo.checked = slide.logo !== false;
+        
+        const currentLogos = slide.logos || ["barueri"];
+        chkLogoItems.forEach(chk => {
+            chk.checked = currentLogos.includes(chk.value);
+        });
+        if (chkLogoCustom) {
+            chkLogoCustom.checked = currentLogos.includes("custom");
+            fgLogoCustom.style.display = chkLogoCustom.checked ? "block" : "none";
+        }
+        
         toggleODS.checked = slide.ods;
         toggleQR.checked = slide.qr;
 
@@ -911,9 +1009,18 @@ document.addEventListener("DOMContentLoaded", function() {
         const slide = slides.find(s => s.id === activeSlideId);
         if (!slide) return;
 
-        // Toggle Logo visibility
+        // Build Logos HTML
+        const logosHtml = buildLogosHtml(slide, false);
+        
+        // Update Logo visibility & content
         document.querySelectorAll(".slide-top-brand").forEach(el => {
-            el.style.display = slide.logo !== false ? "flex" : "none";
+            if (logosHtml === "") {
+                el.style.display = "none";
+                el.innerHTML = "";
+            } else {
+                el.style.display = "flex";
+                el.innerHTML = logosHtml;
+            }
         });
 
         // Ensure sidebar controls match current state
@@ -1167,12 +1274,46 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    toggleLogo.addEventListener("change", (e) => {
+    function syncSlideLogos() {
         const slide = slides.find(s => s.id === activeSlideId);
-        if (slide) slide.logo = e.target.checked;
+        if (!slide) return;
+        slide.logos = [];
+        chkLogoItems.forEach(chk => {
+            if (chk.checked) slide.logos.push(chk.value);
+        });
+        if (chkLogoCustom && chkLogoCustom.checked) {
+            slide.logos.push("custom");
+        }
         updateSlotsVisibility();
         updateActiveThumbnail();
-    });
+    }
+
+    chkLogoItems.forEach(chk => chk.addEventListener("change", syncSlideLogos));
+    
+    if (chkLogoCustom) {
+        chkLogoCustom.addEventListener("change", (e) => {
+            fgLogoCustom.style.display = e.target.checked ? "block" : "none";
+            syncSlideLogos();
+        });
+    }
+
+    if (inputUploadLogoCustom) {
+        inputUploadLogoCustom.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const slide = slides.find(s => s.id === activeSlideId);
+                    if (slide) {
+                        slide.customLogoImg = event.target.result;
+                        updateSlotsVisibility();
+                        updateActiveThumbnail();
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
 
     toggleODS.addEventListener("change", (e) => {
         const slide = slides.find(s => s.id === activeSlideId);
@@ -1315,12 +1456,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
     btnNovoSlide.addEventListener("click", () => {
         slideCounter++;
+        const currentSlide = slides.find(s => s.id === activeSlideId) || {};
+        
         slides.push({
             id: slideCounter,
             template: "capa",
             titulo: "Novo Slide",
             subtitulo: "Subtítulo do novo slide",
-            logo: true,
+            logos: currentSlide.logos ? [...currentSlide.logos] : ["barueri"],
+            customLogoImg: currentSlide.customLogoImg || null,
             ods: false,
             odsNums: [],
             qr: false,
@@ -1427,6 +1571,28 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
+
+    // Fallback manual para as abas retráteis (caso o JS do Bootstrap não esteja carregado/funcionando)
+    document.querySelectorAll('.slots-header[data-bs-toggle="collapse"]').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('data-bs-target');
+            if (targetId) {
+                const targetEl = document.querySelector(targetId);
+                if (targetEl) {
+                    const isExpanded = this.getAttribute('aria-expanded') === 'true';
+                    
+                    if (isExpanded) {
+                        targetEl.classList.remove('show');
+                        this.setAttribute('aria-expanded', 'false');
+                    } else {
+                        targetEl.classList.add('show');
+                        this.setAttribute('aria-expanded', 'true');
+                    }
+                }
+            }
+        });
+    });
 
     renderThumbnails();
     renderActiveSlide();
