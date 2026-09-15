@@ -89,10 +89,10 @@ apresentacao.projeto (id, usuario_id FK, nome, descricao, capa_url)
      │ 1:N
 apresentacao.apresentacao (id, projeto_id FK, nome, categoria_id FK, data_criacao)
      │ 1:N
-apresentacao.slide (id, apresentacao_id FK, ordem INT, template_id FK, alinhamento_texto, cor_texto, estilo_fundo, filtro_fundo)
+apresentacao.slide (id, apresentacao_id FK, ordem INT, template_id FK, alinhamento_texto, estilo_fundo, filtro_fundo)
      │ 1:N
      ├── apresentacao.template (id PK, nome, codigo, descricao) [Lookup estática referenciada por template_id]
-     ├── apresentacao.campo_preenchido (id, slide_id FK, chave_campo, tipo_fonte, valor_manual, indicador_id FK, campo_origem_id FK)
+     ├── apresentacao.campo_preenchido (id, slide_id FK, chave_campo, tipo_fonte, valor_manual, indicador_id FK, campo_origem_id FK, tamanho_texto, cor_texto, fonte)
      └── apresentacao.slot_flexivel (id, slide_id FK, tipo_elemento, posicao_matriz, config_json)
 
 apresentacao.ods (id PK, numero UNIQUE INT, titulo, descricao, icone_url, cor_hex) [Catálogo estático de apoio aos slots flexíveis]
@@ -104,15 +104,17 @@ apresentacao.apresentador (id PK, criado_por_id FK opcional, nome, cargo, biogra
 2. `tipo_fonte = 'indicador'`: Utiliza `indicador_id` (FK para tabela de dados tratados).
 3. `tipo_fonte = 'reuso_midia'`: Utiliza `campo_origem_id` (FK auto-referencial para outro `CampoPreenchido` de mídia pertencente a uma apresentação do **mesmo** `projeto_id`).
 
-### 3.3. Slots Flexíveis (Matriz 3×3) e Estilos do Slide
-- **`posicao_matriz` (Ancoragem):** `'top-left'`, `'top-center'`, `'top-right'`, `'mid-left'`, `'center'`, `'mid-right'`, `'bottom-left'`, `'bottom-center'`, `'bottom-right'`.
-- **`config_json` (Parâmetros específicos do slot):**
-  - ODS: `{"arranjo": "linha"|"grade", "selos": [1, 4, 11]}` (1 linha para poucos selos, grade 2 linhas para múltiplos).
-  - QR Code: `{"url": "https://..."}`.
-  - Logos e Bandeiras: `{"logos": ["prefeitura", "cit", "sp", "brasil"]}`.
-- **Controles Visuais do Slide:**
+### 3.3. Estilização Tipográfica Individual (`campo_preenchido`) e Controles do Slide
+- **Estilização Tipográfica Individual por Texto (`campo_preenchido`):**
+  - Permite que cada texto do slide (título, subtítulo, citação, corpo) tenha estilo visual independente.
+  - `tamanho_texto`: valor de tamanho da fonte (ex: `'32px'`, `'1.5rem'`, `'24'`).
+  - `cor_texto`: cor hexadecimal restrita à paleta institucional (`#FFFFFF`, `#102A56`, `#212529`, `#0052FF`).
+  - `fonte`: família tipográfica institucional (ex: `'Montserrat'`, `'Inter'`, `'Roboto'`).
+- **Slots Flexíveis (Matriz 3×3):**
+  - `posicao_matriz` (Ancoragem): `'top-left'`, `'top-center'`, `'top-right'`, `'mid-left'`, `'center'`, `'mid-right'`, `'bottom-left'`, `'bottom-center'`, `'bottom-right'`.
+  - `config_json`: ODS (`{"arranjo": "linha"|"grade", "selos": [1, 4, 11]}`), QR Code (`{"url": "https://..."}`), Logos/Bandeiras (`{"logos": ["prefeitura", "cit", "sp", "brasil"]}`).
+- **Controles Visuais do Slide (`slide`):**
   - `alinhamento_texto`: `'left'` (padrão), `'center'`, `'right'`, `'justify'`.
-  - `cor_texto`: restrito à paleta institucional (`#FFFFFF`, `#102A56`, `#212529`, `#0052FF`).
   - `filtro_fundo`: `'nenhum'` (padrão), `'escurecer'`, `'borrar'`.
   - `estilo_fundo`: `'full_scrim'` (overlay escuro de legibilidade WCAG sobre foto) ou `'contained'` (área parcial/card).
 
@@ -124,9 +126,9 @@ apresentacao.apresentador (id PK, criado_por_id FK opcional, nome, cargo, biogra
 | **`senha`** | `login` | `usuario_id` (PK/FK `usuario.id`), `senha` (VARCHAR 255) | Relação 1:1 estrita. Armazena apenas o hash Bcrypt. NUNCA texto puro. |
 | **`projeto`** | `apresentacao` | `id` (PK), `usuario_id` (FK `usuario.id`), `nome`, `descricao`, `capa_url` | Pasta temática que delimita o agrupamento e o escopo de reuso de mídia. Um usuário tem vários projetos. |
 | **`apresentacao`** | `apresentacao` | `id` (PK), `projeto_id` (FK `projeto.id`), `nome`, `categoria_id` (FK opcional), `data_criacao` (TIMESTAMP) | Arquivo de apresentação executável. Contém múltiplos slides ordenados. Pertence a 1 projeto. |
-| **`slide`** | `apresentacao` | `id` (PK), `apresentacao_id` (FK `apresentacao.id`), `template_id` (FK `template.id`), `ordem` (INT), `alinhamento_texto`, `cor_texto`, `filtro_fundo`, `estilo_fundo` | Página individual. O campo `ordem` define a sequência de exibição (recalculado em massa pelo backend ao reordenar). |
+| **`slide`** | `apresentacao` | `id` (PK), `apresentacao_id` (FK `apresentacao.id`), `template_id` (FK `template.id`), `ordem` (INT), `alinhamento_texto`, `filtro_fundo`, `estilo_fundo` | Página individual. Controla ordenação e enquadramento de plano de fundo da página. |
 | **`template`** | `apresentacao` | `id` (PK), `nome`, `codigo` (UNIQUE VARCHAR 50), `descricao` | Tabela de referência/lookup estática (7 templates fixos: `capa`, `imagem_texto`, `indicadores`, `grafico`, `mapa`, `video`, `encerramento`). |
-| **`campo_preenchido`** | `apresentacao` | `id` (PK), `slide_id` (FK `slide.id`), `chave_campo`, `tipo_fonte`, `valor_manual`, `indicador_id`, `campo_origem_id` (FK auto-relacional) | Modelo EAV. Armazena os conteúdos específicos dos slots do template. Permite reuso de mídias do mesmo projeto via `campo_origem_id`. |
+| **`campo_preenchido`** | `apresentacao` | `id` (PK), `slide_id` (FK `slide.id`), `chave_campo`, `tipo_fonte`, `valor_manual`, `indicador_id`, `campo_origem_id` (FK auto-relacional), `tamanho_texto`, `cor_texto`, `fonte` | Modelo EAV. Armazena conteúdos dos slots, reuso de mídias e formatação tipográfica individual (`tamanho_texto`, `cor_texto`, `fonte`). |
 | **`slot_flexivel`** | `apresentacao` | `id` (PK), `slide_id` (FK `slide.id`), `tipo_elemento`, `posicao_matriz`, `config_json` (JSONB) | Elementos sobrepostos (ODS, QR Code gerado em tempo real por URL, logos/bandeiras) ancorados na matriz 3×3. |
 | **`ods`** | `apresentacao` | `id` (PK), `numero` (UNIQUE INT 1-17), `titulo` (VARCHAR 150), `descricao` (TEXT), `icone_url` (VARCHAR 255), `cor_hex` (VARCHAR 10) | Catálogo oficial dos 17 Objetivos de Desenvolvimento Sustentável da ONU. Alimenta os badges dos slots flexíveis. Populada via seed. |
 | **`apresentador`** | `apresentacao` | `id` (PK), `criado_por_id` (FK opcional `usuario.id`), `nome`, `cargo`, `biografia`, `foto_url`, `topicos` (JSONB), `midias_extras` (JSONB) | Catálogo institucional COMPARTILHADO e GLOBAL de palestrantes, secretários e autoridades. `topicos` armazena lista de destaques (`[{"destaque": "+27 anos", "rotulo": "Na política"}]`). `midias_extras` armazena inovações (`[{"tipo": "Avatar", "titulo": "...", "url": "..."}]`). Visível globalmente para todos os usuários no template de Perfil/Bio. |
@@ -153,9 +155,9 @@ Os itens abaixo foram formalizados e mapeados, divididos entre a próxima entreg
 | **`projeto`** | `apresentacao` | 🟢 Ativa no banco | Estrutura concluída (pasta e reuso). | Liberado para CRUD de projetos. |
 | **`apresentacao`** | `apresentacao` | 🟢 Ativa no banco | Estrutura concluída (arquivos de slides). | Liberado para CRUD de apresentações. |
 | **`template`** | `apresentacao` | 🟢 Ativa no banco | Populada com os 7 templates fixos via seed. | Liberado para dropdowns de seleção de template. |
-| **`slide`** | `apresentacao` | 🟡 Em Alteração | **Adição de 4 colunas visuais:** `alinhamento_texto`, `cor_texto`, `filtro_fundo`, `estilo_fundo` (sem cabeçalho). | Backend deve incluir esses campos nos formulários e salvar nos endpoints. |
+| **`slide`** | `apresentacao` | 🟢 Codificada em `models.py` | Configurações de fundo (`filtro_fundo`, `estilo_fundo`) e alinhamento (`alinhamento_texto`). Tipografia transferida para `campo_preenchido`. | Backend deve salvar os controles de fundo nos endpoints de slide. |
 | **`slot_flexivel`** | `apresentacao` | 🟢 Codificada em `models.py` | Suporte a ODS, QR Code e Logos sobrepostos na matriz 3×3 via JSONB. | Backend pode montar endpoints para ancorar elementos. |
-| **`campo_preenchido`** | `apresentacao` | 🟢 Codificada em `models.py` | Suporte a preenchimento manual e reuso de mídias no mesmo projeto. | Backend utilizará para salvar o conteúdo dos templates. |
+| **`campo_preenchido`** | `apresentacao` | 🟢 Codificada em `models.py` | Suporte a preenchimento manual, reuso de mídias e estilização tipográfica individual (`tamanho_texto`, `cor_texto`, `fonte`). | Backend utilizará para salvar o conteúdo e estilo tipográfico dos templates. |
 | **`ods`** | `apresentacao` | 🟢 Ativa e Semeada | Populada com os 17 selos da ONU, cores hex e URLs web oficiais em português. | Liberada para consumo em dropdowns/switches de slots flexíveis. |
 | **`apresentador`** | `apresentacao` | 🟢 Codificada em `models.py` | Catálogo global de autoridades com `topicos` e `midias_extras` em JSONB. | Liberada para rotas do catálogo de autoridades e template Perfil/Bio. |
 

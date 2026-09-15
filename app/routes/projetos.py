@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
 from app import db
-from app.models import Projeto, Apresentacao
+from app.models import Projeto, Apresentacao, Slide, CampoPreenchido
 
 projetos_bp = Blueprint('projetos', __name__)
 
@@ -16,22 +16,14 @@ def projetos():
     else:
         projetos_usuario = Projeto.query.filter_by(usuario_id=current_user.id).order_by(Projeto.nome.asc()).all()
 
-    # Garante que todo usuário possui ao menos um projeto inicial para organizar seu conteúdo
-    if not projetos_usuario:
-        projeto_padrao = Projeto(
-            usuario_id=current_user.id,
-            nome="Projeto Geral",
-            descricao="Pasta principal de apresentações institucionais"
-        )
-        db.session.add(projeto_padrao)
-        db.session.commit()
-        projetos_usuario = [projeto_padrao]
-
     # Recupera todas as apresentações dos projetos do usuário ordenadas por criação mais recente
     projeto_ids = [p.id for p in projetos_usuario]
-    apresentacoes = Apresentacao.query.filter(
-        Apresentacao.projeto_id.in_(projeto_ids)
-    ).order_by(Apresentacao.data_criacao.desc()).all()
+    if projeto_ids:
+        apresentacoes = Apresentacao.query.filter(
+            Apresentacao.projeto_id.in_(projeto_ids)
+        ).order_by(Apresentacao.data_criacao.desc()).all()
+    else:
+        apresentacoes = []
 
     return render_template(
         'admin/admin_projetos.html',
@@ -116,12 +108,26 @@ def deletar_projeto(id):
         flash('Permissão negada.', 'danger')
         return redirect(url_for('projetos.projetos'))
 
-    # Deletar apresentações filhas primeiro ou cascata
-    Apresentacao.query.filter_by(projeto_id=id).delete()
-    db.session.delete(projeto)
-    db.session.commit()
+    try:
+        # Busca todas as apresentações vinculadas a este projeto
+        apresentacoes = Apresentacao.query.filter_by(projeto_id=id).all()
+        for ap in apresentacoes:
+            slides = Slide.query.filter_by(apresentacao_id=ap.id).all()
+            for s in slides:
+                CampoPreenchido.query.filter_by(slide_id=s.id).delete(synchronize_session=False)
+                db.session.delete(s)
+            db.session.delete(ap)
+        db.session.delete(projeto)
+        db.session.commit()
 
-    if request.is_json:
-        return jsonify({'status': 'sucesso', 'mensagem': 'Pasta deletada com sucesso!'})
-    flash('Pasta deletada com sucesso!', 'success')
-    return redirect(url_for('projetos.projetos'))
+        if request.is_json:
+            return jsonify({'status': 'sucesso', 'mensagem': 'Pasta deletada com sucesso do banco de dados!'})
+        flash('Pasta deletada com sucesso!', 'success')
+        return redirect(url_for('projetos.projetos'))
+    except Exception as e:
+        db.session.rollback()
+        print(f"[ERRO AO DELETAR PASTA/PROJETO]: {e}")
+        if request.is_json:
+            return jsonify({'status': 'erro', 'mensagem': f'Erro ao deletar pasta: {str(e)}'}), 500
+        flash('Erro ao deletar pasta.', 'danger')
+        return redirect(url_for('projetos.projetos'))

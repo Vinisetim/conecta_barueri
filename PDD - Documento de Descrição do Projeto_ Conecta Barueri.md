@@ -397,15 +397,14 @@ Abaixo está o mapeamento detalhado das tabelas que compõem o banco de dados do
   * `data_criacao` (`TIMESTAMP DEFAULT CURRENT_TIMESTAMP`): Data e hora de criação.
 * **Como usar:** Uma apresentação é executada em modo apresentação (tela cheia) ou editada adicionando/removendo slides.
 
-#### 5. `apresentacao.slide` (Página Ordenada e Configurações de Tela)
-* **Objetivo:** Representa uma página individual da apresentação, guardando sua posição e parâmetros visuais.
+#### 5. `apresentacao.slide` (Página Ordenada e Configurações de Fundo)
+* **Objetivo:** Representa uma página individual da apresentação, guardando sua posição e parâmetros de plano de fundo da tela (a tipografia individual de cada texto é gerenciada em `campo_preenchido`).
 * **Colunas:**
   * `id` (`SERIAL PRIMARY KEY`): Identificador do slide.
   * `apresentacao_id` (`INTEGER NOT NULL`, FK para `apresentacao.apresentacao.id`): Apresentação pai.
   * `template_id` (`INTEGER NOT NULL`, FK para `apresentacao.template.id`): Template visual utilizado.
   * `ordem` (`INTEGER NOT NULL`): Número de sequência da página (1, 2, 3...).
-  * `alinhamento_texto` (`VARCHAR(20) DEFAULT 'left'`): Alinhamento institucional (`left`, `center`, `right`, `justify`).
-  * `cor_texto` (`VARCHAR(10) DEFAULT '#212529'`): Cor restrita da paleta homologada (`#FFFFFF`, `#102A56`, `#212529`, `#0052FF`).
+  * `alinhamento_texto` (`VARCHAR(20) DEFAULT 'left'`): Alinhamento geral institucional (`left`, `center`, `right`, `justify`).
   * `filtro_fundo` (`VARCHAR(20) DEFAULT 'nenhum'`): Efeito na foto de fundo (`'nenhum'`, `'escurecer'`, `'borrar'`).
   * `estilo_fundo` (`VARCHAR(30) DEFAULT 'contained'`): Modo de enquadramento de fundo (`'full_scrim'` ou `'contained'`).
 * **Como usar:** Ao reordenar slides na interface, o frontend envia a lista de IDs na nova sequência e o backend atualiza a coluna `ordem` em lote (bulk update).
@@ -419,8 +418,8 @@ Abaixo está o mapeamento detalhado das tabelas que compõem o banco de dados do
   * `descricao` (`VARCHAR(255)`): Texto informativo para orientar o usuário na criação.
 * **Como usar:** Não é editada pelo usuário final. Populada via script de seed (`seed_templates.py`).
 
-#### 7. `apresentacao.campo_preenchido` (Conteúdo Dinâmico EAV e Reuso de Mídias)
-* **Objetivo:** Armazena cada dado preenchido em um slide de forma desacoplada, permitindo que cada template tenha slots distintos e viabilizando o reuso de mídias.
+#### 7. `apresentacao.campo_preenchido` (Conteúdo Dinâmico EAV, Reuso de Mídias e Tipografia Individual)
+* **Objetivo:** Armazena cada dado preenchido em um slide de forma desacoplada, permitindo que cada template tenha slots distintos, viabilizando o reuso de mídias e permitindo **estilização tipográfica individual (tamanho, cor e fonte por texto, e não por slide)**.
 * **Colunas:**
   * `id` (`SERIAL PRIMARY KEY`): Identificador do registro.
   * `slide_id` (`INTEGER NOT NULL`, FK para `apresentacao.slide.id`): Slide ao qual o dado pertence.
@@ -432,6 +431,15 @@ Abaixo está o mapeamento detalhado das tabelas que compõem o banco de dados do
   * `valor_manual` (`TEXT`): Conteúdo em texto ou URL do arquivo.
   * `campo_origem_id` (`INTEGER`, FK auto-referencial para `campo_preenchido.id`): Aponta para o registro original da imagem/mídia sendo reaproveitada.
   * `indicador_id` (`INTEGER`): Referência futura para a tabela de indicadores municipais.
+  * `tamanho_texto` (`VARCHAR(20)`): Tamanho da fonte tipográfica individual daquele texto (ex: `'32px'`, `'1.5rem'`, `'24'`).
+  * `cor_texto` (`VARCHAR(20)`): Cor individual daquele texto em formato hex (ex: `#FFFFFF`, `#102A56`, `#212529`, `#0052FF`), permitindo que títulos tenham cores e pesos distintos de subtítulos e legendas.
+  * `fonte` (`VARCHAR(50)`): Família tipográfica institucional prevista (ex: `'Montserrat'`, `'Inter'`, `'Roboto'`), permitindo salvar e aplicar fontes customizadas quando a seleção for integrada ao frontend.
+* **Como usar:** No Jinja2, cada campo de texto pode ser estilizado diretamente via atributos CSS inline:
+  ```html
+  <h2 style="{% if campo.tamanho_texto %}font-size: {{ campo.tamanho_texto }};{% endif %} {% if campo.cor_texto %}color: {{ campo.cor_texto }};{% endif %} {% if campo.fonte %}font-family: '{{ campo.fonte }}', sans-serif;{% endif %}">
+    {{ campo.valor_manual }}
+  </h2>
+  ```
 
 #### 8. `apresentacao.slot_flexivel` (Elementos Sobrepostos e Ancoragem Matricial)
 * **Objetivo:** Gerenciar elementos flutuantes/sobrepostos em posições pré-fixadas (matriz 3×3) sem comprometer a identidade visual.
@@ -508,9 +516,9 @@ Para orientar a equipe de desenvolvimento (backend e frontend) sobre o que já e
 | **`projeto`** | `apresentacao` | 🟢 Ativa no banco | Estrutura concluída (agrupador e reuso). | Pronto para listagem e criação de projetos. |
 | **`apresentacao`** | `apresentacao` | 🟢 Ativa no banco | Estrutura concluída (arquivos de slides). | Pronto para rotas de criação de apresentações. |
 | **`template`** | `apresentacao` | 🟢 Ativa no banco | Populada com os 7 templates fixos via seed. | Backend pode listar templates nos formulários. |
-| **`slide`** | `apresentacao` | 🟡 Em Alteração | **Adição de 4 colunas visuais:** `alinhamento_texto`, `cor_texto`, `filtro_fundo`, `estilo_fundo` (sem cabeçalho). | Backend deve incluir esses campos nos formulários e salvar nos endpoints. |
+| **`slide`** | `apresentacao` | 🟢 Codificada em `models.py` | Configurações de fundo (`filtro_fundo`, `estilo_fundo`) e alinhamento (`alinhamento_texto`). Tipografia transferida para `campo_preenchido`. | Backend deve salvar os controles de fundo nos endpoints de slide. |
 | **`slot_flexivel`** | `apresentacao` | 🟢 Codificada em `models.py` | Suporte a ODS, QR Code e Logos sobrepostos na matriz 3×3 via JSONB. | Backend pode montar endpoints para ancorar elementos. |
-| **`campo_preenchido`** | `apresentacao` | 🟢 Codificada em `models.py` | Suporte a preenchimento manual e reuso de mídias no mesmo projeto. | Backend utilizará para salvar o conteúdo dos templates. |
+| **`campo_preenchido`** | `apresentacao` | 🟢 Codificada em `models.py` | Suporte a preenchimento manual, reuso de mídias e estilização tipográfica individual (`tamanho_texto`, `cor_texto`, `fonte`). | Backend utilizará para salvar o conteúdo e estilo tipográfico dos templates. |
 | **`ods`** | `apresentacao` | 🟢 Ativa e Semeada | Populada via seed com os 17 selos da ONU, cores hex e URLs web oficiais. | Liberada para consumo em dropdowns/switches de slots flexíveis. |
 | **`apresentador`** | `apresentacao` | 🟢 Codificada em `models.py` | Catálogo global de autoridades com `topicos` e `midias_extras` em JSONB. | Liberada para rotas do catálogo de autoridades e template Perfil/Bio. |
 

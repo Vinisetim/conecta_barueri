@@ -74,29 +74,98 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // --- DELETAÇÃO DE PROJETOS ---
-    if (cardsGrid) {
-        cardsGrid.addEventListener("click", (e) => {
-            const btnDelete = e.target.closest(".btn-delete-projeto");
-            if (btnDelete) {
-                e.stopPropagation();
-                e.preventDefault();
-                
-                const card = btnDelete.closest(".ap-card-item");
-                const nome = card.dataset.title || "este projeto";
-                
-                if (confirm(`Tem certeza que deseja remover ${nome}? Essa ação não pode ser desfeita e excluirá as apresentações contidas.`)) {
-                    card.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+    // --- DELETAÇÃO DE PROJETOS E APRESENTAÇÕES VIA BACKEND ---
+    window.excluirProjetoBtn = async function(event, btn) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        const projId = btn.getAttribute("data-proj-id");
+        const projNome = btn.getAttribute("data-proj-nome") || "esta pasta";
+
+        if (!confirm(`Atenção! Deseja realmente excluir a pasta "${projNome}" e todas as apresentações salvas dentro dela?\n\nEsta ação é irreversível e apagará do banco de dados.`)) {
+            return;
+        }
+
+        try {
+            btn.disabled = true;
+            btn.style.opacity = "0.5";
+            const response = await fetch(`/projetos/deletar/${projId}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" }
+            });
+            const res = await response.json();
+            if (response.ok && res.status === "sucesso") {
+                const card = btn.closest(".ap-card-item");
+                if (card) {
+                    card.style.transition = "opacity 0.35s ease, transform 0.35s ease";
                     card.style.opacity = "0";
-                    card.style.transform = "scale(0.9)";
-                    
+                    card.style.transform = "scale(0.85)";
                     setTimeout(() => {
                         card.remove();
-                    }, 300);
+                        window.location.reload();
+                    }, 350);
+                } else {
+                    window.location.reload();
                 }
+            } else {
+                alert(res.mensagem || "Erro ao excluir pasta do banco de dados.");
+                btn.disabled = false;
+                btn.style.opacity = "1";
             }
-        });
-    }
+        } catch (err) {
+            console.error(err);
+            alert("Erro ao conectar com o servidor para excluir pasta.");
+            btn.disabled = false;
+            btn.style.opacity = "1";
+        }
+    };
+
+    window.excluirApresentacaoBtn = async function(event, btn) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        const apId = btn.getAttribute("data-id");
+        const apNome = btn.getAttribute("data-nome") || "esta apresentação";
+
+        if (!confirm(`Atenção! Deseja realmente excluir a apresentação "${apNome}"?\n\nEsta ação não pode ser desfeita e excluirá todos os seus slides do banco de dados.`)) {
+            return;
+        }
+
+        try {
+            btn.disabled = true;
+            btn.style.opacity = "0.5";
+            const response = await fetch(`/apresentacao/deletar/${apId}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" }
+            });
+            const res = await response.json();
+            if (response.ok && res.status === "sucesso") {
+                const item = btn.closest(".ap-card-item, .pasta-apresentacao-item, .apresentacao-row-item");
+                if (item) {
+                    item.style.transition = "opacity 0.35s ease, transform 0.35s ease";
+                    item.style.opacity = "0";
+                    item.style.transform = "scale(0.85)";
+                    setTimeout(() => {
+                        item.remove();
+                        window.location.reload();
+                    }, 350);
+                } else {
+                    window.location.reload();
+                }
+            } else {
+                alert(res.mensagem || "Erro ao excluir apresentação do banco de dados.");
+                btn.disabled = false;
+                btn.style.opacity = "1";
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Erro ao conectar com o servidor para excluir apresentação.");
+            btn.disabled = false;
+            btn.style.opacity = "1";
+        }
+    };
 
     // Função para criar HTML do card do projeto dinamicamente
     function adicionarProjeto(nome, desc, categoria, categoriaNome) {

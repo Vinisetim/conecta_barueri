@@ -1,3 +1,4 @@
+import json
 from flask import Blueprint, render_template, request, jsonify, abort, redirect, url_for, flash
 from flask_login import login_required, current_user
 from app import db
@@ -173,12 +174,22 @@ def salvar_apresentacao():
             campos_para_salvar = {
                 'titulo': item.get('titulo', ''),
                 'subtitulo': item.get('subtitulo', ''),
+                'tamanhoTitulo': item.get('tamanhoTitulo'),
+                'tamanhoSubtitulo': item.get('tamanhoSubtitulo'),
+                'corTitulo': item.get('corTitulo'),
+                'corSubtitulo': item.get('corSubtitulo'),
                 'ods': 'true' if item.get('ods') else 'false',
+                'odsNums': json.dumps(item.get('odsNums') or []) if item.get('odsNums') is not None else None,
                 'qr': 'true' if item.get('qr') else 'false',
+                'qrLink': item.get('qrLink', ''),
+                'logos': json.dumps(item.get('logos') or ['barueri']) if item.get('logos') is not None else None,
+                'customLogoImg': item.get('customLogoImg'),
                 'bgCapa': item.get('bgCapa'),
                 'imgTexto': item.get('imgTexto'),
                 'chartType': item.get('chartType', 'line'),
-                'periodo': item.get('periodo', 'Últimos 12 meses')
+                'chartIndicador': item.get('chartIndicador'),
+                'periodo': item.get('periodo', 'Últimos 12 meses'),
+                'indicadores': json.dumps(item.get('indicadores') or []) if item.get('indicadores') is not None else None
             }
 
             for chave, valor in campos_para_salvar.items():
@@ -214,13 +225,25 @@ def deletar_apresentacao(id):
         flash('Permissão negada.', 'danger')
         return redirect(url_for('projetos.projetos'))
 
-    db.session.delete(apresentacao)
-    db.session.commit()
+    try:
+        slides = Slide.query.filter_by(apresentacao_id=apresentacao.id).all()
+        for s in slides:
+            CampoPreenchido.query.filter_by(slide_id=s.id).delete(synchronize_session=False)
+            db.session.delete(s)
+        db.session.delete(apresentacao)
+        db.session.commit()
 
-    if request.is_json:
-        return jsonify({'status': 'sucesso', 'mensagem': 'Apresentação deletada com sucesso!'})
-    flash('Apresentação deletada com sucesso!', 'success')
-    return redirect(url_for('projetos.projetos'))
+        if request.is_json:
+            return jsonify({'status': 'sucesso', 'mensagem': 'Apresentação deletada com sucesso do banco de dados!'})
+        flash('Apresentação deletada com sucesso!', 'success')
+        return redirect(url_for('projetos.projetos'))
+    except Exception as e:
+        db.session.rollback()
+        print(f"[ERRO AO DELETAR APRESENTACAO]: {e}")
+        if request.is_json:
+            return jsonify({'status': 'erro', 'mensagem': f'Erro ao deletar apresentação: {str(e)}'}), 500
+        flash('Erro ao deletar apresentação.', 'danger')
+        return redirect(url_for('projetos.projetos'))
 
 @apresentacao_bp.route('/apresentacao/editar/<int:id>')
 @login_required
@@ -242,20 +265,46 @@ def editar_apresentacao(id):
             'template': slide.template_usado.codigo if slide.template_usado else 'capa',
             'titulo': '',
             'subtitulo': '',
+            'tamanhoTitulo': 4.0,
+            'tamanhoSubtitulo': 1.8,
+            'corTitulo': '#0f172a',
+            'corSubtitulo': '#64748b',
+            'logos': ['barueri'],
+            'customLogoImg': None,
             'ods': False,
+            'odsNums': [],
             'qr': False,
+            'qrLink': '',
             'bgCapa': None,
             'imgTexto': None,
             'chartType': 'line',
-            'periodo': 'Últimos 12 meses'
+            'chartIndicador': 1,
+            'periodo': 'Últimos 12 meses',
+            'indicadores': []
         }
 
         # Reconstrói os dados a partir de CampoPreenchido
         for campo in slide.campos:
+            val = campo.valor_manual
             if campo.chave_campo in ('ods', 'qr'):
-                slide_dict[campo.chave_campo] = (campo.valor_manual == 'true')
+                slide_dict[campo.chave_campo] = (val == 'true')
+            elif campo.chave_campo in ('tamanhoTitulo', 'tamanhoSubtitulo'):
+                try:
+                    slide_dict[campo.chave_campo] = float(val) if val else (4.0 if campo.chave_campo == 'tamanhoTitulo' else 1.8)
+                except (ValueError, TypeError):
+                    slide_dict[campo.chave_campo] = 4.0 if campo.chave_campo == 'tamanhoTitulo' else 1.8
+            elif campo.chave_campo in ('logos', 'odsNums', 'indicadores'):
+                try:
+                    slide_dict[campo.chave_campo] = json.loads(val) if val else []
+                except Exception:
+                    slide_dict[campo.chave_campo] = []
+            elif campo.chave_campo == 'chartIndicador':
+                try:
+                    slide_dict[campo.chave_campo] = int(val) if val else 1
+                except (ValueError, TypeError):
+                    slide_dict[campo.chave_campo] = 1
             else:
-                slide_dict[campo.chave_campo] = campo.valor_manual
+                slide_dict[campo.chave_campo] = val
 
         slides_iniciais.append(slide_dict)
 
@@ -264,17 +313,34 @@ def editar_apresentacao(id):
             'id': 1,
             'template': 'capa',
             'titulo': apresentacao.nome,
-            'subtitulo': 'Apresentação Executiva',
+            'subtitulo': 'Apresentação Executiva - Indicadores Municipais',
+            'tamanhoTitulo': 4.0,
+            'tamanhoSubtitulo': 1.8,
+            'corTitulo': '#0f172a',
+            'corSubtitulo': '#64748b',
+            'logos': ['barueri'],
+            'customLogoImg': None,
             'ods': True,
+            'odsNums': ['11'],
             'qr': False,
+            'qrLink': '',
             'bgCapa': None,
             'imgTexto': None,
             'chartType': 'line',
-            'periodo': 'Últimos 12 meses'
+            'chartIndicador': 1,
+            'periodo': 'Últimos 12 meses',
+            'indicadores': []
         }]
+
+    # Carrega as pastas para exibir no seletor de salvar
+    if getattr(current_user, 'admin', False):
+        projetos = Projeto.query.order_by(Projeto.nome.asc()).all()
+    else:
+        projetos = Projeto.query.filter_by(usuario_id=current_user.id).order_by(Projeto.nome.asc()).all()
 
     return render_template(
         'apresentacao/criar-apresentacao.html',
         apresentacao=apresentacao,
-        slides_iniciais=slides_iniciais
+        slides_iniciais=slides_iniciais,
+        projetos=projetos
     )

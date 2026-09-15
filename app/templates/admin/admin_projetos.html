@@ -214,6 +214,9 @@
                                         <a href="{{ url_for('apresentacao.editar_apresentacao', id=ap.id) }}" class="btn btn-sm btn-light p-1 px-2 border" title="Editar Apresentação">
                                             <i class="bi bi-pencil" style="font-size: 10px;"></i>
                                         </a>
+                                        <button type="button" class="btn btn-sm btn-light p-1 px-2 border text-danger btn-delete-apresentacao" data-id="{{ ap.id }}" data-nome="{{ ap.nome }}" onclick="excluirApresentacaoBtn(event, this)" title="Excluir Apresentação">
+                                            <i class="bi bi-trash" style="font-size: 10px;"></i>
+                                        </button>
                                     </div>
                                 </div>
                                 {% endfor %}
@@ -250,9 +253,10 @@
                                 title="Editar Pasta">
                             <i class="bi bi-pencil"></i>
                         </button>
-                        <button type="button" class="btn-card-action btn-delete-projeto-real" 
+                        <button type="button" class="btn-card-action btn-delete-projeto btn-delete-projeto-real" 
                                 data-proj-id="{{ proj.id }}" 
                                 data-proj-nome="{{ proj.nome }}"
+                                onclick="excluirProjetoBtn(event, this)"
                                 style="background: #fff0f2; color: #e11d48; border: 1px solid #ffe4e6; flex: 0 0 auto;" 
                                 title="Excluir Pasta">
                             <i class="bi bi-trash"></i>
@@ -277,7 +281,7 @@
     <div id="sectionApresentacoes" style="display: none;">
         <div class="apresentacoes-grid" id="cardsGridApresentacoes">
             {% for ap in apresentacoes %}
-            <article class="ap-card-item" data-status="published" data-title="{{ ap.nome }}" onclick="window.location.href='{{ url_for('apresentacao.editar_apresentacao', id=ap.id) }}'" style="cursor: pointer;">
+            <article class="ap-card-item" data-status="published" data-title="{{ ap.nome }}" onclick="if(!event.target.closest('button, a, .btn-card-action')) window.location.href='{{ url_for('apresentacao.editar_apresentacao', id=ap.id) }}'" style="cursor: pointer;">
                 <div class="card-thumb thumb-saude" style="align-items: center; justify-content: center; padding: 20px; background: {{ ap.projeto.capa_uri if ap.projeto and ap.projeto.capa_uri else '#0284c7' }};">
                     <i class="bi bi-file-earmark-slides-fill" style="font-size: 3.5rem; color: rgba(255,255,255,0.95); filter: drop-shadow(0 6px 12px rgba(0,0,0,0.18));"></i>
                 </div>
@@ -302,7 +306,7 @@
                            class="btn-card-action" style="background: #0052ff; color: white; border: none; flex:1;">
                             <i class="bi bi-pencil-square"></i> Editar Slides
                         </a>
-                        <button type="button" class="btn-card-action btn-delete-apresentacao" data-id="{{ ap.id }}" data-nome="{{ ap.nome }}" style="background: #fff0f2; color: #e11d48; border: 1px solid #ffe4e6; flex: 0 0 auto;" title="Excluir Apresentação">
+                        <button type="button" class="btn-card-action btn-delete-apresentacao" data-id="{{ ap.id }}" data-nome="{{ ap.nome }}" onclick="excluirApresentacaoBtn(event, this)" style="background: #fff0f2; color: #e11d48; border: 1px solid #ffe4e6; flex: 0 0 auto;" title="Excluir Apresentação">
                             <i class="bi bi-trash"></i>
                         </button>
                     </div>
@@ -434,7 +438,7 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='js/admin_projetos.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin_projetos.js') }}?v=2.2"></script>
 <script>
 // Alternância entre visualização de Pastas e Todas as Apresentações
 function switchView(mode) {
@@ -522,7 +526,7 @@ document.addEventListener("DOMContentLoaded", function() {
                                     <a href="${ap.editar_url}" class="btn btn-sm btn-primary rounded-3 px-3 d-inline-flex align-items-center gap-1" style="background: #0052ff; border:none;">
                                         <i class="bi bi-pencil-square"></i> Editar
                                     </a>
-                                    <button type="button" class="btn btn-sm btn-delete-apresentacao" data-id="${ap.id}" data-nome="${ap.nome}" style="background: #fff0f2; color: #e11d48; border: 1px solid #ffe4e6; flex: 0 0 auto;" title="Excluir Apresentação">
+                                    <button type="button" class="btn btn-sm btn-delete-apresentacao" data-id="${ap.id}" data-nome="${ap.nome}" onclick="excluirApresentacaoBtn(event, this)" style="background: #fff0f2; color: #e11d48; border: 1px solid #ffe4e6; flex: 0 0 auto;" title="Excluir Apresentação">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
@@ -569,32 +573,115 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // Lógica Excluir Pasta Real
-    document.body.addEventListener('click', async function(e) {
-        const btnDeleteProj = e.target.closest('.btn-delete-projeto-real');
-        if (btnDeleteProj) {
-            e.preventDefault();
-            e.stopPropagation();
-            const projId = btnDeleteProj.getAttribute('data-proj-id');
-            const projNome = btnDeleteProj.getAttribute('data-proj-nome');
-
-            if (confirm(`Atenção! Deseja realmente excluir a pasta "${projNome}" e TODAS as apresentações dentro dela?\n\nEsta ação é irreversível.`)) {
-                try {
-                    const response = await fetch(`/projetos/deletar/${projId}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' }
-                    });
-                    const res = await response.json();
-                    if (response.ok && res.status === 'sucesso') {
-                        window.location.reload();
-                    } else {
-                        alert(res.mensagem || "Erro ao deletar pasta.");
-                    }
-                } catch (err) {
-                    console.error(err);
-                    alert("Erro ao conectar ao servidor.");
-                }
+    // Funções Globais de Exclusão (com fallback e animação na tela)
+    if (!window.excluirProjetoBtn) {
+        window.excluirProjetoBtn = async function(event, btn) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
             }
+            const projId = btn.getAttribute("data-proj-id");
+            const projNome = btn.getAttribute("data-proj-nome") || "esta pasta";
+
+            if (!confirm(`Atenção! Deseja realmente excluir a pasta "${projNome}" e TODAS as apresentações dentro dela?\n\nEsta ação é irreversível e excluirá definitivamente do banco de dados.`)) {
+                return;
+            }
+
+            try {
+                btn.disabled = true;
+                btn.style.opacity = "0.5";
+                const response = await fetch(`/projetos/deletar/${projId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const res = await response.json();
+                if (response.ok && res.status === 'sucesso') {
+                    const card = btn.closest('.ap-card-item');
+                    if (card) {
+                        card.style.transition = "opacity 0.35s ease, transform 0.35s ease";
+                        card.style.opacity = "0";
+                        card.style.transform = "scale(0.85)";
+                        setTimeout(() => {
+                            card.remove();
+                            window.location.reload();
+                        }, 350);
+                    } else {
+                        window.location.reload();
+                    }
+                } else {
+                    alert(res.mensagem || "Erro ao deletar pasta.");
+                    btn.disabled = false;
+                    btn.style.opacity = "1";
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Erro ao conectar ao servidor para deletar pasta.");
+                btn.disabled = false;
+                btn.style.opacity = "1";
+            }
+        };
+    }
+
+    if (!window.excluirApresentacaoBtn) {
+        window.excluirApresentacaoBtn = async function(event, btn) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            const apId = btn.getAttribute("data-id");
+            const apNome = btn.getAttribute("data-nome") || "esta apresentação";
+
+            if (!confirm(`Atenção! Deseja realmente excluir a apresentação "${apNome}"?\n\nEsta ação é irreversível e apagará todos os seus slides do banco de dados.`)) {
+                return;
+            }
+
+            try {
+                btn.disabled = true;
+                btn.style.opacity = "0.5";
+                const response = await fetch(`/apresentacao/deletar/${apId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const res = await response.json();
+                if (response.ok && res.status === 'sucesso') {
+                    const item = btn.closest('.ap-card-item, .pasta-apresentacao-item, .apresentacao-row-item');
+                    if (item) {
+                        item.style.transition = "opacity 0.35s ease, transform 0.35s ease";
+                        item.style.opacity = "0";
+                        item.style.transform = "scale(0.85)";
+                        setTimeout(() => {
+                            item.remove();
+                            window.location.reload();
+                        }, 350);
+                    } else {
+                        window.location.reload();
+                    }
+                } else {
+                    alert(res.mensagem || "Erro ao deletar apresentação.");
+                    btn.disabled = false;
+                    btn.style.opacity = "1";
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Erro ao conectar ao servidor para deletar apresentação.");
+                btn.disabled = false;
+                btn.style.opacity = "1";
+            }
+        };
+    }
+
+    // Delegação de cliques para botões dinâmicos ou não capturados diretamente
+    document.body.addEventListener('click', function(e) {
+        const btnDeleteProj = e.target.closest('.btn-delete-projeto, .btn-delete-projeto-real');
+        if (btnDeleteProj) {
+            window.excluirProjetoBtn(e, btnDeleteProj);
+            return;
+        }
+
+        const btnDeleteAp = e.target.closest('.btn-delete-apresentacao');
+        if (btnDeleteAp) {
+            window.excluirApresentacaoBtn(e, btnDeleteAp);
+            return;
         }
 
         const btnEditProj = e.target.closest('.btn-editar-projeto');
@@ -614,32 +701,6 @@ document.addEventListener("DOMContentLoaded", function() {
             if (inputEditCorProjeto) inputEditCorProjeto.value = projCor || "#0052ff";
 
             if (modalEditarProjeto) modalEditarProjeto.classList.add('show');
-        }
-
-        const btnDeleteAp = e.target.closest('.btn-delete-apresentacao');
-        if (btnDeleteAp) {
-            e.preventDefault();
-            e.stopPropagation();
-            const apId = btnDeleteAp.getAttribute('data-id');
-            const apNome = btnDeleteAp.getAttribute('data-nome');
-
-            if (confirm(`Atenção! Deseja excluir a apresentação "${apNome}"?\n\nEsta ação não pode ser desfeita.`)) {
-                try {
-                    const response = await fetch(`/apresentacao/deletar/${apId}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' }
-                    });
-                    const res = await response.json();
-                    if (response.ok && res.status === 'sucesso') {
-                        window.location.reload();
-                    } else {
-                        alert(res.mensagem || "Erro ao deletar apresentação.");
-                    }
-                } catch (err) {
-                    console.error(err);
-                    alert("Erro ao conectar ao servidor.");
-                }
-            }
         }
     });
 

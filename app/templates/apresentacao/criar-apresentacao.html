@@ -11,8 +11,11 @@
 
     <header class="editor-header">
         <div class="editor-header-info">
-            <h1 class="editor-title" id="displayApresentacaoTitulo">Apresentação Executiva</h1>
-            <p class="editor-subtitle">Edite e organize os slides da sua apresentação institucional.</p>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <input type="text" id="displayApresentacaoTitulo" class="editor-title-input" value="{{ apresentacao.nome if apresentacao else 'Apresentação Executiva' }}" style="font-size: 1.45rem; font-weight: 700; color: #0f172a; border: 1.5px solid #e2e8f0; background: #fff; padding: 6px 12px; border-radius: 8px; min-width: 320px; max-width: 550px; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.03);" onfocus="this.style.borderColor='#0052ff'; this.style.boxShadow='0 0 0 3px rgba(0,82,255,0.12)';" onblur="this.style.borderColor='#e2e8f0'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.03)';" title="Clique para alterar o nome da apresentação">
+                <i class="bi bi-pencil-square" style="font-size: 1.15rem; color: #64748b; cursor: pointer;" onclick="document.getElementById('displayApresentacaoTitulo').focus()" title="Editar nome da apresentação"></i>
+            </div>
+            <p class="editor-subtitle" style="margin-top: 4px;">Edite e organize os slides da sua apresentação institucional.</p>
         </div>
 
         <div class="editor-header-actions">
@@ -434,12 +437,14 @@
         <div class="form-group" style="margin-bottom: 24px;">
             <label style="font-size:0.85rem; font-weight:600; color:#334155; margin-bottom:6px; display:block;">Salvar no Projeto (Pasta)</label>
             <select class="form-control" id="selectSaveProjeto" style="padding: 10px 14px;">
-                <option value="">Selecione um projeto...</option>
-                <option value="1">Saúde & Bem Estar</option>
-                <option value="2">Educação e Inovação</option>
-                <option value="3">Segurança Pública</option>
-                <option value="4">Obras e Infraestrutura</option>
-                <option value="5">Geral / Institucional</option>
+                <option value="">Selecione uma pasta...</option>
+                {% if projetos %}
+                    {% for proj in projetos %}
+                    <option value="{{ proj.id }}" {% if (apresentacao and apresentacao.projeto_id == proj.id) or (request.args.get('projeto_id')|int == proj.id) %}selected{% endif %}>{{ proj.nome }}</option>
+                    {% endfor %}
+                {% else %}
+                    <option value="1" selected>Projeto Geral</option>
+                {% endif %}
             </select>
             <small style="color: #64748b; font-size: 0.75rem; display:block; margin-top: 6px;">
                 A apresentação ficará disponível dentro da pasta deste projeto.
@@ -543,27 +548,35 @@ document.addEventListener("DOMContentLoaded", function() {
     const urlParams = new URLSearchParams(window.location.search);
     const initialTemplate = urlParams.get('template') || "capa";
 
-    let slides = [
-        {
-            id: 1,
-            template: initialTemplate,
-            titulo: initialTemplate === "capa" ? "Capa" : "Novo Slide",
-            subtitulo: initialTemplate === "capa" ? "Apresentação Executiva - Indicadores Municipais" : "Subtítulo do novo slide",
-            logos: ["barueri"],
-            customLogoImg: null,
-            ods: true,
-            odsNums: ["11"],
-            qr: false,
-            qrLink: "",
-            bgCapa: null,
-            imgTexto: null,
-            chartType: "line",
-            periodo: "Últimos 12 meses",
-            indicadores: []
-        }
-    ];
-    let activeSlideId = 1;
-    let slideCounter = 1;
+    let slides = {{ (slides_iniciais or [{
+        "id": 1,
+        "template": "capa",
+        "titulo": (apresentacao.nome if apresentacao else "Capa"),
+        "subtitulo": "Apresentação Executiva - Indicadores Municipais",
+        "logos": ["barueri"],
+        "customLogoImg": None,
+        "ods": true,
+        "odsNums": ["11"],
+        "qr": false,
+        "qrLink": "",
+        "bgCapa": None,
+        "imgTexto": None,
+        "chartType": "line",
+        "chartIndicador": 1,
+        "periodo": "Últimos 12 meses",
+        "indicadores": [],
+        "tamanhoTitulo": 4.0,
+        "tamanhoSubtitulo": 1.8,
+        "corTitulo": "#0f172a",
+        "corSubtitulo": "#64748b"
+    }]) | tojson }};
+
+    window.apresentacaoId = {{ apresentacao.id if apresentacao else 'null' }};
+    window.projetoId = {{ apresentacao.projeto_id if apresentacao and apresentacao.projeto_id else 'null' }};
+
+    let activeSlideId = (slides && slides.length > 0) ? slides[0].id : 1;
+    let slideCounter = (slides && slides.length > 0) ? slides.reduce((max, s) => Math.max(max, Number(s.id) || 0), 0) : 1;
+    if (slideCounter < 1) slideCounter = 1;
 
     let slideChartInstance = null;
 
@@ -1634,7 +1647,11 @@ document.addEventListener("DOMContentLoaded", function() {
             imgTexto: null,
             chartType: "line",
             periodo: "Últimos 12 meses",
-            indicadores: []
+            indicadores: [],
+            tamanhoTitulo: currentSlide.tamanhoTitulo || 4.0,
+            tamanhoSubtitulo: currentSlide.tamanhoSubtitulo || 1.8,
+            corTitulo: currentSlide.corTitulo || "#0f172a",
+            corSubtitulo: currentSlide.corSubtitulo || "#64748b"
         });
         activeSlideId = slideCounter;
         renderThumbnails();
@@ -1652,10 +1669,24 @@ document.addEventListener("DOMContentLoaded", function() {
     const inputSaveNome = document.getElementById("inputSaveNome");
     const selectSaveProjeto = document.getElementById("selectSaveProjeto");
 
+    // Sincronização entre o input do cabeçalho e o modal de salvar
+    const displayTituloInput = document.getElementById("displayApresentacaoTitulo");
+    if (displayTituloInput) {
+        displayTituloInput.addEventListener("input", (e) => {
+            if (inputSaveNome) inputSaveNome.value = e.target.value;
+        });
+    }
+
     btnSalvar.addEventListener("click", () => {
-        // Pre-fill default name based on first slide title if empty
-        if (slides.length > 0 && !inputSaveNome.value) {
+        // Preenche o nome padrão baseado no input do cabeçalho ou no primeiro slide
+        const currentTitle = displayTituloInput ? (displayTituloInput.value || displayTituloInput.innerText || "").trim() : "";
+        if (currentTitle) {
+            inputSaveNome.value = currentTitle;
+        } else if (slides.length > 0 && !inputSaveNome.value) {
             inputSaveNome.value = slides[0].titulo || "Nova Apresentação";
+        }
+        if (window.projetoId && selectSaveProjeto) {
+            selectSaveProjeto.value = window.projetoId;
         }
         saveModal.style.display = "flex";
     });
@@ -1668,17 +1699,69 @@ document.addEventListener("DOMContentLoaded", function() {
     if (btnCancelSave) btnCancelSave.addEventListener("click", fecharSaveModal);
 
     if (btnConfirmSave) {
-        btnConfirmSave.addEventListener("click", () => {
-            const nomeStr = inputSaveNome.value || "Apresentação sem título";
-            const projetoStr = selectSaveProjeto.options[selectSaveProjeto.selectedIndex].text;
-            console.log(`Salvando no projeto: ${projetoStr} | Nome: ${nomeStr} | Payload:`, slides);
+        btnConfirmSave.addEventListener("click", async () => {
+            const originalBtnHtml = btnConfirmSave.innerHTML;
+            btnConfirmSave.disabled = true;
+            btnConfirmSave.innerHTML = `<i class="bi bi-arrow-repeat spin"></i> <span>Salvando...</span>`;
 
-            fecharSaveModal();
+            const nomeStr = inputSaveNome.value.trim() || (slides[0]?.titulo || "Apresentação sem título");
+            const projetoIdVal = selectSaveProjeto.value ? parseInt(selectSaveProjeto.value) : window.projetoId;
 
-            saveToast.style.display = "flex";
-            setTimeout(() => {
-                saveToast.style.display = "none";
-            }, 3000);
+            const payload = {
+                apresentacao_id: window.apresentacaoId,
+                projeto_id: projetoIdVal,
+                titulo: nomeStr,
+                slides: slides
+            };
+
+            try {
+                const response = await fetch("{{ url_for('apresentacao.salvar_apresentacao') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.status === 'sucesso') {
+                    if (data.apresentacao_id) {
+                        window.apresentacaoId = data.apresentacao_id;
+                        window.projetoId = projetoIdVal;
+                        // Atualiza a URL no navegador sem recarregar a página
+                        if (!window.location.pathname.includes('/apresentacao/editar/')) {
+                            window.history.replaceState(null, '', `/apresentacao/editar/${data.apresentacao_id}`);
+                        }
+                    }
+
+                    // Atualiza o título exibido no header
+                    const displayTitulo = document.getElementById("displayApresentacaoTitulo");
+                    if (displayTitulo) {
+                        if ('value' in displayTitulo) displayTitulo.value = nomeStr;
+                        else displayTitulo.textContent = nomeStr;
+                    }
+
+                    fecharSaveModal();
+
+                    if (saveToast) {
+                        const msgSpan = saveToast.querySelector('span');
+                        if (msgSpan) msgSpan.textContent = data.mensagem || "Apresentação salva com sucesso no banco!";
+                        saveToast.style.display = "flex";
+                        setTimeout(() => {
+                            saveToast.style.display = "none";
+                        }, 3500);
+                    }
+                } else {
+                    alert("Erro ao salvar apresentação: " + (data.mensagem || "Falha no servidor."));
+                }
+            } catch (error) {
+                console.error("Erro na requisição ao salvar:", error);
+                alert("Erro de conexão ao salvar apresentação no banco de dados.");
+            } finally {
+                btnConfirmSave.disabled = false;
+                btnConfirmSave.innerHTML = originalBtnHtml;
+            }
         });
     }
 
