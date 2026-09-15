@@ -1,86 +1,38 @@
-{% extends "base.html" %}
-
 {% block title %}Nova Apresentação | Conecta Barueri{% endblock %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/apresentacao/nova_apresentacao.css') }}">
-{% endblock %}
-
 {% block content %}
-<div class="apresentacao-container">
 
-    <!-- CABEÇALHO COM NAVEGAÇÃO -->
-    <div class="page-header-ap">
-        <div class="page-title-wrap">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-2" style="font-size: 0.85rem;">
-                    <li class="breadcrumb-item"><a href="{{ url_for('apresentacao.apresentacao') }}" style="color: #64748b; text-decoration: none;">Apresentações</a></li>
-                    <li class="breadcrumb-item active" aria-current="page" style="color: #0052ff; font-weight: 600;">Nova Apresentação</li>
-                </ol>
-            </nav>
-            <h1>Criar Nova Apresentação</h1>
-            <p>Vincule sua apresentação a uma pasta institucional e configure os parâmetros iniciais.</p>
         </div>
-        <div class="page-actions">
-            <a href="{{ url_for('apresentacao.apresentacao') }}" class="btn btn-outline-secondary btn-cancelar">
-                <i class="bi bi-arrow-left"></i> Voltar
-            </a>
         </div>
     </div>
 
-    <!-- FORMULÁRIO CENTRALIZADO -->
-    <div class="form-nova-container">
-        <div class="form-card">
-            <div class="form-card-header">
-                <h2><i class="bi bi-file-earmark-plus text-primary"></i> Detalhes da Apresentação</h2>
-                <p>O primeiro slide (Capa Institucional) será gerado automaticamente com os dados informados.</p>
-            </div>
+                </div>
 
-            <form method="POST" action="{{ url_for('apresentacao.criar_apresentacao') }}">
                 {{ form.hidden_tag() }}
 
                 <!-- CAMPO: NOME DA APRESENTAÇÃO -->
                 <div class="mb-4">
-                    <label for="{{ form.nome.id }}" class="form-label">
-                        {{ form.nome.label.text }} <span class="text-danger">*</span>
                     </label>
-                    {{ form.nome(class="form-control" + (" is-invalid" if form.nome.errors else ""), placeholder="Ex: Relatório Quadrimestral de Metas da Saúde") }}
                     {% if form.nome.errors %}
-                        <div class="invalid-feedback-custom">
                             {% for error in form.nome.errors %}
-                                <div><i class="bi bi-exclamation-circle"></i> {{ error }}</div>
                             {% endfor %}
                         </div>
                     {% else %}
-                        <small class="text-muted d-block mt-1">Dê um título claro e descritivo para seu documento oficial.</small>
                     {% endif %}
                 </div>
 
-                <!-- CAMPO: PROJETO / PASTA -->
                 <div class="mb-4">
-                    <label for="{{ form.projeto_id.id }}" class="form-label">
-                        {{ form.projeto_id.label.text }} <span class="text-danger">*</span>
                     </label>
-                    {{ form.projeto_id(class="form-select" + (" is-invalid" if form.projeto_id.errors else "")) }}
                     {% if form.projeto_id.errors %}
-                        <div class="invalid-feedback-custom">
                             {% for error in form.projeto_id.errors %}
-                                <div><i class="bi bi-exclamation-circle"></i> {{ error }}</div>
                             {% endfor %}
                         </div>
                     {% else %}
-                        <small class="text-muted d-block mt-1">Pasta ou projeto institucional onde esta apresentação ficará salva.</small>
                     {% endif %}
                 </div>
 
-                <!-- AÇÕES DO FORMULÁRIO -->
-                <div class="d-flex justify-content-end align-items-center gap-3 mt-4 pt-3 border-top">
-                    <a href="{{ url_for('apresentacao.apresentacao') }}" class="btn btn-outline-secondary btn-cancelar">
                         Cancelar
                     </a>
-                    <button type="submit" class="btn-criar-submit">
-                        <i class="bi bi-magic"></i>
-                        {{ form.submit.label.text }}
                     </button>
                 </div>
             </form>

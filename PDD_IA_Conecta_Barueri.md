@@ -65,7 +65,7 @@ database:
   engine: "PostgreSQL"
   schemas:
     login: ["usuario", "senha"]
-    apresentacao: ["projeto", "apresentacao", "slide", "template", "campo_preenchido", "slot_flexivel"]
+    apresentacao: ["projeto", "apresentacao", "slide", "template", "campo_preenchido", "slot_flexivel", "ods", "apresentador"]
 ```
 
 ---
@@ -94,6 +94,9 @@ apresentacao.slide (id, apresentacao_id FK, ordem INT, template_id FK, alinhamen
      ├── apresentacao.template (id PK, nome, codigo, descricao) [Lookup estática referenciada por template_id]
      ├── apresentacao.campo_preenchido (id, slide_id FK, chave_campo, tipo_fonte, valor_manual, indicador_id FK, campo_origem_id FK)
      └── apresentacao.slot_flexivel (id, slide_id FK, tipo_elemento, posicao_matriz, config_json)
+
+apresentacao.ods (id PK, numero UNIQUE INT, titulo, descricao, icone_url, cor_hex) [Catálogo estático de apoio aos slots flexíveis]
+apresentacao.apresentador (id PK, criado_por_id FK opcional, nome, cargo, biografia, foto_url, topicos JSONB, midias_extras JSONB) [Catálogo institucional global de autoridades e palestrantes]
 ```
 
 ### 3.2. Regra das 3 Origens do `CampoPreenchido`
@@ -125,23 +128,19 @@ apresentacao.slide (id, apresentacao_id FK, ordem INT, template_id FK, alinhamen
 | **`template`** | `apresentacao` | `id` (PK), `nome`, `codigo` (UNIQUE VARCHAR 50), `descricao` | Tabela de referência/lookup estática (7 templates fixos: `capa`, `imagem_texto`, `indicadores`, `grafico`, `mapa`, `video`, `encerramento`). |
 | **`campo_preenchido`** | `apresentacao` | `id` (PK), `slide_id` (FK `slide.id`), `chave_campo`, `tipo_fonte`, `valor_manual`, `indicador_id`, `campo_origem_id` (FK auto-relacional) | Modelo EAV. Armazena os conteúdos específicos dos slots do template. Permite reuso de mídias do mesmo projeto via `campo_origem_id`. |
 | **`slot_flexivel`** | `apresentacao` | `id` (PK), `slide_id` (FK `slide.id`), `tipo_elemento`, `posicao_matriz`, `config_json` (JSONB) | Elementos sobrepostos (ODS, QR Code gerado em tempo real por URL, logos/bandeiras) ancorados na matriz 3×3. |
+| **`ods`** | `apresentacao` | `id` (PK), `numero` (UNIQUE INT 1-17), `titulo` (VARCHAR 150), `descricao` (TEXT), `icone_url` (VARCHAR 255), `cor_hex` (VARCHAR 10) | Catálogo oficial dos 17 Objetivos de Desenvolvimento Sustentável da ONU. Alimenta os badges dos slots flexíveis. Populada via seed. |
+| **`apresentador`** | `apresentacao` | `id` (PK), `criado_por_id` (FK opcional `usuario.id`), `nome`, `cargo`, `biografia`, `foto_url`, `topicos` (JSONB), `midias_extras` (JSONB) | Catálogo institucional COMPARTILHADO e GLOBAL de palestrantes, secretários e autoridades. `topicos` armazena lista de destaques (`[{"destaque": "+27 anos", "rotulo": "Na política"}]`). `midias_extras` armazena inovações (`[{"tipo": "Avatar", "titulo": "...", "url": "..."}]`). Visível globalmente para todos os usuários no template de Perfil/Bio. |
 
-### 3.5. Backlog de Dados e Pendências Futuras (Issue #29 & Pós-MVP)
+### 3.5. Backlog de Dados e Pendências Futuras (Issue #29 & Próximas Entregas)
 
-Os itens abaixo foram formalizados e mapeados, divididos entre MVP e extensões futuras:
+Os itens abaixo foram formalizados e mapeados, divididos entre a próxima entrega e extensões futuras:
 1. **Modelar tabela de Indicadores / Dados Tratados (`apresentacao.indicador`):**
    - *Estrutura planejada:* `id` (PK), `nome`, `valor`, `fonte`, `data_referencia`, `categoria_id`.
-   - *Status:* Base para alimentação dinâmica de slides (`campo_preenchido.indicador_id`).
-2. **Modelar tabela de Apresentadores (`apresentacao.apresentador`):**
-   - *Estrutura planejada:* `id` (PK), `nome`, `descricao`, `avatar_url`.
-   - *Status:* Pós-MVP (Template de Perfil/Bio fora do escopo inicial).
-3. **Modelar estrutura de Pontos do Mapa (`apresentacao.ponto_mapa`):**
+   - *Status:* Prioridade da próxima entrega (base para alimentação dinâmica de slides via `campo_preenchido.indicador_id`).
+2. **Modelar estrutura de Pontos do Mapa (`apresentacao.ponto_mapa`):**
    - *Estrutura planejada:* `id` (PK), `slide_id` (FK), `latitude`, `longitude`, `titulo`, `descricao`, `indicador_id` (FK opcional).
-   - *Status:* Para o template específico de mapa municipal (Leaflet.js).
-4. **Modelar ODS como tabela de catálogo (`apresentacao.ods_catalogo`):**
-   - *Estrutura planejada:* `id` (PK 1-17), `numero`, `nome`, `icone_url`, `cor_hex`.
-   - *Status:* Tabela estática de apoio para o componente de selos ODS dos slots flexíveis.
-5. **Colaboradores por Projeto (`apresentacao.projeto_colaborador`):**
+   - *Status:* Prioridade da próxima entrega (para o template específico de mapa municipal Leaflet.js).
+3. **Colaboradores por Projeto (`apresentacao.projeto_colaborador`):**
    - *Estrutura planejada:* Tabela associativa N:N com `papel` (`'editor'` ou `'visualizador'`).
    - *Status:* Pós-MVP (no MVP apenas o criador `usuario_id` gerencia seu projeto).
 
@@ -157,9 +156,12 @@ Os itens abaixo foram formalizados e mapeados, divididos entre MVP e extensões 
 | **`slide`** | `apresentacao` | 🟡 Em Alteração | **Adição de 4 colunas visuais:** `alinhamento_texto`, `cor_texto`, `filtro_fundo`, `estilo_fundo` (sem cabeçalho). | Backend deve incluir esses campos nos formulários e salvar nos endpoints. |
 | **`slot_flexivel`** | `apresentacao` | 🟢 Codificada em `models.py` | Suporte a ODS, QR Code e Logos sobrepostos na matriz 3×3 via JSONB. | Backend pode montar endpoints para ancorar elementos. |
 | **`campo_preenchido`** | `apresentacao` | 🟢 Codificada em `models.py` | Suporte a preenchimento manual e reuso de mídias no mesmo projeto. | Backend utilizará para salvar o conteúdo dos templates. |
+| **`ods`** | `apresentacao` | 🟢 Ativa e Semeada | Populada com os 17 selos da ONU, cores hex e URLs web oficiais em português. | Liberada para consumo em dropdowns/switches de slots flexíveis. |
+| **`apresentador`** | `apresentacao` | 🟢 Codificada em `models.py` | Catálogo global de autoridades com `topicos` e `midias_extras` em JSONB. | Liberada para rotas do catálogo de autoridades e template Perfil/Bio. |
 
-### 3.7. Próxima Tabela Prioritária de Dados (Sprint Imediata)
-* **`apresentacao.ods_catalogo` (Próximo Passo):** Tabela de catálogo estática com os 17 Objetivos de Desenvolvimento Sustentável da ONU (`id`, `numero`, `nome`, `icone_url`, `cor_hex`). Alimentará a seleção de selos ODS dos slots flexíveis sobrepostos.
+### 3.7. Próxima Entrega de Dados (Roadmap Imediato)
+* **`apresentacao.indicador`:** Tabela de dados tratados socioeconômicos e operacionais do município (`id`, `nome`, `valor`, `fonte`, `data_referencia`, `categoria_id`).
+* **`apresentacao.ponto_mapa`:** Marcadores de geolocalização com coordenadas e descrições para o Leaflet.js.
 
 ---
 

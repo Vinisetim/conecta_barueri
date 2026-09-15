@@ -442,19 +442,58 @@ Abaixo está o mapeamento detalhado das tabelas que compõem o banco de dados do
   * `posicao_matriz` (`VARCHAR(30) NOT NULL`): Posição de ancoragem na tela (`'top-left'`, `'top-center'`, `'top-right'`, `'mid-left'`, `'center'`, `'mid-right'`, `'bottom-left'`, `'bottom-center'`, `'bottom-right'`).
   * `config_json` (`JSONB NOT NULL`): Configurações específicas em formato chave-valor (ex: para QR Code: `{"url": "https://barueri.sp.gov.br"}`; para ODS: `{"selos": [1, 4, 11], "arranjo": "grade"}`).
 
+#### 9. `apresentacao.ods` (Catálogo Oficial dos 17 ODS da ONU)
+* **Objetivo:** Tabela de consulta estática (Lookup Table) contendo os 17 Objetivos de Desenvolvimento Sustentável da ONU para alimentar a seleção dinâmica de selos nos slots flexíveis sobrepostos.
+* **Colunas:**
+  * `id` (`SERIAL PRIMARY KEY`): Identificador do registro.
+  * `numero` (`INTEGER UNIQUE NOT NULL`): Número oficial do ODS (1 a 17).
+  * `titulo` (`VARCHAR(150) NOT NULL`): Nome oficial do objetivo (ex: *"Educação de Qualidade"*).
+  * `descricao` (`TEXT`): Texto explicativo da meta da ONU.
+  * `icone_url` (`VARCHAR(255)`): Caminho/URL da imagem ou badge oficial do selo (Wikimedia Commons CDN em bucket seguro `/250px-`).
+  * `cor_hex` (`VARCHAR(10)`): Código hexadecimal da cor institucional do selo (ex: `#E5243B` para ODS 1).
+* **Como usar:** Populada pelos desenvolvedores via script de seed idempotente (`seed.py`). Utilizada pelo frontend para exibir a galeria de badges selecionáveis no painel lateral do editor.
+
+#### 10. `apresentacao.apresentador` (Catálogo Institucional de Autoridades e Palestrantes - Perfil/Bio)
+* **Objetivo:** Catálogo compartilhado e institucional com secretários, autoridades municipais e palestrantes convidados, visível para todos os usuários do sistema no template de Perfil/Bio.
+* **Colunas:**
+  * `id` (`SERIAL PRIMARY KEY`): Identificador único do apresentador.
+  * `criado_por_id` (`INTEGER`, FK opcional para `login.usuario.id`): Usuário que cadastrou inicialmente a autoridade (para fins de rastreabilidade e auditoria). Por se tratar de um catálogo público/institucional de Barueri, o registro não é isolado por usuário e fica disponível para todos os servidores da prefeitura.
+  * `nome` (`VARCHAR(150) NOT NULL`): Nome da autoridade ou palestrante (ex: *"Jonatas Randal"*).
+  * `cargo` (`VARCHAR(255)`): Cargo ou função oficial (ex: *"Secretário de Inovação e Tecnologia"*).
+  * `biografia` (`TEXT`): Resumo biográfico ou trajetória institucional do apresentador.
+  * `foto_url` (`VARCHAR(255)`): Caminho ou URL da foto oficial em alta resolução.
+  * `topicos` (`JSONB DEFAULT '[]'`): Lista dinâmica de métricas e destaques de carreira estruturada em pares de valor/rótulo. Exemplo: `[{"destaque": "+27 anos", "rotulo": "Na política"}, {"destaque": "10k+", "rotulo": "Liderados"}]`.
+  * `midias_extras` (`JSONB DEFAULT '[]'`): Elementos visuais complementares como avatares 3D, vídeos ou badges. Exemplo: `[{"tipo": "Avatar", "titulo": "Avatar 3D", "url": "https://..."}]`.
+* **Como usar:**
+  * *No editor de slides:* Ao adicionar ou configurar um slide do template "Perfil/Bio", o usuário pode abrir um modal/dropdown do catálogo e selecionar um apresentador já cadastrado. Os dados são preenchidos automaticamente. Caso a autoridade ainda não exista, um formulário simples permite cadastrá-la no catálogo global, ficando disponível para futuros projetos de qualquer secretaria.
+  * *No Jinja2 (Renderização do Slide):* Os tópicos e mídias extras são iterados em listas limpas com Bootstrap:
+    ```html
+    <!-- Exemplo de iteração de tópicos em Perfil/Bio -->
+    <div class="row g-3 mt-3">
+      {% for topico in apresentador.topicos %}
+        <div class="col-6">
+          <div class="border rounded p-2 text-center bg-light">
+            <h4 class="fw-bold text-primary mb-0">{{ topico.destaque }}</h4>
+            <small class="text-muted">{{ topico.rotulo }}</small>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    ```
+
 ---
 
 ### 8.6. Backlog de Dados e Pendências Técnicas de Banco (Issue #29 & Roadmap)
 
-Mapeamento das funcionalidades de dados registradas na Issue #29 do repositório, classificadas entre o escopo imediato e evoluções pós-MVP:
+Mapeamento das funcionalidades de dados registradas na Issue #29 do repositório, alinhadas com as entregas de sprints acordadas:
 
 | Item do Banco | Objetivo e Estrutura Prevista | Status de Entrega |
 | :--- | :--- | :--- |
-| **Indicadores / Dados Tratados** | Tabela `apresentacao.indicador` (`id`, `nome`, `valor`, `fonte`, `data_referencia`, `categoria_id`). Alimenta dinamicamente os slides de dados via `campo_preenchido.indicador_id`. | ⏳ Aguardando integração de APIs municipais. |
-| **Apresentadores (Perfil/Bio)** | Tabela `apresentacao.apresentador` (`id`, `nome`, `descricao`, `avatar_url`). Catálogo de autoridades e palestrantes institucionais. | 🚫 Pós-MVP (Template Perfil/Bio despriorizado no MVP). |
-| **Pontos do Mapa Interativo** | Tabela `apresentacao.ponto_mapa` (`id`, `slide_id` FK, `latitude`, `longitude`, `titulo`, `descricao`, `indicador_id` FK). Alimenta os marcadores (pins) do Leaflet.js no template de mapa municipal. | ⏳ Previsto para o template bônus de mapa. |
-| **Catálogo Oficial dos 17 ODS** | Tabela `apresentacao.ods_catalogo` (`id` 1-17, `numero`, `nome`, `icone_url`, `cor_hex`). Tabela de consulta estática para seleção de badges da ONU. | ⏳ Em especificação (atualmente suprida pelo `config_json` do slot flexível). |
-| **Colaboradores de Projeto** | Tabela associativa `apresentacao.projeto_colaborador` (`projeto_id` FK, `usuario_id` FK, `papel`: `'editor'` ou `'visualizador'`). | 🚫 Pós-MVP (no MVP apenas o criador `usuario_id` acessa seu projeto). |
+| **ODS da ONU (`apresentacao.ods`)** | Catálogo oficial dos 17 Objetivos da ONU com cores e ícones CDN. | ✅ **Concluído e Semeado** (Script `seed.py` rodado no Supabase). |
+| **Apresentadores (`apresentacao.apresentador`)** | Catálogo global compartilhado de autoridades com `topicos` e `midias_extras` em JSONB. | ✅ **Concluído e Modelado** (Codificado em `models.py`). |
+| **Indicadores / Dados Tratados** | Tabela `apresentacao.indicador` (`id`, `nome`, `valor`, `fonte`, `data_referencia`, `categoria_id`). Alimenta dinamicamente os slides de dados via `campo_preenchido.indicador_id`. | ⏳ **Próxima Entrega de Dados** (Postergado por alinhamento de escopo). |
+| **Pontos do Mapa Interativo** | Tabela `apresentacao.ponto_mapa` (`id`, `slide_id` FK, `latitude`, `longitude`, `titulo`, `descricao`, `indicador_id` FK). Marcadores do Leaflet.js. | ⏳ **Próxima Entrega de Dados** (Postergado junto aos Indicadores). |
+| **Colaboradores de Projeto** | Tabela associativa `apresentacao.projeto_colaborador` (`projeto_id` FK, `usuario_id` FK, `papel`: `'editor'` ou `'visualizador'`). | 🚫 **Pós-MVP** (No MVP, apenas o criador `usuario_id` acessa seu projeto). |
 
 ---
 
@@ -472,9 +511,11 @@ Para orientar a equipe de desenvolvimento (backend e frontend) sobre o que já e
 | **`slide`** | `apresentacao` | 🟡 Em Alteração | **Adição de 4 colunas visuais:** `alinhamento_texto`, `cor_texto`, `filtro_fundo`, `estilo_fundo` (sem cabeçalho). | Backend deve incluir esses campos nos formulários e salvar nos endpoints. |
 | **`slot_flexivel`** | `apresentacao` | 🟢 Codificada em `models.py` | Suporte a ODS, QR Code e Logos sobrepostos na matriz 3×3 via JSONB. | Backend pode montar endpoints para ancorar elementos. |
 | **`campo_preenchido`** | `apresentacao` | 🟢 Codificada em `models.py` | Suporte a preenchimento manual e reuso de mídias no mesmo projeto. | Backend utilizará para salvar o conteúdo dos templates. |
+| **`ods`** | `apresentacao` | 🟢 Ativa e Semeada | Populada via seed com os 17 selos da ONU, cores hex e URLs web oficiais. | Liberada para consumo em dropdowns/switches de slots flexíveis. |
+| **`apresentador`** | `apresentacao` | 🟢 Codificada em `models.py` | Catálogo global de autoridades com `topicos` e `midias_extras` em JSONB. | Liberada para rotas do catálogo de autoridades e template Perfil/Bio. |
 
 ### 8.8. Próximo Passo Prioritário de Dados
-* **Modelagem da Tabela de ODS (`apresentacao.ods_catalogo`):** Estruturação dos 17 Objetivos de Desenvolvimento Sustentável da ONU com ícones oficiais e códigos de cor para alimentar a seleção dinâmica nos slots flexíveis dos slides.
+* **Próxima Entrega:** Modelagem e implementação das tabelas de **Indicadores (`apresentacao.indicador`)** e **Pontos do Mapa (`apresentacao.ponto_mapa`)**, responsáveis por alimentar dinamicamente os slides de dados socioeconômicos e o mapa interativo Leaflet.js de Barueri.
 
 ---
 
