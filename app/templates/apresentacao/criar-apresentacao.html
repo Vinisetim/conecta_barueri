@@ -289,6 +289,41 @@
                     </select>
                 </div>
 
+                <!-- Estilos de Texto -->
+                <div class="config-slots-section mt-3">
+                    <div class="slots-header" data-bs-toggle="collapse" data-bs-target="#collapseTexto" role="button" aria-expanded="false" aria-controls="collapseTexto" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                        <h4>Estilos de Texto</h4>
+                        <i class="bi bi-chevron-down" style="font-size: 0.9rem; color: #64748b;"></i>
+                    </div>
+                    <div class="collapse" id="collapseTexto">
+                        <div style="padding-top: 8px;">
+                            <label style="font-size: 0.85rem; font-weight: 600;">Tamanho do Texto</label>
+                            <div style="display:flex; gap: 8px; align-items: center; margin-bottom: 12px;">
+                                <div style="flex:1;">
+                                    <label style="font-size: 0.75rem;">Título (<span id="lblRangeTitulo">4.0</span>x)</label>
+                                    <input type="range" class="form-range" id="inputRangeTitulo" min="1.0" max="10.0" step="0.2" value="4.0">
+                                </div>
+                                <div style="flex:1;">
+                                    <label style="font-size: 0.75rem;">Subtítulo (<span id="lblRangeSubtitulo">1.8</span>x)</label>
+                                    <input type="range" class="form-range" id="inputRangeSubtitulo" min="0.5" max="6.0" step="0.2" value="1.8">
+                                </div>
+                            </div>
+
+                            <label style="font-size: 0.85rem; font-weight: 600;">Cor do Texto</label>
+                            <div style="display:flex; gap: 12px; align-items: center; margin-bottom: 12px;">
+                                <div>
+                                    <label style="font-size: 0.75rem; display:block;">Título</label>
+                                    <input type="color" id="inputCorTitulo" value="#0f172a" style="width:36px; height:36px; padding:0; border:1px solid #cbd5e1; border-radius:4px; cursor:pointer;">
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.75rem; display:block;">Subtítulo</label>
+                                    <input type="color" id="inputCorSubtitulo" value="#64748b" style="width:36px; height:36px; padding:0; border:1px solid #cbd5e1; border-radius:4px; cursor:pointer;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="config-slots-section mt-3">
                     <div class="slots-header" data-bs-toggle="collapse" data-bs-target="#collapseLogos" role="button" aria-expanded="false" aria-controls="collapseLogos" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
                         <h4>Logos no Slide</h4>
@@ -687,16 +722,21 @@ document.addEventListener("DOMContentLoaded", function() {
 
         if (tpl === 'capa') {
             const hasBg = !!slide.bgCapa;
-            const textColor = hasBg ? '#ffffff' : '#0f172a';
-            const subColor = hasBg ? 'rgba(255,255,255,0.85)' : '#64748b';
+            const defaultTextColor = hasBg ? '#ffffff' : '#0f172a';
+            const defaultSubColor = hasBg ? 'rgba(255,255,255,0.85)' : '#64748b';
+            const textColor = slide.corTitulo || defaultTextColor;
+            const subColor = slide.corSubtitulo || defaultSubColor;
+            const titleSize = slide.tamanhoTitulo ? (slide.tamanhoTitulo * 1.5) + 'px' : '7px';
+            const subSize = slide.tamanhoSubtitulo ? (slide.tamanhoSubtitulo * 1.5) + 'px' : '4.5px';
+
             const logoHtml = buildLogosHtml(slide, true);
             return `
                 <div style="width:100%; height:100%; position:relative; padding: 4px 6px; display:flex; flex-direction:column; justify-content:space-between; ${hasBg ? `background: url(${slide.bgCapa}) center/cover no-repeat;` : 'background:#ffffff;'} box-sizing: border-box; overflow:hidden;">
                     ${hasBg ? '<div style="position:absolute; inset:0; background:rgba(0,0,0,0.35); z-index:0;"></div>' : ''}
                     ${logoHtml}
                     <div style="position:relative; z-index:1; margin-bottom:2px;">
-                        <div style="font-size:7px; font-weight:800; color:${textColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.1;">${title || 'Capa'}</div>
-                        <div style="font-size:4.5px; color:${subColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.1;">${subtitle || 'Apresentação Executiva'}</div>
+                        <div style="font-size:${titleSize}; font-weight:800; color:${textColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.1;">${title || 'Capa'}</div>
+                        <div style="font-size:${subSize}; color:${subColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.1;">${subtitle || 'Apresentação Executiva'}</div>
                     </div>
                     ${odsBadge}
                     ${qrBadge}
@@ -706,6 +746,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
         if (tpl === 'imagem_texto') {
             const imgSrc = slide.imgTexto || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb';
+            const textColor = slide.corTitulo || '#0f172a';
+            const subColor = slide.corSubtitulo || '#64748b';
+            const titleSize = slide.tamanhoTitulo ? (slide.tamanhoTitulo * 1.5) + 'px' : '6px';
+            const subSize = slide.tamanhoSubtitulo ? (slide.tamanhoSubtitulo * 1.5) + 'px' : '4.5px';
+
             const logoHtml = buildLogosHtml(slide, true);
             return `
                 <div style="width:100%; height:100%; position:relative; padding:3px; display:flex; flex-direction:column; background:#ffffff; box-sizing:border-box; overflow:hidden;">
@@ -716,8 +761,8 @@ document.addEventListener("DOMContentLoaded", function() {
                         </div>
                         <div style="flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; gap:2px;">
                             <div style="font-size:3.5px; font-weight:700; color:#64748b; text-transform:uppercase; line-height:1;">TÍTULO</div>
-                            <div style="font-size:6px; font-weight:800; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1;">${title || 'Título'}</div>
-                            <div style="font-size:4.5px; color:#64748b; line-height:1.1; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${subtitle || 'Texto de apoio'}</div>
+                            <div style="font-size:${titleSize}; font-weight:800; color:${textColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1;">${title || 'Título'}</div>
+                            <div style="font-size:${subSize}; color:${subColor}; line-height:1.1; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${subtitle || 'Texto de apoio'}</div>
                         </div>
                     </div>
                     ${odsBadge}
@@ -735,6 +780,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 </div>
             `).join("");
 
+            const textColor = slide.corTitulo || '#0f172a';
+            const titleSize = slide.tamanhoTitulo ? (slide.tamanhoTitulo * 1.5) + 'px' : '5.5px';
+
             const logoHtml = buildLogosHtml(slide, true);
 
             return `
@@ -742,7 +790,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     ${logoHtml}
                     <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
                         <div style="text-align:center; margin-bottom:2px;">
-                            <div style="font-size:5.5px; font-weight:800; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1;">${title || 'Indicadores'}</div>
+                            <div style="font-size:${titleSize}; font-weight:800; color:${textColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1;">${title || 'Indicadores'}</div>
                         </div>
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:2px;">
                             ${indHtml}
@@ -780,12 +828,15 @@ document.addEventListener("DOMContentLoaded", function() {
                     </svg>`;
             }
 
+            const textColor = slide.corTitulo || '#0f172a';
+            const titleSize = slide.tamanhoTitulo ? (slide.tamanhoTitulo * 1.5) + 'px' : '5.5px';
+
             const logoHtml = buildLogosHtml(slide, true);
 
             return `
                 <div style="width:100%; height:100%; position:relative; padding:3px 4px; display:flex; flex-direction:column; background:#ffffff; box-sizing:border-box; overflow:hidden;">
                     ${logoHtml}
-                    <div style="font-size:5.5px; font-weight:800; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; line-height:1;">${title || 'Gráfico'}</div>
+                    <div style="font-size:${titleSize}; font-weight:800; color:${textColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; line-height:1;">${title || 'Gráfico'}</div>
                     <div style="flex:1; margin-top:2px; background:#f8fafc; border:0.5px solid #e2e8f0; border-radius:2px; display:flex; flex-direction:column; padding:2px;">
                         <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
                             <span style="font-size:3px; font-weight:700; color:#1e293b;">Total</span>
@@ -864,6 +915,25 @@ document.addEventListener("DOMContentLoaded", function() {
         selectTemplate.value = slide.template;
         inputTitulo.value = slide.titulo;
         inputSubtitulo.value = slide.subtitulo;
+
+        // Sync text styles
+        const inputCorTitulo = document.getElementById("inputCorTitulo");
+        const inputCorSubtitulo = document.getElementById("inputCorSubtitulo");
+        const inputRangeTitulo = document.getElementById("inputRangeTitulo");
+        const lblRangeTitulo = document.getElementById("lblRangeTitulo");
+        const inputRangeSubtitulo = document.getElementById("inputRangeSubtitulo");
+        const lblRangeSubtitulo = document.getElementById("lblRangeSubtitulo");
+
+        if(inputCorTitulo) inputCorTitulo.value = slide.corTitulo || "#0f172a";
+        if(inputCorSubtitulo) inputCorSubtitulo.value = slide.corSubtitulo || "#64748b";
+        if(inputRangeTitulo) {
+            inputRangeTitulo.value = slide.tamanhoTitulo || 4.0;
+            if(lblRangeTitulo) lblRangeTitulo.textContent = parseFloat(inputRangeTitulo.value).toFixed(1);
+        }
+        if(inputRangeSubtitulo) {
+            inputRangeSubtitulo.value = slide.tamanhoSubtitulo || 1.8;
+            if(lblRangeSubtitulo) lblRangeSubtitulo.textContent = parseFloat(inputRangeSubtitulo.value).toFixed(1);
+        }
 
         const currentLogos = slide.logos || ["barueri"];
         chkLogoItems.forEach(chk => {
@@ -1011,8 +1081,16 @@ document.addEventListener("DOMContentLoaded", function() {
     function updatePreviewTexts() {
         const slide = slides.find(s => s.id === activeSlideId);
         if (!slide) return;
-        document.querySelectorAll(".preview-titulo").forEach(el => el.textContent = slide.titulo || "Título");
-        document.querySelectorAll(".preview-subtitulo").forEach(el => el.textContent = slide.subtitulo || "Subtítulo");
+        document.querySelectorAll(".preview-titulo").forEach(el => {
+            el.textContent = slide.titulo || "Título";
+            if (slide.corTitulo) el.style.setProperty('color', slide.corTitulo, 'important');
+            if (slide.tamanhoTitulo) el.style.setProperty('font-size', `${slide.tamanhoTitulo}cqw`, 'important');
+        });
+        document.querySelectorAll(".preview-subtitulo").forEach(el => {
+            el.textContent = slide.subtitulo || "Subtítulo";
+            if (slide.corSubtitulo) el.style.setProperty('color', slide.corSubtitulo, 'important');
+            if (slide.tamanhoSubtitulo) el.style.setProperty('font-size', `${slide.tamanhoSubtitulo}cqw`, 'important');
+        });
     }
 
     function updateSlotsVisibility() {
@@ -1286,6 +1364,42 @@ document.addEventListener("DOMContentLoaded", function() {
         updatePreviewTexts();
         updateActiveThumbnail();
     });
+
+    const inputRangeTitulo = document.getElementById("inputRangeTitulo");
+    const lblRangeTitulo = document.getElementById("lblRangeTitulo");
+    const inputRangeSubtitulo = document.getElementById("inputRangeSubtitulo");
+    const lblRangeSubtitulo = document.getElementById("lblRangeSubtitulo");
+    const inputCorTitulo = document.getElementById("inputCorTitulo");
+    const inputCorSubtitulo = document.getElementById("inputCorSubtitulo");
+
+    if (inputRangeTitulo) {
+        inputRangeTitulo.addEventListener("input", (e) => {
+            const val = parseFloat(e.target.value).toFixed(1);
+            if (lblRangeTitulo) lblRangeTitulo.textContent = val;
+            const slide = slides.find(s => s.id === activeSlideId);
+            if (slide) { slide.tamanhoTitulo = val; updatePreviewTexts(); updateActiveThumbnail(); }
+        });
+    }
+    if (inputRangeSubtitulo) {
+        inputRangeSubtitulo.addEventListener("input", (e) => {
+            const val = parseFloat(e.target.value).toFixed(1);
+            if (lblRangeSubtitulo) lblRangeSubtitulo.textContent = val;
+            const slide = slides.find(s => s.id === activeSlideId);
+            if (slide) { slide.tamanhoSubtitulo = val; updatePreviewTexts(); updateActiveThumbnail(); }
+        });
+    }
+    if (inputCorTitulo) {
+        inputCorTitulo.addEventListener("input", (e) => {
+            const slide = slides.find(s => s.id === activeSlideId);
+            if (slide) { slide.corTitulo = e.target.value; updatePreviewTexts(); updateActiveThumbnail(); }
+        });
+    }
+    if (inputCorSubtitulo) {
+        inputCorSubtitulo.addEventListener("input", (e) => {
+            const slide = slides.find(s => s.id === activeSlideId);
+            if (slide) { slide.corSubtitulo = e.target.value; updatePreviewTexts(); updateActiveThumbnail(); }
+        });
+    }
 
     selectTemplate.addEventListener("change", (e) => {
         const slide = slides.find(s => s.id === activeSlideId);
