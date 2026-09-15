@@ -222,13 +222,29 @@
                     <textarea id="inputSubtitulo" class="form-control-ap" rows="3">Apresentação Executiva - Indicadores Municipais</textarea>
                 </div>
 
-                <!-- Capa específicos -->
-                <div class="form-group-ap tpl-capa">
-                    <label>Imagem do background</label>
-                    <div class="media-upload-preview">
-                        <div class="media-thumb-box"><img id="bgCapaThumbPreview" src="https://images.unsplash.com/photo-1506744038136-46273834b3fb" alt="BG"></div>
-                        <button type="button" class="btn-media-action" id="btnUploadBgCapa"><i class="bi bi-image"></i></button>
-                        <input type="file" id="inputUploadBgCapa" accept="image/*" style="display: none;">
+                <!-- Fundo do Slide -->
+                <div class="config-slots-section mt-3">
+                    <div class="slots-header" data-bs-toggle="collapse" data-bs-target="#collapseFundo" role="button" aria-expanded="false" aria-controls="collapseFundo" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                        <h4>Fundo do Slide</h4>
+                        <i class="bi bi-chevron-down" style="font-size: 0.9rem; color: #64748b;"></i>
+                    </div>
+                    <div class="collapse" id="collapseFundo">
+                        <div style="padding-top: 8px;">
+                            <label style="font-size: 0.85rem; font-weight: 600;">Cor de Fundo</label>
+                            <div style="display:flex; align-items: center; margin-bottom: 12px; gap:8px;">
+                                <div style="position:relative; width:38px; height:38px; border-radius:50%; overflow:hidden; border:2px solid #e2e8f0; box-shadow:0 2px 4px rgba(0,0,0,0.05); cursor:pointer;">
+                                    <input type="color" id="inputCorFundo" value="#ffffff" style="position:absolute; top:-10px; left:-10px; width:60px; height:60px; padding:0; border:none; cursor:pointer;">
+                                </div>
+                            </div>
+
+                            <label style="font-size: 0.85rem; font-weight: 600;">Imagem de Fundo</label>
+                            <div class="media-upload-preview" style="margin-top: 4px;">
+                                <div class="media-thumb-box"><img id="bgGeralThumbPreview" src="" alt="BG" style="display:none;"></div>
+                                <button type="button" class="btn-media-action" id="btnUploadBgGeral" style="flex:1;">Upload Imagem</button>
+                                <button type="button" class="btn-media-action" id="btnRemoveBgGeral" style="background:#fee2e2; color:#ef4444; border:1px solid #f87171; display:none;"><i class="bi bi-trash"></i></button>
+                                <input type="file" id="inputUploadBgGeral" accept="image/*" style="display: none;">
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -644,11 +660,9 @@ document.addEventListener("DOMContentLoaded", function() {
         const logos = slide.logos || ["barueri"];
         if (logos.length === 0) return "";
 
-        const hasBg = isMini ? !!slide.bgCapa : false; // For main canvas, css classes handle color usually, but we will force white on capa if it has bg.
-        const tpl = slide.template || 'capa';
-        const isCapaMainBg = (!isMini && tpl === 'capa' && !!slide.bgCapa);
-        const textColor = (hasBg || isCapaMainBg) ? '#ffffff' : '#0f172a';
-        const barueriColor = (hasBg || isCapaMainBg) ? '#ffffff' : '#0284c7';
+        const hasBg = !!slide.bgGeral; // For main canvas, css classes handle color usually, but we will force white if it has bg.
+        const textColor = hasBg ? '#ffffff' : '#0f172a';
+        const barueriColor = hasBg ? '#ffffff' : '#0284c7';
 
         // Base scales
         const scale = isMini ? 1 : 2; // mini uses fixed px, main uses cqw (approximated here)
@@ -742,11 +756,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 ${(slide.qrLink && slide.qrLink.trim() !== '') ? `<img src="https://api.qrserver.com/v1/create-qr-code/?size=50x50&data=${encodeURIComponent(slide.qrLink)}" style="width:100%; height:100%; object-fit:contain;">` : `<i class="bi bi-qr-code" style="font-size: 6px;"></i>`}
             </div>` : '';
 
+        const globalBgStyle = slide.bgGeral ? `background: url(${slide.bgGeral}) center/cover no-repeat;` : `background: ${slide.corFundo || '#ffffff'};`;
+        const hasBgImg = !!slide.bgGeral;
 
         if (tpl === 'capa') {
-            const hasBg = !!slide.bgCapa;
-            const defaultTextColor = hasBg ? '#ffffff' : '#0f172a';
-            const defaultSubColor = hasBg ? 'rgba(255,255,255,0.85)' : '#64748b';
+            const defaultTextColor = hasBgImg ? '#ffffff' : '#0f172a';
+            const defaultSubColor = hasBgImg ? 'rgba(255,255,255,0.85)' : '#64748b';
             const textColor = slide.corTitulo || defaultTextColor;
             const subColor = slide.corSubtitulo || defaultSubColor;
             const titleSize = slide.tamanhoTitulo ? (slide.tamanhoTitulo * 1.5) + 'px' : '7px';
@@ -754,8 +769,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
             const logoHtml = buildLogosHtml(slide, true);
             return `
-                <div style="width:100%; height:100%; position:relative; padding: 4px 6px; display:flex; flex-direction:column; justify-content:space-between; ${hasBg ? `background: url(${slide.bgCapa}) center/cover no-repeat;` : 'background:#ffffff;'} box-sizing: border-box; overflow:hidden;">
-                    ${hasBg ? '<div style="position:absolute; inset:0; background:rgba(0,0,0,0.35); z-index:0;"></div>' : ''}
+                <div style="width:100%; height:100%; position:relative; padding: 4px 6px; display:flex; flex-direction:column; justify-content:space-between; ${globalBgStyle} box-sizing: border-box; overflow:hidden;">
+                    ${hasBgImg ? '<div style="position:absolute; inset:0; background:rgba(0,0,0,0.35); z-index:0;"></div>' : ''}
                     ${logoHtml}
                     <div style="position:relative; z-index:1; margin-bottom:2px;">
                         <div style="font-size:${titleSize}; font-weight:800; color:${textColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.1;">${title || 'Capa'}</div>
@@ -769,23 +784,28 @@ document.addEventListener("DOMContentLoaded", function() {
 
         if (tpl === 'imagem_texto') {
             const imgSrc = slide.imgTexto || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb';
-            const textColor = slide.corTitulo || '#0f172a';
-            const subColor = slide.corSubtitulo || '#64748b';
+            const defaultTextColor = hasBgImg ? '#ffffff' : '#0f172a';
+            const defaultSubColor = hasBgImg ? 'rgba(255,255,255,0.85)' : '#64748b';
+            const textColor = slide.corTitulo || defaultTextColor;
+            const subColor = slide.corSubtitulo || defaultSubColor;
             const titleSize = slide.tamanhoTitulo ? (slide.tamanhoTitulo * 1.5) + 'px' : '6px';
             const subSize = slide.tamanhoSubtitulo ? (slide.tamanhoSubtitulo * 1.5) + 'px' : '4.5px';
 
             const logoHtml = buildLogosHtml(slide, true);
             return `
-                <div style="width:100%; height:100%; position:relative; padding:3px; display:flex; flex-direction:column; background:#ffffff; box-sizing:border-box; overflow:hidden;">
-                    ${logoHtml}
-                    <div style="display:flex; flex:1; gap:4px; align-items:center; min-height:0;">
-                        <div style="width:45%; height:100%; border-radius:2px; overflow:hidden; flex-shrink:0; background:#f1f5f9; position:relative;">
-                            <img src="${imgSrc}" style="width:100%; height:100%; object-fit:cover; display:block;">
-                        </div>
-                        <div style="flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; gap:2px;">
-                            <div style="font-size:3.5px; font-weight:700; color:#64748b; text-transform:uppercase; line-height:1;">TÍTULO</div>
-                            <div style="font-size:${titleSize}; font-weight:800; color:${textColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1;">${title || 'Título'}</div>
-                            <div style="font-size:${subSize}; color:${subColor}; line-height:1.1; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${subtitle || 'Texto de apoio'}</div>
+                <div style="width:100%; height:100%; position:relative; padding:3px; display:flex; flex-direction:column; ${globalBgStyle} box-sizing:border-box; overflow:hidden;">
+                    ${hasBgImg ? '<div style="position:absolute; inset:0; background:rgba(255,255,255,0.7); z-index:0;"></div>' : ''}
+                    <div style="position:relative; z-index:1; display:flex; flex-direction:column; height:100%;">
+                        ${logoHtml}
+                        <div style="display:flex; flex:1; gap:4px; align-items:center; min-height:0;">
+                            <div style="width:45%; height:100%; border-radius:2px; overflow:hidden; flex-shrink:0; background:#f1f5f9; position:relative;">
+                                <img src="${imgSrc}" style="width:100%; height:100%; object-fit:cover; display:block;">
+                            </div>
+                            <div style="flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; gap:2px;">
+                                <div style="font-size:3.5px; font-weight:700; color:#64748b; text-transform:uppercase; line-height:1;">TÍTULO</div>
+                                <div style="font-size:${titleSize}; font-weight:800; color:${textColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1;">${title || 'Título'}</div>
+                                <div style="font-size:${subSize}; color:${subColor}; line-height:1.1; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${subtitle || 'Texto de apoio'}</div>
+                            </div>
                         </div>
                     </div>
                     ${odsBadge}
@@ -803,20 +823,24 @@ document.addEventListener("DOMContentLoaded", function() {
                 </div>
             `).join("");
 
-            const textColor = slide.corTitulo || '#0f172a';
+            const defaultTextColor = hasBgImg ? '#ffffff' : '#0f172a';
+            const textColor = slide.corTitulo || defaultTextColor;
             const titleSize = slide.tamanhoTitulo ? (slide.tamanhoTitulo * 1.5) + 'px' : '5.5px';
 
             const logoHtml = buildLogosHtml(slide, true);
 
             return `
-                <div style="width:100%; height:100%; position:relative; padding:3px 4px; display:flex; flex-direction:column; background:#ffffff; box-sizing:border-box; overflow:hidden;">
-                    ${logoHtml}
-                    <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
-                        <div style="text-align:center; margin-bottom:2px;">
-                            <div style="font-size:${titleSize}; font-weight:800; color:${textColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1;">${title || 'Indicadores'}</div>
-                        </div>
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:2px;">
-                            ${indHtml}
+                <div style="width:100%; height:100%; position:relative; padding:3px 4px; display:flex; flex-direction:column; ${globalBgStyle} box-sizing:border-box; overflow:hidden;">
+                    ${hasBgImg ? '<div style="position:absolute; inset:0; background:rgba(255,255,255,0.6); z-index:0;"></div>' : ''}
+                    <div style="position:relative; z-index:1; display:flex; flex-direction:column; height:100%;">
+                        ${logoHtml}
+                        <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                            <div style="text-align:center; margin-bottom:2px;">
+                                <div style="font-size:${titleSize}; font-weight:800; color:${textColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1;">${title || 'Indicadores'}</div>
+                            </div>
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:2px;">
+                                ${indHtml}
+                            </div>
                         </div>
                     </div>
                     ${odsBadge}
@@ -851,22 +875,26 @@ document.addEventListener("DOMContentLoaded", function() {
                     </svg>`;
             }
 
-            const textColor = slide.corTitulo || '#0f172a';
+            const defaultTextColor = hasBgImg ? '#ffffff' : '#0f172a';
+            const textColor = slide.corTitulo || defaultTextColor;
             const titleSize = slide.tamanhoTitulo ? (slide.tamanhoTitulo * 1.5) + 'px' : '5.5px';
 
             const logoHtml = buildLogosHtml(slide, true);
 
             return `
-                <div style="width:100%; height:100%; position:relative; padding:3px 4px; display:flex; flex-direction:column; background:#ffffff; box-sizing:border-box; overflow:hidden;">
-                    ${logoHtml}
-                    <div style="font-size:${titleSize}; font-weight:800; color:${textColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; line-height:1;">${title || 'Gráfico'}</div>
-                    <div style="flex:1; margin-top:2px; background:#f8fafc; border:0.5px solid #e2e8f0; border-radius:2px; display:flex; flex-direction:column; padding:2px;">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
-                            <span style="font-size:3px; font-weight:700; color:#1e293b;">Total</span>
-                            <span style="font-size:2.5px; background:#e2e8f0; color:#475569; padding:0.5px 1.5px; border-radius:1px;">${slide.periodo || '12 meses'}</span>
-                        </div>
-                        <div style="flex:1; display:flex; align-items:flex-end; justify-content:center;">
-                            ${chartSvg}
+                <div style="width:100%; height:100%; position:relative; padding:3px 4px; display:flex; flex-direction:column; ${globalBgStyle} box-sizing:border-box; overflow:hidden;">
+                    ${hasBgImg ? '<div style="position:absolute; inset:0; background:rgba(255,255,255,0.6); z-index:0;"></div>' : ''}
+                    <div style="position:relative; z-index:1; display:flex; flex-direction:column; height:100%;">
+                        ${logoHtml}
+                        <div style="font-size:${titleSize}; font-weight:800; color:${textColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; line-height:1;">${title || 'Gráfico'}</div>
+                        <div style="flex:1; margin-top:2px; background:#f8fafc; border:0.5px solid #e2e8f0; border-radius:2px; display:flex; flex-direction:column; padding:2px;">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
+                                <span style="font-size:3px; font-weight:700; color:#1e293b;">Total</span>
+                                <span style="font-size:2.5px; background:#e2e8f0; color:#475569; padding:0.5px 1.5px; border-radius:1px;">${slide.periodo || '12 meses'}</span>
+                            </div>
+                            <div style="flex:1; display:flex; align-items:flex-end; justify-content:center;">
+                                ${chartSvg}
+                            </div>
                         </div>
                     </div>
                     ${odsBadge}
@@ -940,22 +968,20 @@ document.addEventListener("DOMContentLoaded", function() {
         inputSubtitulo.value = slide.subtitulo;
 
         // Sync text styles
+        const inputCorFundo = document.getElementById("inputCorFundo");
         const inputCorTitulo = document.getElementById("inputCorTitulo");
         const inputCorSubtitulo = document.getElementById("inputCorSubtitulo");
         const inputRangeTitulo = document.getElementById("inputRangeTitulo");
-        const lblRangeTitulo = document.getElementById("lblRangeTitulo");
         const inputRangeSubtitulo = document.getElementById("inputRangeSubtitulo");
-        const lblRangeSubtitulo = document.getElementById("lblRangeSubtitulo");
 
+        if(inputCorFundo) inputCorFundo.value = slide.corFundo || "#ffffff";
         if(inputCorTitulo) inputCorTitulo.value = slide.corTitulo || "#0f172a";
         if(inputCorSubtitulo) inputCorSubtitulo.value = slide.corSubtitulo || "#64748b";
         if(inputRangeTitulo) {
             inputRangeTitulo.value = slide.tamanhoTitulo || 4.0;
-            if(lblRangeTitulo) lblRangeTitulo.textContent = parseFloat(inputRangeTitulo.value).toFixed(1);
         }
         if(inputRangeSubtitulo) {
             inputRangeSubtitulo.value = slide.tamanhoSubtitulo || 1.8;
-            if(lblRangeSubtitulo) lblRangeSubtitulo.textContent = parseFloat(inputRangeSubtitulo.value).toFixed(1);
         }
 
         const currentLogos = slide.logos || ["barueri"];
@@ -1303,19 +1329,25 @@ document.addEventListener("DOMContentLoaded", function() {
         const slide = slides.find(s => s.id === activeSlideId);
         if (!slide) return;
 
-        // Tratar imagem de fundo para Capa
-        if (slide.template === "capa") {
-            if (slide.bgCapa) {
-                activeSlideSurface.style.backgroundImage = `url(${slide.bgCapa})`;
-                activeSlideSurface.style.backgroundSize = "cover";
-                activeSlideSurface.style.backgroundPosition = "center";
-                bgCapaThumbPreview.src = slide.bgCapa;
-            } else {
-                activeSlideSurface.style.backgroundImage = "";
-                bgCapaThumbPreview.src = "https://images.unsplash.com/photo-1506744038136-46273834b3fb";
+        // Tratar imagem de fundo global (todos os templates) e cor de fundo
+        const bgGeralThumbPreview = document.getElementById("bgGeralThumbPreview");
+        const btnRemoveBgGeral = document.getElementById("btnRemoveBgGeral");
+
+        if (slide.bgGeral) {
+            activeSlideSurface.style.backgroundImage = `url(${slide.bgGeral})`;
+            activeSlideSurface.style.backgroundSize = "cover";
+            activeSlideSurface.style.backgroundPosition = "center";
+            activeSlideSurface.style.backgroundColor = "transparent";
+            if(bgGeralThumbPreview) {
+                bgGeralThumbPreview.src = slide.bgGeral;
+                bgGeralThumbPreview.style.display = "block";
             }
+            if(btnRemoveBgGeral) btnRemoveBgGeral.style.display = "block";
         } else {
             activeSlideSurface.style.backgroundImage = "";
+            activeSlideSurface.style.backgroundColor = slide.corFundo || "#ffffff";
+            if(bgGeralThumbPreview) bgGeralThumbPreview.style.display = "none";
+            if(btnRemoveBgGeral) btnRemoveBgGeral.style.display = "none";
         }
 
         // Tratar imagem para Imagem + Texto
@@ -1502,26 +1534,52 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // Upload de Imagem de Fundo para Capa
-    btnUploadBgCapa.addEventListener("click", () => {
-        inputUploadBgCapa.click();
-    });
+    // Fundo do Slide
+    const btnUploadBgGeral = document.getElementById("btnUploadBgGeral");
+    const inputUploadBgGeral = document.getElementById("inputUploadBgGeral");
+    const btnRemoveBgGeral = document.getElementById("btnRemoveBgGeral");
+    const inputCorFundo = document.getElementById("inputCorFundo");
 
-    inputUploadBgCapa.addEventListener("change", (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const slide = slides.find(s => s.id === activeSlideId);
-                if (slide) {
-                    slide.bgCapa = event.target.result;
-                    updatePreviewMedia();
-                    updateActiveThumbnail();
-                }
-            };
-            reader.readAsDataURL(file);
-        }
-    });
+    if(btnUploadBgGeral) {
+        btnUploadBgGeral.addEventListener("click", () => inputUploadBgGeral.click());
+    }
+    if(inputUploadBgGeral) {
+        inputUploadBgGeral.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const slide = slides.find(s => s.id === activeSlideId);
+                    if (slide) {
+                        slide.bgGeral = event.target.result;
+                        updatePreviewMedia();
+                        updateActiveThumbnail();
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    if(btnRemoveBgGeral) {
+        btnRemoveBgGeral.addEventListener("click", () => {
+            const slide = slides.find(s => s.id === activeSlideId);
+            if(slide) {
+                slide.bgGeral = null;
+                updatePreviewMedia();
+                updateActiveThumbnail();
+            }
+        });
+    }
+    if(inputCorFundo) {
+        inputCorFundo.addEventListener("input", (e) => {
+            const slide = slides.find(s => s.id === activeSlideId);
+            if(slide) {
+                slide.corFundo = e.target.value;
+                updatePreviewMedia();
+                updateActiveThumbnail();
+            }
+        });
+    }
 
     // Upload de Imagem para Imagem+Texto
     btnUploadImgTexto.addEventListener("click", () => {
