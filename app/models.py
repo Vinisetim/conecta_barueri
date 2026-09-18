@@ -179,3 +179,59 @@ class CampoPreenchido(db.Model):
     indicador_id = db.Column(db.Integer)
 
     data_criacao = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+class SlotFlexivel(db.Model):
+    """
+    Mapeia apresentacao.slot_flexivel
+    Elemento sobrepostos e ancorados na matriz 3x3
+    """
+
+    __tablename__ = 'slot_flexivel'
+    __table_args__ = {'schema':'apresentacao'}
+
+    id = db.Column(db.Integer, primary_key=True)
+    slide_id = db.Column(db.Integer, db.ForeignKey('apresentacao.slide.id'), nullable=False)
+
+    tipo_elemento = db.Column(db.String(50), nullable=False)
+    posicao_matriz = db.Column(db.String(30), nullable=False)
+    config_json = db.Column(db.JSON, nullable=False)
+
+
+class Ods(db.Model):
+    """
+    Mapeia a tabela apresentacao.ods
+    Catálogo estático com os 17 Objetivos de Desenvolvimento Sustentável da ONU
+    """
+    __tablename__ = 'ods'
+    __table_args__ = {'schema': 'apresentacao'}
+
+    id = db.Column(db.Integer, primary_key=True)
+    numero = db.Column(db.Integer, unique=True, nullable=False)
+    titulo = db.Column(db.String(150), nullable=False)
+    descricao = db.Column(db.Text)
+    icone_url = db.Column(db.String(255))
+    cor_hex = db.Column(db.String(10))
+
+class Apresentador(db.Model):
+    """
+    Mapeia apresentacao.apresentador.
+    Catálogo INSTITUCIONAL e COMPARTILHADO de autoridades, secretários e palestrantes.
+    Visível globalmente para todos os usuários do sistema.
+    """
+    __tablename__ = 'apresentador'
+    __table_args__ = {'schema':'apresentacao'}
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    criado_por_id = db.Column(db.Integer, db.ForeignKey('login.usuario.id'), nullable=True)
+
+    nome = db.Column(db.String(150), nullable=False)
+    cargo = db.Column(db.String(255))
+
+    biografia = db.Column(db.Text)
+    foto_url = db.Column(db.String(255))
+
+    # Estruturas dinâmicas em JSON
+    topicos = db.Column(db.JSON, default=list)
+    midias_extras = db.Column(db.JSON, default=list)
+
