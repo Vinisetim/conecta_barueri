@@ -1,388 +1,709 @@
 {% extends "base.html" %}
 
+{% block title %}Projetos e Pastas | Conecta Barueri{% endblock %}
+
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/projeto.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/apresentacao/apresentacao.css') }}">
+<style>
+    /* Estilos de abas de alternância de visualização */
+    .view-mode-tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 12px;
+    }
+    .view-mode-tab {
+        background: transparent;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.92rem;
+        color: #64748b;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+    }
+    .view-mode-tab:hover {
+        background: #f1f5f9;
+        color: #0f172a;
+    }
+    .view-mode-tab.active {
+        background: #eff6ff;
+        color: #0052ff;
+    }
+
+    /* Lista interna de apresentações dentro do card de pasta */
+    .pasta-apresentacoes-box {
+        margin-top: 14px;
+        padding-top: 12px;
+        border-top: 1px solid #f1f5f9;
+    }
+    .pasta-apresentacao-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 10px;
+        border-radius: 8px;
+        background: #f8fafc;
+        margin-bottom: 6px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s ease;
+    }
+    .pasta-apresentacao-item:hover {
+        background: #ffffff;
+        border-color: #0052ff;
+        box-shadow: 0 2px 6px rgba(0, 82, 255, 0.08);
+    }
+    .pasta-apresentacao-item a {
+        color: #1e293b;
+        font-weight: 500;
+        font-size: 0.85rem;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 190px;
+    }
+    .pasta-apresentacao-item a:hover {
+        color: #0052ff;
+    }
+    .pasta-badge-count {
+        font-size: 11px;
+        background: #e2e8f0;
+        color: #475569;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 600;
+    }
+
+    /* Modal */
+    .modal-apresentacoes-list {
+        max-height: 420px;
+        overflow-y: auto;
+    }
+    .apresentacao-row-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        margin-bottom: 8px;
+        background: #fff;
+        transition: all 0.2s ease;
+    }
+    .apresentacao-row-item:hover {
+        border-color: #0052ff;
+        box-shadow: 0 4px 12px rgba(0, 82, 255, 0.06);
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-    
+<div class="apresentacao-container">
 
-    <div class="">
-        <div>
-            <h1>Projetos</h1>
-            <p>Crie gerencie e compartilhe  projetos dinâmicos com dados e indicadores  da cidade</p>
+    <!-- CABEÇALHO -->
+    <div class="page-header-ap">
+        <div class="page-title-wrap">
+            <h1>Projetos e Pastas</h1>
+            <p>Gerencie suas pastas de projetos e acesse todas as apresentações salvas no banco de dados.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <a href="{{ url_for('apresentacao.criar_apresentacao') }}" class="btn btn-primary d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 shadow-sm text-decoration-none" style="background: #0052ff; border: none; font-weight: 500;">
+                <i class="bi bi-plus-lg"></i>
+                <span>Nova Apresentação</span>
+            </a>
+            <button type="button" id="btnNovoProjeto" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3" style="background: #fff; font-weight: 500;">
+                <i class="bi bi-folder-plus text-primary"></i>
+                <span>Nova Pasta</span>
+            </button>
         </div>
     </div>
 
+    <!-- MENSAGENS FLASH -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show mb-4" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 
-
-
-
-    <div class="projeto" id="projectsGrid">
-
-            <div class="filters-bar">
-                  <div class="search-box">
-                    <i class="bi bi-search"></i>
-                    <input type="text" id="searchInput" placeholder="Buscar projetos..." oninput="filterCards()"/>
-                  </div>
-                  <select class="filter-select" id="statusFilter" onchange="filterCards()">
-                    <option value="">Todos os status</option>
-                    <option value="published">Publicada</option>
-                    <option value="draft">Rascunho</option>
-                  </select>
-                  <select class="filter-select" id="sortFilter">
-                    <option>Mais recentes</option>
-                    <option>Mais antigos</option>
-                    <option>A–Z</option>
-                  </select>
-                  <div class="view-toggle">
-                    <button class="view-btn active" id="gridBtn" onclick="setView('grid')"><i class="bi bi-grid"></i></button>
-                    <button class="view-btn" id="listBtn" onclick="setView('list')"><i class="bi bi-list-ul"></i></button>
-                  </div>
-            </div>
-
-            <div class="projects-grid">
-                  <!-- CARD 1 -->
-                      <div class="project-card" data-status="published" data-title="Indicadores de Educação">
-                        <div class="card-thumb educacao">
-                          <div class="thumb-mock">
-                            <div style="display:flex;align-items:center;gap:12px;">
-                              <div class="thumb-circle"></div>
-                              <div class="thumb-chart">
-                                <div class="thumb-bar" style="height:40px;"></div>
-                                <div class="thumb-bar" style="height:55px;"></div>
-                                <div class="thumb-bar" style="height:30px;"></div>
-                                <div class="thumb-bar" style="height:48px;"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="card-body-proj">
-                          <h5 class="card-title">Indicadores de Educação</h5>
-                          <p class="card-updated">Atualizado há 2 dias</p>
-                          <div class="card-creator">
-                            <div class="creator-avatar" style="background:#0052ff;">MA</div>
-                            <div class="creator-info">
-                              <div class="creator-name">Maria Aparecida</div>
-                              <div class="creator-date"><i class="bi bi-calendar3" style="font-size:10px;"></i> Criado em 12 mai. 2026</div>
-                            </div>
-                          </div>
-                          <div class="card-footer-proj">
-                            <span class="badge-status published"><i class="bi bi-globe2"></i> Publicada</span>
-                          </div>
-                        </div>
-                      </div>
-                       <div class="project-card" data-status="published" data-title="Indicadores de Educação">
-                        <div class="card-thumb educacao">
-                          <div class="thumb-mock">
-                            <div style="display:flex;align-items:center;gap:12px;">
-                              <div class="thumb-circle"></div>
-                              <div class="thumb-chart">
-                                <div class="thumb-bar" style="height:40px;"></div>
-                                <div class="thumb-bar" style="height:55px;"></div>
-                                <div class="thumb-bar" style="height:30px;"></div>
-                                <div class="thumb-bar" style="height:48px;"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="card-body-proj">
-                          <h5 class="card-title">Indicadores de Educação</h5>
-                          <p class="card-updated">Atualizado há 2 dias</p>
-                          <div class="card-creator">
-                            <div class="creator-avatar" style="background:#0052ff;">MA</div>
-                            <div class="creator-info">
-                              <div class="creator-name">Maria Aparecida</div>
-                              <div class="creator-date"><i class="bi bi-calendar3" style="font-size:10px;"></i> Criado em 12 mai. 2026</div>
-                            </div>
-                          </div>
-                          <div class="card-footer-proj">
-                            <span class="badge-status published"><i class="bi bi-globe2"></i> Publicada</span>
-                          </div>
-                        </div>
-                      </div>
-
-                       <div class="project-card" data-status="published" data-title="Indicadores de Educação">
-                        <div class="card-thumb educacao">
-                          <div class="thumb-mock">
-                            <div style="display:flex;align-items:center;gap:12px;">
-                              <div class="thumb-circle"></div>
-                              <div class="thumb-chart">
-                                <div class="thumb-bar" style="height:40px;"></div>
-                                <div class="thumb-bar" style="height:55px;"></div>
-                                <div class="thumb-bar" style="height:30px;"></div>
-                                <div class="thumb-bar" style="height:48px;"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="card-body-proj">
-                          <h5 class="card-title">Indicadores de Educação</h5>
-                          <p class="card-updated">Atualizado há 2 dias</p>
-                          <div class="card-creator">
-                            <div class="creator-avatar" style="background:#0052ff;">MA</div>
-                            <div class="creator-info">
-                              <div class="creator-name">Maria Aparecida</div>
-                              <div class="creator-date"><i class="bi bi-calendar3" style="font-size:10px;"></i> Criado em 12 mai. 2026</div>
-                            </div>
-                          </div>
-                          <div class="card-footer-proj">
-                            <span class="badge-status published"><i class="bi bi-globe2"></i> Publicada</span>
-                          </div>
-                        </div>
-                      </div>
-
-                       <div class="project-card" data-status="published" data-title="Indicadores de Educação">
-                        <div class="card-thumb educacao">
-                          <div class="thumb-mock">
-                            <div style="display:flex;align-items:center;gap:12px;">
-                              <div class="thumb-circle"></div>
-                              <div class="thumb-chart">
-                                <div class="thumb-bar" style="height:40px;"></div>
-                                <div class="thumb-bar" style="height:55px;"></div>
-                                <div class="thumb-bar" style="height:30px;"></div>
-                                <div class="thumb-bar" style="height:48px;"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="card-body-proj">
-                          <h5 class="card-title">Indicadores de Educação</h5>
-                          <p class="card-updated">Atualizado há 2 dias</p>
-                          <div class="card-creator">
-                            <div class="creator-avatar" style="background:#0052ff;">MA</div>
-                            <div class="creator-info">
-                              <div class="creator-name">Maria Aparecida</div>
-                              <div class="creator-date"><i class="bi bi-calendar3" style="font-size:10px;"></i> Criado em 12 mai. 2026</div>
-                            </div>
-                          </div>
-                          <div class="card-footer-proj">
-                            <span class="badge-status published"><i class="bi bi-globe2"></i> Publicada</span>
-                          </div>
-                        </div>
-                      </div>
-
-                       <div class="project-card" data-status="published" data-title="Indicadores de Educação">
-                        <div class="card-thumb educacao">
-                          <div class="thumb-mock">
-                            <div style="display:flex;align-items:center;gap:12px;">
-                              <div class="thumb-circle"></div>
-                              <div class="thumb-chart">
-                                <div class="thumb-bar" style="height:40px;"></div>
-                                <div class="thumb-bar" style="height:55px;"></div>
-                                <div class="thumb-bar" style="height:30px;"></div>
-                                <div class="thumb-bar" style="height:48px;"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="card-body-proj">
-                          <h5 class="card-title">Indicadores de Educação</h5>
-                          <p class="card-updated">Atualizado há 2 dias</p>
-                          <div class="card-creator">
-                            <div class="creator-avatar" style="background:#0052ff;">MA</div>
-                            <div class="creator-info">
-                              <div class="creator-name">Maria Aparecida</div>
-                              <div class="creator-date"><i class="bi bi-calendar3" style="font-size:10px;"></i> Criado em 12 mai. 2026</div>
-                            </div>
-                          </div>
-                          <div class="card-footer-proj">
-                            <span class="badge-status published"><i class="bi bi-globe2"></i> Publicada</span>
-                          </div>
-                        </div>
-                      </div>
-
-                       <div class="project-card" data-status="published" data-title="Indicadores de Educação">
-                        <div class="card-thumb educacao">
-                          <div class="thumb-mock">
-                            <div style="display:flex;align-items:center;gap:12px;">
-                              <div class="thumb-circle"></div>
-                              <div class="thumb-chart">
-                                <div class="thumb-bar" style="height:40px;"></div>
-                                <div class="thumb-bar" style="height:55px;"></div>
-                                <div class="thumb-bar" style="height:30px;"></div>
-                                <div class="thumb-bar" style="height:48px;"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="card-body-proj">
-                          <h5 class="card-title">Indicadores de Educação</h5>
-                          <p class="card-updated">Atualizado há 2 dias</p>
-                          <div class="card-creator">
-                            <div class="creator-avatar" style="background:#0052ff;">MA</div>
-                            <div class="creator-info">
-                              <div class="creator-name">Maria Aparecida</div>
-                              <div class="creator-date"><i class="bi bi-calendar3" style="font-size:10px;"></i> Criado em 12 mai. 2026</div>
-                            </div>
-                          </div>
-                          <div class="card-footer-proj">
-                            <span class="badge-status published"><i class="bi bi-globe2"></i> Publicada</span>
-                          </div>
-                        </div>
-                      </div>
-
-                       <div class="project-card" data-status="published" data-title="Indicadores de Educação">
-                        <div class="card-thumb educacao">
-                          <div class="thumb-mock">
-                            <div style="display:flex;align-items:center;gap:12px;">
-                              <div class="thumb-circle"></div>
-                              <div class="thumb-chart">
-                                <div class="thumb-bar" style="height:40px;"></div>
-                                <div class="thumb-bar" style="height:55px;"></div>
-                                <div class="thumb-bar" style="height:30px;"></div>
-                                <div class="thumb-bar" style="height:48px;"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="card-body-proj">
-                          <h5 class="card-title">Indicadores de Educação</h5>
-                          <p class="card-updated">Atualizado há 2 dias</p>
-                          <div class="card-creator">
-                            <div class="creator-avatar" style="background:#0052ff;">MA</div>
-                            <div class="creator-info">
-                              <div class="creator-name">Maria Aparecida</div>
-                              <div class="creator-date"><i class="bi bi-calendar3" style="font-size:10px;"></i> Criado em 12 mai. 2026</div>
-                            </div>
-                          </div>
-                          <div class="card-footer-proj">
-                            <span class="badge-status published"><i class="bi bi-globe2"></i> Publicada</span>
-                          </div>
-                        </div>
-                      </div>
-
-                       <div class="project-card" data-status="published" data-title="Indicadores de Educação">
-                        <div class="card-thumb educacao">
-                          <div class="thumb-mock">
-                            <div style="display:flex;align-items:center;gap:12px;">
-                              <div class="thumb-circle"></div>
-                              <div class="thumb-chart">
-                                <div class="thumb-bar" style="height:40px;"></div>
-                                <div class="thumb-bar" style="height:55px;"></div>
-                                <div class="thumb-bar" style="height:30px;"></div>
-                                <div class="thumb-bar" style="height:48px;"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="card-body-proj">
-                          <h5 class="card-title">Indicadores de Educação</h5>
-                          <p class="card-updated">Atualizado há 2 dias</p>
-                          <div class="card-creator">
-                            <div class="creator-avatar" style="background:#0052ff;">MA</div>
-                            <div class="creator-info">
-                              <div class="creator-name">Maria Aparecida</div>
-                              <div class="creator-date"><i class="bi bi-calendar3" style="font-size:10px;"></i> Criado em 12 mai. 2026</div>
-                            </div>
-                          </div>
-                          <div class="card-footer-proj">
-                            <span class="badge-status published"><i class="bi bi-globe2"></i> Publicada</span>
-                          </div>
-                        </div>
-                      </div>
-
-                       <div class="project-card" data-status="published" data-title="Indicadores de Educação">
-                        <div class="card-thumb educacao">
-                          <div class="thumb-mock">
-                            <div style="display:flex;align-items:center;gap:12px;">
-                              <div class="thumb-circle"></div>
-                              <div class="thumb-chart">
-                                <div class="thumb-bar" style="height:40px;"></div>
-                                <div class="thumb-bar" style="height:55px;"></div>
-                                <div class="thumb-bar" style="height:30px;"></div>
-                                <div class="thumb-bar" style="height:48px;"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="card-body-proj">
-                          <h5 class="card-title">Indicadores de Educação</h5>
-                          <p class="card-updated">Atualizado há 2 dias</p>
-                          <div class="card-creator">
-                            <div class="creator-avatar" style="background:#0052ff;">MA</div>
-                            <div class="creator-info">
-                              <div class="creator-name">Maria Aparecida</div>
-                              <div class="creator-date"><i class="bi bi-calendar3" style="font-size:10px;"></i> Criado em 12 mai. 2026</div>
-                            </div>
-                          </div>
-                          <div class="card-footer-proj">
-                            <span class="badge-status published"><i class="bi bi-globe2"></i> Publicada</span>
-                          </div>
-                        </div>
-                      </div>
-
-                       <div class="project-card" data-status="published" data-title="Indicadores de Educação">
-                        <div class="card-thumb educacao">
-                          <div class="thumb-mock">
-                            <div style="display:flex;align-items:center;gap:12px;">
-                              <div class="thumb-circle"></div>
-                              <div class="thumb-chart">
-                                <div class="thumb-bar" style="height:40px;"></div>
-                                <div class="thumb-bar" style="height:55px;"></div>
-                                <div class="thumb-bar" style="height:30px;"></div>
-                                <div class="thumb-bar" style="height:48px;"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="card-body-proj">
-                          <h5 class="card-title">Indicadores de Educação</h5>
-                          <p class="card-updated">Atualizado há 2 dias</p>
-                          <div class="card-creator">
-                            <div class="creator-avatar" style="background:#0052ff;">MA</div>
-                            <div class="creator-info">
-                              <div class="creator-name">Maria Aparecida</div>
-                              <div class="creator-date"><i class="bi bi-calendar3" style="font-size:10px;"></i> Criado em 12 mai. 2026</div>
-                            </div>
-                          </div>
-                          <div class="card-footer-proj">
-                            <span class="badge-status published"><i class="bi bi-globe2"></i> Publicada</span>
-                          </div>
-                        </div>
-                      </div>
-
-                       <div class="project-card" data-status="published" data-title="Indicadores de Educação">
-                        <div class="card-thumb educacao">
-                          <div class="thumb-mock">
-                            <div style="display:flex;align-items:center;gap:12px;">
-                              <div class="thumb-circle"></div>
-                              <div class="thumb-chart">
-                                <div class="thumb-bar" style="height:40px;"></div>
-                                <div class="thumb-bar" style="height:55px;"></div>
-                                <div class="thumb-bar" style="height:30px;"></div>
-                                <div class="thumb-bar" style="height:48px;"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="card-body-proj">
-                          <h5 class="card-title">Indicadores de Educação</h5>
-                          <p class="card-updated">Atualizado há 2 dias</p>
-                          <div class="card-creator">
-                            <div class="creator-avatar" style="background:#0052ff;">MA</div>
-                            <div class="creator-info">
-                              <div class="creator-name">Maria Aparecida</div>
-                              <div class="creator-date"><i class="bi bi-calendar3" style="font-size:10px;"></i> Criado em 12 mai. 2026</div>
-                            </div>
-                          </div>
-                          <div class="card-footer-proj">
-                            <span class="badge-status published"><i class="bi bi-globe2"></i> Publicada</span>
-                          </div>
-                        </div>
-                      </div>
-
-          <!-- CARD NOVO PROJETO -->
-          <div class="new-project-card" onclick="openModal()">
-            <div class="new-project-icon"><i class="bi bi-graph-up-arrow"></i></div>
-            <h6>Novo projeto</h6>
-            <p>Comece do zero com um projeto em branco.</p>
-            <a class="link-criar" href="#">Criar projeto →</a>
-          </div>
-
-        </div><!-- /projects-grid -->
-
+    <!-- ABAS DE NAVEGAÇÃO -->
+    <div class="view-mode-tabs">
+        <button type="button" class="view-mode-tab active" id="tabPastas" onclick="switchView('pastas')">
+            <i class="bi bi-folder2-open"></i>
+            <span>Visualizar por Pastas ({{ projetos|length }})</span>
+        </button>
+        <button type="button" class="view-mode-tab" id="tabApresentacoes" onclick="switchView('apresentacoes')">
+            <i class="bi bi-file-earmark-slides"></i>
+            <span>Todas as Apresentações Salvas ({{ apresentacoes|length }})</span>
+        </button>
     </div>
 
+    <!-- FILTROS E BUSCA -->
+    <div class="filters-bar">
+        <div class="search-box">
+            <i class="bi bi-search"></i>
+            <input type="text" id="searchInput" placeholder="Buscar por título..." onkeyup="filterCards()">
+        </div>
 
+        <div class="view-toggle">
+            <button class="view-btn active" id="gridBtn" type="button" onclick="setView('grid')" title="Visualização em Grade">
+                <i class="bi bi-grid"></i>
+            </button>
+            <button class="view-btn" id="listBtn" type="button" onclick="setView('list')" title="Visualização em Lista">
+                <i class="bi bi-list-ul"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- SEÇÃO 1: VISUALIZAÇÃO POR PASTAS (COM APRESENTAÇÕES DENTRO DE CADA PASTA) -->
+    <div id="sectionPastas">
+        <div class="apresentacoes-grid" id="cardsGrid">
+            {% for proj in projetos %}
+            <article class="ap-card-item" data-status="published" data-title="{{ proj.nome }}">
+                <!-- TOPO / ÍCONE DA PASTA -->
+                <div class="card-thumb thumb-saude" style="align-items: center; justify-content: center; padding: 20px; background: {{ proj.capa_uri or '#0052ff' }};">
+                    <i class="bi bi-folder-fill" style="font-size: 3.8rem; color: rgba(255,255,255,0.95); filter: drop-shadow(0 6px 12px rgba(0,0,0,0.18));"></i>
+                </div>
+
+                <!-- CORPO DA PASTA -->
+                <div class="card-body-ap">
+                    <div class="card-meta-top">
+                        <span class="badge-modulo saude">Pasta</span>
+                        <span class="badge-status" style="color: #64748b; font-weight: 500;">
+                            <i class="bi bi-file-earmark-slides me-1"></i> {{ proj.apresentacoes|length }} Apresentação(ões)
+                        </span>
+                    </div>
+
+                    <h5 class="card-title mb-1">{{ proj.nome }}</h5>
+                    <p class="card-desc mb-2">{{ proj.descricao or 'Pasta de apresentações institucionais.' }}</p>
+
+                    <!-- APRESENTAÇÕES SALVAS DENTRO DESTA PASTA (DIRETAMENTE VISÍVEIS) -->
+                    <div class="pasta-apresentacoes-box">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="small fw-semibold text-muted text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">
+                                Conteúdo da pasta:
+                            </span>
+                            <a href="{{ url_for('apresentacao.criar_apresentacao', projeto_id=proj.id) }}" class="small text-primary text-decoration-none fw-semibold" title="Criar nova apresentação nesta pasta">
+                                <i class="bi bi-plus"></i> Nova
+                            </a>
+                        </div>
+
+                        {% if proj.apresentacoes %}
+                            <div class="list-unstyled mb-0">
+                                {% for ap in proj.apresentacoes[:3] %}
+                                <div class="pasta-apresentacao-item">
+                                    <a href="{{ url_for('apresentacao.editar_apresentacao', id=ap.id) }}" title="{{ ap.nome }}">
+                                        <i class="bi bi-file-earmark-slides text-primary"></i>
+                                        <span>{{ ap.nome }}</span>
+                                    </a>
+                                    <div class="d-flex align-items-center gap-1">
+                                        <span class="pasta-badge-count">{{ ap.slides|length }} slides</span>
+                                        <a href="{{ url_for('apresentacao.editar_apresentacao', id=ap.id) }}" class="btn btn-sm btn-light p-1 px-2 border" title="Editar Apresentação">
+                                            <i class="bi bi-pencil" style="font-size: 10px;"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-light p-1 px-2 border text-danger btn-delete-apresentacao" data-id="{{ ap.id }}" data-nome="{{ ap.nome }}" onclick="excluirApresentacaoBtn(event, this)" title="Excluir Apresentação">
+                                            <i class="bi bi-trash" style="font-size: 10px;"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            {% if proj.apresentacoes|length > 3 %}
+                            <div class="text-center mt-2">
+                                <button type="button" class="btn btn-link btn-sm text-primary text-decoration-none p-0 btn-ver-projeto" data-proj-id="{{ proj.id }}" data-proj-nome="{{ proj.nome }}" style="font-size: 12px; font-weight: 500;">
+                                    Ver todas as {{ proj.apresentacoes|length }} apresentações desta pasta →
+                                </button>
+                            </div>
+                            {% endif %}
+                        {% else %}
+                            <div class="text-center py-2 px-2 text-muted small bg-light rounded-2 border border-dashed" style="font-size: 12px;">
+                                Nenhuma apresentação salva nesta pasta ainda.
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- RODAPÉ DO CARD -->
+                    <div class="card-footer-ap mt-3" style="display:flex; gap:8px;">
+                        <button type="button" class="btn-card-action btn-ver-projeto" 
+                                data-proj-id="{{ proj.id }}" 
+                                data-proj-nome="{{ proj.nome }}" 
+                                style="background: #0052ff; color: white; border: none; flex: 1;">
+                            <i class="bi bi-folder2-open"></i> Ver
+                        </button>
+                        <button type="button" class="btn-card-action btn-editar-projeto" 
+                                data-proj-id="{{ proj.id }}" 
+                                data-proj-nome="{{ proj.nome }}" 
+                                data-proj-desc="{{ proj.descricao }}"
+                                data-proj-cor="{{ proj.capa_uri or '#0052ff' }}"
+                                style="background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; flex: 0 0 auto;" 
+                                title="Editar Pasta">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button type="button" class="btn-card-action btn-delete-projeto btn-delete-projeto-real" 
+                                data-proj-id="{{ proj.id }}" 
+                                data-proj-nome="{{ proj.nome }}"
+                                onclick="excluirProjetoBtn(event, this)"
+                                style="background: #fff0f2; color: #e11d48; border: 1px solid #ffe4e6; flex: 0 0 auto;" 
+                                title="Excluir Pasta">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </article>
+            {% else %}
+            <div class="no-projects-box" style="grid-column: 1 / -1; padding: 48px 24px; text-align: center; background: #ffffff; border-radius: 16px; border: 1px dashed #cbd5e1; margin-bottom: 20px;">
+                <i class="bi bi-folder-x" style="font-size: 3.5rem; color: #94a3b8; display: block; margin-bottom: 16px;"></i>
+                <h4 style="margin: 0 0 8px 0; color: #1e293b; font-weight: 600;">Nenhuma pasta encontrada</h4>
+                <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 24px;">Crie sua primeira pasta de projetos para organizar suas apresentações.</p>
+                <button type="button" onclick="document.getElementById('btnNovoProjeto').click()" class="btn btn-primary" style="background: #0052ff; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 500;">
+                    <i class="bi bi-folder-plus me-1"></i> Criar Nova Pasta
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- SEÇÃO 2: TODAS AS APRESENTAÇÕES (GRID DIRETO COM TODAS AS APRESENTAÇÕES DO BANCO) -->
+    <div id="sectionApresentacoes" style="display: none;">
+        <div class="apresentacoes-grid" id="cardsGridApresentacoes">
+            {% for ap in apresentacoes %}
+            <article class="ap-card-item" data-status="published" data-title="{{ ap.nome }}" onclick="if(!event.target.closest('button, a, .btn-card-action')) window.location.href='{{ url_for('apresentacao.editar_apresentacao', id=ap.id) }}'" style="cursor: pointer;">
+                <div class="card-thumb thumb-saude" style="align-items: center; justify-content: center; padding: 20px; background: {{ ap.projeto.capa_uri if ap.projeto and ap.projeto.capa_uri else '#0284c7' }};">
+                    <i class="bi bi-file-earmark-slides-fill" style="font-size: 3.5rem; color: rgba(255,255,255,0.95); filter: drop-shadow(0 6px 12px rgba(0,0,0,0.18));"></i>
+                </div>
+                <div class="card-body-ap">
+                    <div class="card-meta-top">
+                        <span class="badge-modulo saude"><i class="bi bi-folder2 me-1"></i>{{ ap.projeto.nome if ap.projeto else 'Projeto Geral' }}</span>
+                        <span class="badge-status" style="color: #64748b; font-weight: 500;">
+                            {{ ap.slides|length }} slide(s)
+                        </span>
+                    </div>
+                    <h5 class="card-title">{{ ap.nome }}</h5>
+                    <p class="card-desc">Salva na pasta <strong>{{ ap.projeto.nome if ap.projeto else 'Projeto Geral' }}</strong> • Criada em {{ ap.data_criacao.strftime('%d/%m/%Y') if ap.data_criacao else 'Recente' }}</p>
+                    <div class="card-creator">
+                        <div class="creator-avatar saude">{{ current_user.nome[:2].upper() if current_user.nome else 'CB' }}</div>
+                        <div class="creator-info">
+                            <div class="creator-name">{{ current_user.nome or 'Servidor Barueri' }}</div>
+                            <div class="creator-date"><i class="bi bi-clock"></i> ID: #{{ ap.id }}</div>
+                        </div>
+                    </div>
+                    <div class="card-footer-ap" style="display:flex; gap:8px;">
+                        <a href="{{ url_for('apresentacao.editar_apresentacao', id=ap.id) }}" 
+                           class="btn-card-action" style="background: #0052ff; color: white; border: none; flex:1;">
+                            <i class="bi bi-pencil-square"></i> Editar Slides
+                        </a>
+                        <button type="button" class="btn-card-action btn-delete-apresentacao" data-id="{{ ap.id }}" data-nome="{{ ap.nome }}" onclick="excluirApresentacaoBtn(event, this)" style="background: #fff0f2; color: #e11d48; border: 1px solid #ffe4e6; flex: 0 0 auto;" title="Excluir Apresentação">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </article>
+            {% else %}
+            <div class="no-projects-box" style="grid-column: 1 / -1; padding: 48px 24px; text-align: center; background: #ffffff; border-radius: 16px; border: 1px dashed #cbd5e1; margin-bottom: 20px;">
+                <i class="bi bi-file-earmark-x" style="font-size: 3.5rem; color: #94a3b8; display: block; margin-bottom: 16px;"></i>
+                <h4 style="margin: 0 0 8px 0; color: #1e293b; font-weight: 600;">Nenhuma apresentação encontrada</h4>
+                <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 24px;">Você ainda não possui apresentações salvas no banco de dados.</p>
+                <a href="{{ url_for('apresentacao.criar_apresentacao') }}" class="btn btn-primary" style="background: #0052ff; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 500; text-decoration: none; color: #fff;">
+                    <i class="bi bi-plus-lg me-1"></i> Criar Nova Apresentação
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+
+<!-- MODAL VER APRESENTAÇÕES DA PASTA (PROJETOS) -->
+<div id="modalVerApresentacoes" class="projetos-modal-overlay">
+    <div class="projetos-modal" style="max-width: 620px;">
+        <div class="modal-header-proj">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-folder2-open text-primary fs-4"></i>
+                <h2 id="modalVerProjTitulo" style="margin: 0; font-size: 1.25rem;">Apresentações da Pasta</h2>
+            </div>
+            <button type="button" class="btn-close-modal" id="btnCloseVerModal"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="modal-body-proj">
+            <p class="text-muted small mb-3">Veja abaixo todas as apresentações salvas nesta pasta:</p>
+            
+            <div id="modalApresentacoesConteudo" class="modal-apresentacoes-list">
+                <!-- Preenchido dinamicamente via JS -->
+            </div>
+        </div>
+        <div class="modal-footer-proj d-flex justify-content-between">
+            <a href="#" id="modalBtnCriarNestaPasta" class="btn btn-primary d-inline-flex align-items-center gap-2 rounded-3 text-decoration-none" style="background: #0052ff; border: none; font-size: 0.9rem;">
+                <i class="bi bi-plus-lg"></i> Nova Apresentação nesta Pasta
+            </a>
+            <button type="button" class="btn btn-light rounded-3 text-secondary" id="btnFecharVerModal">Fechar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EDITAR PASTA (PROJETO) -->
+<div id="modalEditarProjeto" class="projetos-modal-overlay">
+    <div class="projetos-modal">
+        <form method="POST" id="formEditarProjeto">
+            <div class="modal-header-proj">
+                <h2>Editar Pasta de Projeto</h2>
+                <button type="button" class="btn-close-modal" id="btnCloseEditarModal"><i class="bi bi-x-lg"></i></button>
+            </div>
+            <div class="modal-body-proj">
+                <div class="form-group-proj">
+                    <label for="inputEditNomeProjeto">Nome da Pasta (Projeto) *</label>
+                    <input type="text" name="nome" id="inputEditNomeProjeto" required>
+                </div>
+                <div class="form-group-proj">
+                    <label for="inputEditDescProjeto">Descrição Opcional</label>
+                    <input type="text" name="descricao" id="inputEditDescProjeto">
+                </div>
+                <div class="form-group-proj">
+                    <label for="inputEditCorProjeto">Cor da Pasta</label>
+                    <input type="color" name="cor" id="inputEditCorProjeto" value="#0052ff" style="width: 100%; height: 40px; padding: 2px; cursor: pointer;">
+                </div>
+            </div>
+            <div class="modal-footer-proj">
+                <button type="button" class="btn-cancel-proj" id="btnCancelEditarModal">Cancelar</button>
+                <button type="submit" class="btn-save-proj" id="btnSaveEditarProjeto">Salvar Alterações</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL NOVA PASTA (PROJETO) -->
+<div id="modalNovoProjeto" class="projetos-modal-overlay">
+    <div class="projetos-modal">
+        <form method="POST" action="{{ url_for('projetos.criar_projeto') }}">
+            <div class="modal-header-proj">
+                <h2>Nova Pasta de Projeto</h2>
+                <button type="button" class="btn-close-modal" id="btnCloseModal"><i class="bi bi-x-lg"></i></button>
+            </div>
+            <div class="modal-body-proj">
+                <div class="form-group-proj">
+                    <label for="inputNomeProjeto">Nome da Pasta (Projeto) *</label>
+                    <input type="text" name="nome" id="inputNomeProjeto" placeholder="Ex: Secretaria de Saúde - Indicadores" required>
+                </div>
+                <div class="form-group-proj">
+                    <label for="inputDescProjeto">Descrição Opcional</label>
+                    <input type="text" name="descricao" id="inputDescProjeto" placeholder="Ex: Painéis executivos e métricas da rede municipal">
+                </div>
+                <div class="form-group-proj">
+                    <label for="inputCorProjeto">Cor da Pasta</label>
+                    <input type="color" name="cor" id="inputCorProjeto" value="#0052ff" style="width: 100%; height: 40px; padding: 2px; cursor: pointer;">
+                </div>
+            </div>
+            <div class="modal-footer-proj">
+                <button type="button" class="btn-cancel-proj" id="btnCancelModal">Cancelar</button>
+                <button type="submit" class="btn-save-proj" id="btnSaveProjeto">Criar Pasta</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- DADOS RELACIONAIS SERIALIZADOS PARA INTERAÇÃO RÁPIDA -->
+<script id="dadosProjetosEApresentacoes" type="application/json">
+{
+    {% for proj in projetos %}
+    "{{ proj.id }}": {
+        "nome": {{ proj.nome | tojson }},
+        "apresentacoes": [
+            {% for ap in proj.apresentacoes %}
+            {
+                "id": {{ ap.id }},
+                "nome": {{ ap.nome | tojson }},
+                "slides_count": {{ ap.slides | length }},
+                "data_criacao": {{ (ap.data_criacao.strftime('%d/%m/%Y') if ap.data_criacao else 'Recente') | tojson }},
+                "editar_url": {{ url_for('apresentacao.editar_apresentacao', id=ap.id) | tojson }}
+            }{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ]
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+}
+</script>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/admin_projetos.js') }}?v=2.2"></script>
+<script>
+// Alternância entre visualização de Pastas e Todas as Apresentações
+function switchView(mode) {
+    const secPastas = document.getElementById("sectionPastas");
+    const secAps = document.getElementById("sectionApresentacoes");
+    const tabPastas = document.getElementById("tabPastas");
+    const tabAps = document.getElementById("tabApresentacoes");
+
+    if (mode === 'apresentacoes') {
+        if (secPastas) secPastas.style.display = 'none';
+        if (secAps) secAps.style.display = 'block';
+        if (tabPastas) tabPastas.classList.remove('active');
+        if (tabAps) tabAps.classList.add('active');
+    } else {
+        if (secPastas) secPastas.style.display = 'block';
+        if (secAps) secAps.style.display = 'none';
+        if (tabPastas) tabPastas.classList.add('active');
+        if (tabAps) tabAps.classList.remove('active');
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    const rawData = document.getElementById("dadosProjetosEApresentacoes");
+    let projetosMap = {};
+    if (rawData) {
+        try {
+            projetosMap = JSON.parse(rawData.textContent);
+        } catch (e) {
+            console.error("Erro ao analisar dados das apresentações:", e);
+        }
+    }
+
+    const modalVer = document.getElementById("modalVerApresentacoes");
+    const btnCloseVerModal = document.getElementById("btnCloseVerModal");
+    const btnFecharVerModal = document.getElementById("btnFecharVerModal");
+    const modalVerProjTitulo = document.getElementById("modalVerProjTitulo");
+    const modalApresentacoesConteudo = document.getElementById("modalApresentacoesConteudo");
+    const modalBtnCriarNestaPasta = document.getElementById("modalBtnCriarNestaPasta");
+
+    function fecharModalVer() {
+        if (modalVer) modalVer.classList.remove("show");
+    }
+
+    if (btnCloseVerModal) btnCloseVerModal.addEventListener("click", fecharModalVer);
+    if (btnFecharVerModal) btnFecharVerModal.addEventListener("click", fecharModalVer);
+    if (modalVer) {
+        modalVer.addEventListener("click", function(e) {
+            if (e.target === modalVer) fecharModalVer();
+        });
+    }
+
+    // Clique em "Ver Projetos" nos cards
+    document.querySelectorAll(".btn-ver-projeto").forEach(btn => {
+        btn.addEventListener("click", function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const projId = this.getAttribute("data-proj-id");
+            const projNome = this.getAttribute("data-proj-nome");
+            const projData = projetosMap[projId] || { nome: projNome, apresentacoes: [] };
+
+            if (modalVerProjTitulo) {
+                modalVerProjTitulo.textContent = `Apresentações: ${projData.nome}`;
+            }
+
+            if (modalBtnCriarNestaPasta) {
+                modalBtnCriarNestaPasta.href = `/apresentacao/criar?projeto_id=${projId}`;
+            }
+
+            if (modalApresentacoesConteudo) {
+                if (projData.apresentacoes && projData.apresentacoes.length > 0) {
+                    let itemsHtml = '';
+                    projData.apresentacoes.forEach(ap => {
+                        itemsHtml += `
+                            <div class="apresentacao-row-item">
+                                <div>
+                                    <div class="fw-semibold text-dark mb-1">
+                                        <i class="bi bi-file-earmark-slides text-primary me-2"></i>${ap.nome}
+                                    </div>
+                                    <div class="text-muted small">
+                                        <span>${ap.slides_count} slide(s)</span> • 
+                                        <span>Criado em ${ap.data_criacao}</span>
+                                    </div>
+                                </div>
+                                <div style="display:flex; gap:6px;">
+                                    <a href="${ap.editar_url}" class="btn btn-sm btn-primary rounded-3 px-3 d-inline-flex align-items-center gap-1" style="background: #0052ff; border:none;">
+                                        <i class="bi bi-pencil-square"></i> Editar
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-delete-apresentacao" data-id="${ap.id}" data-nome="${ap.nome}" onclick="excluirApresentacaoBtn(event, this)" style="background: #fff0f2; color: #e11d48; border: 1px solid #ffe4e6; flex: 0 0 auto;" title="Excluir Apresentação">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    modalApresentacoesConteudo.innerHTML = itemsHtml;
+                } else {
+                    modalApresentacoesConteudo.innerHTML = `
+                        <div class="text-center py-4 text-muted">
+                            <i class="bi bi-folder-x fs-1 text-secondary opacity-50 d-block mb-2"></i>
+                            <p class="mb-2">Nenhuma apresentação salva nesta pasta ainda.</p>
+                            <a href="/apresentacao/criar?projeto_id=${projId}" class="btn btn-sm btn-outline-primary rounded-3">
+                                <i class="bi bi-plus-lg me-1"></i> Criar primeira apresentação
+                            </a>
+                        </div>
+                    `;
+                }
+            }
+
+            if (modalVer) modalVer.classList.add("show");
+        });
+    });
+
+    // Lógica Editar Pasta
+    const modalEditarProjeto = document.getElementById('modalEditarProjeto');
+    const formEditarProjeto = document.getElementById('formEditarProjeto');
+    const btnCloseEditarModal = document.getElementById('btnCloseEditarModal');
+    const btnCancelEditarModal = document.getElementById('btnCancelEditarModal');
+    const inputEditNomeProjeto = document.getElementById('inputEditNomeProjeto');
+    const inputEditDescProjeto = document.getElementById('inputEditDescProjeto');
+
+    const inputEditCorProjeto = document.getElementById('inputEditCorProjeto');
+
+    function fecharModalEditar() {
+        if (modalEditarProjeto) modalEditarProjeto.classList.remove('show');
+    }
+
+    if (btnCloseEditarModal) btnCloseEditarModal.addEventListener('click', fecharModalEditar);
+    if (btnCancelEditarModal) btnCancelEditarModal.addEventListener('click', fecharModalEditar);
+    if (modalEditarProjeto) {
+        modalEditarProjeto.addEventListener('click', e => {
+            if (e.target === modalEditarProjeto) fecharModalEditar();
+        });
+    }
+
+    // Funções Globais de Exclusão (com fallback e animação na tela)
+    if (!window.excluirProjetoBtn) {
+        window.excluirProjetoBtn = async function(event, btn) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            const projId = btn.getAttribute("data-proj-id");
+            const projNome = btn.getAttribute("data-proj-nome") || "esta pasta";
+
+            if (!confirm(`Atenção! Deseja realmente excluir a pasta "${projNome}" e TODAS as apresentações dentro dela?\n\nEsta ação é irreversível e excluirá definitivamente do banco de dados.`)) {
+                return;
+            }
+
+            try {
+                btn.disabled = true;
+                btn.style.opacity = "0.5";
+                const response = await fetch(`/projetos/deletar/${projId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const res = await response.json();
+                if (response.ok && res.status === 'sucesso') {
+                    const card = btn.closest('.ap-card-item');
+                    if (card) {
+                        card.style.transition = "opacity 0.35s ease, transform 0.35s ease";
+                        card.style.opacity = "0";
+                        card.style.transform = "scale(0.85)";
+                        setTimeout(() => {
+                            card.remove();
+                            window.location.reload();
+                        }, 350);
+                    } else {
+                        window.location.reload();
+                    }
+                } else {
+                    alert(res.mensagem || "Erro ao deletar pasta.");
+                    btn.disabled = false;
+                    btn.style.opacity = "1";
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Erro ao conectar ao servidor para deletar pasta.");
+                btn.disabled = false;
+                btn.style.opacity = "1";
+            }
+        };
+    }
+
+    if (!window.excluirApresentacaoBtn) {
+        window.excluirApresentacaoBtn = async function(event, btn) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            const apId = btn.getAttribute("data-id");
+            const apNome = btn.getAttribute("data-nome") || "esta apresentação";
+
+            if (!confirm(`Atenção! Deseja realmente excluir a apresentação "${apNome}"?\n\nEsta ação é irreversível e apagará todos os seus slides do banco de dados.`)) {
+                return;
+            }
+
+            try {
+                btn.disabled = true;
+                btn.style.opacity = "0.5";
+                const response = await fetch(`/apresentacao/deletar/${apId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const res = await response.json();
+                if (response.ok && res.status === 'sucesso') {
+                    const item = btn.closest('.ap-card-item, .pasta-apresentacao-item, .apresentacao-row-item');
+                    if (item) {
+                        item.style.transition = "opacity 0.35s ease, transform 0.35s ease";
+                        item.style.opacity = "0";
+                        item.style.transform = "scale(0.85)";
+                        setTimeout(() => {
+                            item.remove();
+                            window.location.reload();
+                        }, 350);
+                    } else {
+                        window.location.reload();
+                    }
+                } else {
+                    alert(res.mensagem || "Erro ao deletar apresentação.");
+                    btn.disabled = false;
+                    btn.style.opacity = "1";
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Erro ao conectar ao servidor para deletar apresentação.");
+                btn.disabled = false;
+                btn.style.opacity = "1";
+            }
+        };
+    }
+
+    // Delegação de cliques para botões dinâmicos ou não capturados diretamente
+    document.body.addEventListener('click', function(e) {
+        const btnDeleteProj = e.target.closest('.btn-delete-projeto, .btn-delete-projeto-real');
+        if (btnDeleteProj) {
+            window.excluirProjetoBtn(e, btnDeleteProj);
+            return;
+        }
+
+        const btnDeleteAp = e.target.closest('.btn-delete-apresentacao');
+        if (btnDeleteAp) {
+            window.excluirApresentacaoBtn(e, btnDeleteAp);
+            return;
+        }
+
+        const btnEditProj = e.target.closest('.btn-editar-projeto');
+        if (btnEditProj) {
+            e.preventDefault();
+            e.stopPropagation();
+            const projId = btnEditProj.getAttribute('data-proj-id');
+            const projNome = btnEditProj.getAttribute('data-proj-nome');
+            const projDesc = btnEditProj.getAttribute('data-proj-desc');
+            const projCor = btnEditProj.getAttribute('data-proj-cor');
+
+            if (formEditarProjeto) {
+                formEditarProjeto.action = `/projetos/editar/${projId}`;
+            }
+            if (inputEditNomeProjeto) inputEditNomeProjeto.value = projNome;
+            if (inputEditDescProjeto) inputEditDescProjeto.value = projDesc;
+            if (inputEditCorProjeto) inputEditCorProjeto.value = projCor || "#0052ff";
+
+            if (modalEditarProjeto) modalEditarProjeto.classList.add('show');
+        }
+    });
+
+});
+</script>
 {% endblock %}

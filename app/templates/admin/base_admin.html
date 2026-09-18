@@ -5,7 +5,7 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{% block title %}Conecta Barueri{% endblock %}</title>
+    <title>{% block title %}Administração | Conecta Barueri{% endblock %}</title>
 
     <!-- Bootstrap -->
     <link
@@ -25,7 +25,7 @@
         rel="stylesheet"
     >
 
-    <!-- CSS principal da sidebar/layout -->
+    <!-- CSS Administração -->
     <link
         rel="stylesheet"
         href="{{ url_for('static', filename='css/sidebar.css') }}"
@@ -62,66 +62,92 @@
             <div class="menu-section-label">Principal</div>
 
             <nav class="sidebar-menu">
-
-                <a href="{{ url_for('app.home') }}" class="menu-link">
+                <a href="#" class="menu-link">
                     <i class="bi bi-house-door"></i>
-                    <span>Home</span>
-                </a>
-                
-                <a href="{{ url_for('apresentacao.apresentacao') }}" class="menu-link">
-                    <i class="bi bi-display"></i>
-                    <span>Apresentação</span>
+                    <span>Placeholder 1</span>
                 </a>
 
+                <a href="#" class="menu-link">
+                    <i class="bi bi-graph-up-arrow"></i>
+                    <span>Placeholder 2</span>
+                </a>
 
-                <a href="{{ url_for('projetos.projetos') }}" class="menu-link">
+                <a href="#" class="menu-link">
                     <i class="bi bi-folder2-open"></i>
+                    <span>Placeholder 3</span>
+                </a>
+
+                <a href="#" class="menu-link">
+                    <i class="bi bi-display"></i>
+                    <span>Placeholder 4</span>
+                </a>
+
+                <a href="#" class="menu-link">
+                    <i class="bi bi-database"></i>
+                    <span>Placeholder 5</span>
+                </a>
+            </nav>
+
+            <!-- MENU ADMIN -->
+            <div class="menu-section-label admin-label">Administração</div>
+
+            <nav class="sidebar-menu admin-menu">
+
+                <a href="#" class="menu-link admin-parent active-parent">
+                    <i class="bi bi-shield-check"></i>
+                    <span>Administrador</span>
+                    <i class="bi bi-chevron-up admin-chevron"></i>
+                </a>
+
+                <a href="#" class="submenu-link active">
+                    <span class="submenu-dot"></span>
+                    <span>Visão geral</span>
+                </a>
+
+                <a href="#" class="submenu-link">
+                    <i class="bi bi-people"></i>
+                    <span>Usuários</span>
+                </a>
+
+                <a href="#" class="submenu-link">
+                    <i class="bi bi-diagram-3"></i>
+                    <span>Equipes</span>
+                </a>
+
+                <a href="#" class="submenu-link">
+                    <i class="bi bi-folder"></i>
                     <span>Projetos</span>
                 </a>
 
-
-                <a href="{{ url_for('dados_abertos.dados_abertos') }}" class="menu-link">
+                <a href="#" class="submenu-link">
                     <i class="bi bi-database"></i>
-                    <span>Dados Abertos</span>
+                    <span>Fontes de dados</span>
+                </a>
+
+                <a href="#" class="submenu-link">
+                    <i class="bi bi-arrow-repeat"></i>
+                    <span>Requisições</span>
+                </a>
+
+                <a href="#" class="submenu-link">
+                    <i class="bi bi-journal-text"></i>
+                    <span>Logs de requisições</span>
+                </a>
+
+                <a href="#" class="submenu-link">
+                    <i class="bi bi-key"></i>
+                    <span>Permissões</span>
+                </a>
+
+                <a href="#" class="submenu-link">
+                    <i class="bi bi-gear"></i>
+                    <span>Configurações</span>
                 </a>
 
             </nav>
 
-            <!-- MENU ADMIN -->
-<!-- MENU ADMIN -->
-<div class="menu-section-label admin-label">Administração</div>
-
-<nav class="sidebar-menu admin-menu">
-
-    <button class="menu-link admin-parent" id="adminToggle" type="button">
-        <i class="bi bi-shield-check"></i>
-        <span>Administrador</span>
-        <i class="bi bi-chevron-down admin-chevron" id="adminChevron"></i>
-    </button>
-
-    <div class="admin-submenu" id="adminSubmenu">
-        <a href="{{ url_for('admin.visao_geral') }}" class="submenu-link">
-            <span class="submenu-dot"></span>
-            <span>Visão geral</span>
-        </a>
-        <a href="{{ url_for('admin.usuario') }}" class="submenu-link">
-            <i class="bi bi-people"></i>
-            <span>Usuários</span>
-        </a>
-        <a href="{{ url_for('admin.equipes') }}" class="submenu-link">
-            <i class="bi bi-diagram-3"></i>
-            <span>Equipes</span>
-        </a>
-        <a href="{{ url_for('admin.fonte_dados') }}" class="submenu-link">
-            <i class="bi bi-database"></i>
-            <span>Fontes de dados</span>
-        </a>
-    </div>
-
-</nav>
-
             <div class="sidebar-bottom">
-                <a href="{{ url_for('auth.logout') }}" class="menu-link logout-link">
+                <a href="#" class="menu-link logout-link">
                     <i class="bi bi-box-arrow-left"></i>
                     <span>Sair</span>
                 </a>
@@ -161,28 +187,25 @@
 
             </header>
 
-            <!-- CONTEÚDO DAS PÁGINAS -->
+            <!-- CONTEÚDO -->
             <main class="content">
                 {% block content %}{% endblock %}
             </main>
 
-            <!-- FOOTER -->
+            <!-- MESMO FOOTER DA HOME -->
             <footer class="home-page-footer">
-
                 <div class="footer-content">
-
                     <div>
                         <span class="footer-brand">
                             Conecta <span>Barueri</span>
                         </span>
 
                         <p>
-                            © 2026 - Projeto Técnico Etec 
+                            © 2026 - Projeto Técnico Etec — Informática para Internet.
                         </p>
                     </div>
 
                     <div class="footer-links">
-
                         <a href="#" class="footer-icon">
                             <i class="bi bi-github"></i>
                         </a>
@@ -190,11 +213,8 @@
                         <a href="#" class="footer-icon">
                             <i class="bi bi-envelope"></i>
                         </a>
-
                     </div>
-
                 </div>
-
             </footer>
 
         </div>
@@ -205,45 +225,9 @@
         const sidebar = document.getElementById("sidebar");
         const sidebarToggle = document.getElementById("sidebarToggle");
 
-        if (sidebar && sidebarToggle) {
-            sidebarToggle.addEventListener("click", function () {
-                sidebar.classList.toggle("collapsed");
-            });
-        }
-
-        const currentPath = window.location.pathname;
-        const sidebarLinks = document.querySelectorAll(".menu-link, .submenu-link");
-
-        sidebarLinks.forEach(function (link) {
-            const href = link.getAttribute("href");
-
-            if (href && href !== "#" && href === currentPath) {
-                link.classList.add("active");
-
-                const adminParent = document.querySelector(".admin-parent");
-                if (currentPath.startsWith("/admin") && adminParent) {
-                    adminParent.classList.add("active-parent");
-                }
-            }
+        sidebarToggle.addEventListener("click", function () {
+            sidebar.classList.toggle("collapsed");
         });
-        // Toggle do submenu admin
-const adminToggle = document.getElementById('adminToggle')
-const adminSubmenu = document.getElementById('adminSubmenu')
-const adminChevron = document.getElementById('adminChevron')
-
-if (adminToggle) {
-    // Abre automaticamente se estiver em rota /admin
-    if (currentPath.startsWith('/admin')) {
-        adminSubmenu.classList.add('open')
-        adminChevron.classList.add('rotated')
-        adminToggle.classList.add('active-parent')
-    }
-
-    adminToggle.addEventListener('click', function () {
-        adminSubmenu.classList.toggle('open')
-        adminChevron.classList.toggle('rotated')
-    })
-}
     </script>
 
     {% block extra_js %}{% endblock %}

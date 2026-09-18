@@ -1,0 +1,1903 @@
+{% extends "base.html" %}
+
+{% block title %}Editor de Apresentações | Conecta Barueri{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/apresentacao/criar-apresentacao.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="editor-container">
+
+    <header class="editor-header">
+        <div class="editor-header-info">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <input type="text" id="displayApresentacaoTitulo" class="editor-title-input" value="{{ apresentacao.nome if apresentacao else 'Apresentação Executiva' }}" style="font-size: 1.45rem; font-weight: 700; color: #0f172a; border: 1.5px solid #e2e8f0; background: #fff; padding: 6px 12px; border-radius: 8px; min-width: 320px; max-width: 550px; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.03);" onfocus="this.style.borderColor='#0052ff'; this.style.boxShadow='0 0 0 3px rgba(0,82,255,0.12)';" onblur="this.style.borderColor='#e2e8f0'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.03)';" title="Clique para alterar o nome da apresentação">
+                <i class="bi bi-pencil-square" style="font-size: 1.15rem; color: #64748b; cursor: pointer;" onclick="document.getElementById('displayApresentacaoTitulo').focus()" title="Editar nome da apresentação"></i>
+            </div>
+            <p class="editor-subtitle" style="margin-top: 4px;">Edite e organize os slides da sua apresentação institucional.</p>
+        </div>
+
+        <div class="editor-header-actions">
+            <button type="button" class="btn-editor-visualizar" id="btnVisualizar">
+                <i class="bi bi-eye"></i>
+                <span>Visualizar</span>
+            </button>
+            <button type="button" class="btn-editor-salvar" id="btnSalvar">
+                <i class="bi bi-floppy"></i>
+                <span>Salvar</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="editor-workspace">
+
+        <!-- NAVEGADOR -->
+        <aside class="panel-card slides-nav-panel">
+            <div class="panel-header">
+                <h2>Navegador de Slides</h2>
+                <span class="panel-badge-count">SLIDES</span>
+            </div>
+            <div class="slides-thumbs-list" id="slidesThumbsList">
+                <div class="slide-thumb-item active" data-slide-id="1">
+                    <span class="slide-index">1</span>
+                    <div class="thumb-card">
+                        <div class="thumb-canvas-mini capa-mini">
+                            <span class="mini-tag">Barueri</span>
+                            <div class="mini-title-bar"></div>
+                        </div>
+                        <span class="thumb-label">Slide 1</span>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn-novo-slide" id="btnNovoSlide">
+                <i class="bi bi-plus-lg"></i>
+                <span>Novo Slide</span>
+            </button>
+        </aside>
+
+        <!-- CANVAS -->
+        <main class="panel-card slide-canvas-panel">
+            <div class="panel-header">
+                <h2>Canvas do Slide</h2>
+            </div>
+            <div class="canvas-stage">
+                <div class="slide-surface template-capa" id="activeSlideSurface">
+
+                    <!-- CAPA LAYOUT -->
+                    <div class="layout-capa">
+                        <div class="slide-top-brand">
+                            <img src="{{ url_for('static', filename='img/logo-barueri.jpeg') }}" alt="Logo Barueri" class="slide-logo">
+                            <div class="slide-brand-text">
+                                <span>Prefeitura de</span>
+                                <strong>Barueri</strong>
+                            </div>
+                        </div>
+                        <div class="slide-main-content">
+                            <h1 class="slide-title-preview preview-titulo">Capa</h1>
+                            <h2 class="slide-subtitle-preview preview-subtitulo">Apresentação Executiva - Indicadores Municipais</h2>
+                        </div>
+                    </div>
+
+                    <!-- IMAGEM + TEXTO LAYOUT -->
+                    <div class="layout-imagem-texto" style="display: none;">
+                        <div class="slide-top-brand">
+                            <img src="{{ url_for('static', filename='img/logo-barueri.jpeg') }}" alt="Logo Barueri" class="slide-logo">
+                            <div class="slide-brand-text">
+                                <span>Prefeitura de</span>
+                                <strong>Barueri</strong>
+                            </div>
+                        </div>
+                        <div class="it-content-wrapper">
+                            <div class="it-left">
+                                <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb" alt="Imagem" class="it-img">
+                                <div class="it-qr-slot"></div>
+                            </div>
+                            <div class="it-right">
+                                <div class="it-ods-slot"></div>
+                                <div class="it-text-content">
+                                    <span class="it-label">Título do Slide</span>
+                                    <h1 class="slide-title-preview preview-titulo">Visão Geral dos Indicadores</h1>
+                                    <span class="it-label">Texto de Apoio</span>
+                                    <p class="slide-subtitle-preview preview-subtitulo">Resumo comparativo dos principais dados socioeconômicos.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- INDICADORES LAYOUT -->
+                    <div class="layout-indicadores" style="display: none;">
+                        <div class="slide-top-brand">
+                            <img src="{{ url_for('static', filename='img/logo-barueri.jpeg') }}" alt="Logo Barueri" class="slide-logo">
+                            <div class="slide-brand-text">
+                                <span>Prefeitura de</span>
+                                <strong>Barueri</strong>
+                            </div>
+                        </div>
+                        <div class="ind-content-wrapper">
+                            <div class="ind-header">
+                                <h1 class="slide-title-preview preview-titulo">Principais Indicadores Municipais</h1>
+                                <p class="slide-subtitle-preview preview-subtitulo">Plataforma integrada de dados da cidade.</p>
+                            </div>
+                            <div class="ind-grid" id="indGridPreview">
+                                <!-- Renderizado via JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GRÁFICO LAYOUT -->
+                    <div class="layout-grafico" style="display: none; flex: 1; min-height: 0; flex-direction: column;">
+                        <div class="slide-top-brand">
+                            <img src="{{ url_for('static', filename='img/logo-barueri.jpeg') }}" alt="Logo Barueri" class="slide-logo">
+                            <div class="slide-brand-text">
+                                <span>Prefeitura de</span>
+                                <strong>Barueri</strong>
+                            </div>
+                        </div>
+                        <div class="gra-header" style="margin-top: 2cqw;">
+                            <h1 class="slide-title-preview preview-titulo">Atendimentos médicos</h1>
+                            <p class="slide-subtitle-preview preview-subtitulo">Evolução no número de atendimentos médicos.</p>
+                        </div>
+                        <div class="gra-content" style="flex: 1; min-height: 0; display: flex; flex-direction: column;">
+                            <div class="gra-main-chart" style="flex:1; width:100%; position:relative; min-height:0; display:flex; flex-direction:column; background: #fff; padding: 2cqw; border-radius: 2cqw; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2cqw;">
+                                    <h4 style="margin: 0; font-size: 2.2cqw; font-weight: 700; color: #1e293b;">Total de atendimentos</h4>
+                                    <span class="gra-tag" id="previewPeriodo">Últimos 12 meses</span>
+                                </div>
+                                <div class="fake-chart-area" style="display:block; flex:1; position:relative; width:100%; min-height:0; padding: 0; background: transparent;">
+                                    <canvas id="slideChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="gra-side">
+                                <div class="gra-dropdown">Últimos 12 meses <i class="bi bi-chevron-down"></i></div>
+                                <div class="gra-stat">
+                                    <i class="bi bi-heart-pulse"></i>
+                                    <div>
+                                        <small>Consultas</small>
+                                        <strong>6.421</strong>
+                                    </div>
+                                </div>
+                                <div class="gra-stat">
+                                    <i class="bi bi-file-medical"></i>
+                                    <div>
+                                        <small>Exames</small>
+                                        <strong>1.842</strong>
+                                    </div>
+                                </div>
+                                <div class="gra-stat">
+                                    <i class="bi bi-file-earmark-text"></i>
+                                    <div>
+                                        <small>Procedimentos</small>
+                                        <strong>472</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SLOTS (Global posicionado absoluto ou no rodapé) -->
+                    <div class="global-slots-container" style="z-index: 1000; position: absolute; bottom: 12px; right: 12px; display: flex; gap: 10px; align-items: flex-end;">
+                        <div class="slide-slot-item" id="slotODS" style="display: none; flex-direction: row; gap: 3px; flex-wrap: nowrap; flex-shrink: 0;">
+                            <!-- badges gerados pelo JS -->
+                        </div>
+                        <div class="slide-slot-item" id="slotQRCode" style="display: none;">
+                            <div class="qr-code-box" style="padding:0; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+                                <img id="qrCodeImg" src="" style="width:100%; height:100%; object-fit:contain; display:none;">
+                                <i class="bi bi-qr-code" id="qrCodePlaceholder"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+
+        <!-- CONFIGURAÇÃO -->
+        <aside class="panel-card slide-config-panel">
+            <div class="panel-header">
+                <h2>Configuração do Slide</h2>
+            </div>
+            <form class="config-form" id="slideConfigForm" onsubmit="return false;">
+
+                <div class="form-group-ap">
+                    <label for="selectTemplate">Tipo de Template</label>
+                    <div class="select-wrapper">
+                        <select id="selectTemplate" class="form-control-ap">
+                            <option value="capa" selected>Capa / Abertura</option>
+                            <option value="imagem_texto">Imagem + Texto</option>
+                            <option value="indicadores">Indicadores</option>
+                            <option value="grafico">Gráfico</option>
+                        </select>
+                        <i class="bi bi-chevron-down select-chevron"></i>
+                    </div>
+                </div>
+
+                <div class="form-group-ap fg-titulo">
+                    <label for="inputTitulo" id="labelTitulo">Título</label>
+                    <input type="text" id="inputTitulo" class="form-control-ap" value="Capa">
+                </div>
+
+                <div class="form-group-ap fg-subtitulo">
+                    <label for="inputSubtitulo" id="labelSubtitulo">Texto Introdutório</label>
+                    <textarea id="inputSubtitulo" class="form-control-ap" rows="3">Apresentação Executiva - Indicadores Municipais</textarea>
+                </div>
+
+                <!-- Fundo do Slide -->
+                <div class="config-slots-section mt-3">
+                    <div class="slots-header" data-bs-toggle="collapse" data-bs-target="#collapseFundo" role="button" aria-expanded="false" aria-controls="collapseFundo" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                        <h4>Fundo do Slide</h4>
+                        <i class="bi bi-chevron-down" style="font-size: 0.9rem; color: #64748b;"></i>
+                    </div>
+                    <div class="collapse" id="collapseFundo">
+                        <div style="padding-top: 8px;">
+                            <label style="font-size: 0.85rem; font-weight: 600;">Cor de Fundo</label>
+                            <div style="display:flex; align-items: center; margin-bottom: 12px; gap:8px;">
+                                <div style="position:relative; width:38px; height:38px; border-radius:50%; overflow:hidden; border:2px solid #e2e8f0; box-shadow:0 2px 4px rgba(0,0,0,0.05); cursor:pointer;">
+                                    <input type="color" id="inputCorFundo" value="#ffffff" style="position:absolute; top:-10px; left:-10px; width:60px; height:60px; padding:0; border:none; cursor:pointer;">
+                                </div>
+                            </div>
+
+                            <label style="font-size: 0.85rem; font-weight: 600;">Imagem de Fundo</label>
+                            <div class="media-upload-preview" style="margin-top: 4px;">
+                                <div class="media-thumb-box"><img id="bgGeralThumbPreview" src="" alt="BG" style="display:none;"></div>
+                                <button type="button" class="btn-media-action" id="btnUploadBgGeral" style="flex:1;">Upload Imagem</button>
+                                <button type="button" class="btn-media-action" id="btnRemoveBgGeral" style="background:#fee2e2; color:#ef4444; border:1px solid #f87171; display:none;"><i class="bi bi-trash"></i></button>
+                                <input type="file" id="inputUploadBgGeral" accept="image/*" style="display: none;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Imagem+Texto específicos -->
+                <div class="form-group-ap tpl-imgtexto" style="display: none;">
+                    <label>Upload de Imagem</label>
+                    <div class="media-upload-preview">
+                        <button type="button" class="btn-editor-visualizar" style="flex:1;" id="btnUploadImgTexto">Upload + Thumbnail</button>
+                        <input type="file" id="inputUploadImgTexto" accept="image/*" style="display: none;">
+                        <div class="media-thumb-box" style="width: 40px; flex: none;"><img id="imgTextoThumbPreview" src="https://images.unsplash.com/photo-1506744038136-46273834b3fb" alt="IMG"></div>
+                    </div>
+                </div>
+
+                <!-- Indicadores específicos -->
+                <div class="form-group-ap tpl-indicadores" style="display: none;">
+                    <label>Indicadores (Máximo 4)</label>
+                    <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                        <select id="selectIndicadorNovo" class="form-control-ap" style="flex: 1;">
+                            <option value="1">Saúde (3.237)</option>
+                            <option value="2">Segurança (3.847)</option>
+                            <option value="3">Educação (3.755)</option>
+                            <option value="4">Mobilidade (4.687)</option>
+                            <option value="5">Meio Ambiente (1.240)</option>
+                            <option value="6">Economia (8.921)</option>
+                        </select>
+                        <button type="button" id="btnAddIndicador" style="background: var(--primary); color: #fff; border: none; border-radius: 4px; padding: 0 12px; cursor: pointer;"><i class="bi bi-plus"></i></button>
+                    </div>
+                    <div class="ind-list-edit" id="indListEdit">
+                        <!-- Renderizado via JS -->
+                    </div>
+                </div>
+
+                <!-- Gráfico específicos -->
+                <div class="form-group-ap tpl-grafico" style="display: none;">
+                    <label for="selectChartIndicador">Indicador Base</label>
+                    <select class="form-control-ap mb-3" id="selectChartIndicador">
+                        <option value="1">Saúde</option>
+                        <option value="2">Segurança</option>
+                        <option value="3">Educação</option>
+                        <option value="4">Mobilidade</option>
+                        <option value="5">Meio Ambiente</option>
+                        <option value="6">Economia</option>
+                    </select>
+
+                    <label>Tipo de gráfico</label>
+                    <div class="chart-type-selector">
+                        <button type="button" class="btn-chart-type active" data-type="line"><i class="bi bi-graph-up"></i> Linha</button>
+                        <button type="button" class="btn-chart-type" data-type="bar"><i class="bi bi-bar-chart"></i> Barras</button>
+                        <button type="button" class="btn-chart-type" data-type="pie"><i class="bi bi-pie-chart"></i> Pizza</button>
+                    </div>
+                    <label class="mt-2">Dados</label>
+                    <div class="d-flex gap-3 mb-2" style="font-size:0.75rem;">
+                        <label><input type="radio" name="fonte" checked> Manual</label>
+                        <label><input type="radio" name="fonte"> Dado do sistema</label>
+                    </div>
+                    <label>Período</label>
+                    <select class="form-control-ap" id="selectPeriodo">
+                        <option value="Últimos 12 meses">Últimos 12 meses</option>
+                        <option value="Ano atual">Ano atual</option>
+                        <option value="Ano anterior">Ano anterior</option>
+                    </select>
+                </div>
+
+                <!-- Estilos de Texto -->
+                <div class="config-slots-section mt-3">
+                    <div class="slots-header" data-bs-toggle="collapse" data-bs-target="#collapseTexto" role="button" aria-expanded="false" aria-controls="collapseTexto" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                        <h4>Estilos de Texto</h4>
+                        <i class="bi bi-chevron-down" style="font-size: 0.9rem; color: #64748b;"></i>
+                    </div>
+                    <div class="collapse" id="collapseTexto">
+                        <div style="padding-top: 8px;">
+                            <label style="font-size: 0.85rem; font-weight: 600;">Tamanho do Texto (Proporção)</label>
+                            <div style="display:flex; flex-direction:column; gap: 8px; margin-bottom: 16px;">
+                                <div style="display:flex; align-items: center; justify-content: space-between;">
+                                    <label style="font-size: 0.75rem; color:#475569;">Título</label>
+                                    <div class="input-group input-group-sm" style="width: 120px;">
+                                        <input type="number" class="form-control" id="inputRangeTitulo" min="1.0" max="15.0" step="0.2" value="4.0" style="text-align:center; border-color:#e2e8f0;">
+                                        <span class="input-group-text" style="background:#f8fafc; border-color:#e2e8f0; color:#64748b; font-size:0.7rem;">x</span>
+                                    </div>
+                                </div>
+                                <div style="display:flex; align-items: center; justify-content: space-between;">
+                                    <label style="font-size: 0.75rem; color:#475569;">Subtítulo</label>
+                                    <div class="input-group input-group-sm" style="width: 120px;">
+                                        <input type="number" class="form-control" id="inputRangeSubtitulo" min="0.5" max="10.0" step="0.2" value="1.8" style="text-align:center; border-color:#e2e8f0;">
+                                        <span class="input-group-text" style="background:#f8fafc; border-color:#e2e8f0; color:#64748b; font-size:0.7rem;">x</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <label style="font-size: 0.85rem; font-weight: 600;">Cor do Texto</label>
+                            <div style="display:flex; gap: 16px; align-items: center; margin-bottom: 12px;">
+                                <div style="display:flex; flex-direction:column; gap:4px; align-items:center;">
+                                    <label style="font-size: 0.7rem; color:#64748b; font-weight:600; text-transform:uppercase;">Título</label>
+                                    <div style="position:relative; width:38px; height:38px; border-radius:50%; overflow:hidden; border:2px solid #e2e8f0; box-shadow:0 2px 4px rgba(0,0,0,0.05); cursor:pointer;">
+                                        <input type="color" id="inputCorTitulo" value="#0f172a" style="position:absolute; top:-10px; left:-10px; width:60px; height:60px; padding:0; border:none; cursor:pointer;">
+                                    </div>
+                                </div>
+                                <div style="display:flex; flex-direction:column; gap:4px; align-items:center;">
+                                    <label style="font-size: 0.7rem; color:#64748b; font-weight:600; text-transform:uppercase;">Subtítulo</label>
+                                    <div style="position:relative; width:38px; height:38px; border-radius:50%; overflow:hidden; border:2px solid #e2e8f0; box-shadow:0 2px 4px rgba(0,0,0,0.05); cursor:pointer;">
+                                        <input type="color" id="inputCorSubtitulo" value="#64748b" style="position:absolute; top:-10px; left:-10px; width:60px; height:60px; padding:0; border:none; cursor:pointer;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-slots-section mt-3">
+                    <div class="slots-header" data-bs-toggle="collapse" data-bs-target="#collapseLogos" role="button" aria-expanded="false" aria-controls="collapseLogos" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                        <h4>Logos no Slide</h4>
+                        <i class="bi bi-chevron-down" style="font-size: 0.9rem; color: #64748b;"></i>
+                    </div>
+                    <div class="collapse" id="collapseLogos">
+                        <div style="display:flex; flex-direction:column; gap:8px; margin-bottom: 16px; font-size: 0.85rem; color: #334155; padding-top: 8px;">
+                            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="chk-logo-item" value="barueri" checked> Prefeitura de Barueri</label>
+                            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="chk-logo-item" value="sit"> Sec. Inovação (SIT)</label>
+                            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="chk-logo-item" value="inovacao"> Inovação Barueri</label>
+                            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="chk-logo-item" value="tv"> TV Inovação</label>
+                            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="chk-logo-item" value="onu"> ONU BR</label>
+                            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="chkLogoCustom"> Logo Personalizada</label>
+                            <div id="fgLogoCustom" style="display:none; padding-left: 20px;">
+                                <input type="file" id="inputUploadLogoCustom" accept="image/*" class="form-control" style="font-size:0.75rem; padding:4px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slots-header" data-bs-toggle="collapse" data-bs-target="#collapseExtras" role="button" aria-expanded="false" aria-controls="collapseExtras" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+                        <h4>Elementos extras</h4>
+                        <i class="bi bi-chevron-down" style="font-size: 0.9rem; color: #64748b;"></i>
+                    </div>
+                    <div class="collapse" id="collapseExtras">
+                        <div class="slot-toggle-row" style="margin-top: 8px;">
+                            <div class="slot-row-label">
+                                <img src="https://sdgs.un.org/sites/default/files/2023-08/SDG_logo_without_UN_emblem_Square_Transparent_WEB.png" style="width:16px;">
+                                <span>ODS</span>
+                            </div>
+                            <label class="switch-ap">
+                                <input type="checkbox" id="toggleODS">
+                                <span class="slider-ap"></span>
+                            </label>
+                        </div>
+                        <div id="fgODSSelect" style="display: none; margin-top: 8px; display:flex; flex-direction:column; gap:6px;">
+                            <div id="odsSelectsContainer" style="display:flex; flex-direction:column; gap:6px;">
+                                <!-- selects gerados pelo JS -->
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddOds" style="font-size:0.8rem;">
+                                <i class="bi bi-plus-circle"></i> Adicionar ODS
+                            </button>
+                        </div>
+                        <div class="slot-toggle-row">
+                            <div class="slot-row-label">
+                                <i class="bi bi-qr-code"></i>
+                                <span>QR Code</span>
+                            </div>
+                            <label class="switch-ap">
+                                <input type="checkbox" id="toggleQR">
+                                <span class="slider-ap"></span>
+                            </label>
+                        </div>
+                        <div class="form-group" id="fgQRLink" style="display: none; padding-left: 0; margin-top: 8px;">
+                            <label style="font-size:0.85rem; color:var(--text-muted); margin-bottom:4px; display:block;">Link do QR Code:</label>
+                            <input type="url" id="inputQRLink" class="form-control" placeholder="https://..." style="font-size:0.85rem; padding:8px 12px;">
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+        </aside>
+
+    </div>
+</div>
+
+<!-- PREVIEW MODAL -->
+<div id="previewModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.95); z-index:9999; flex-direction:column; align-items:center; justify-content:center; padding:20px;">
+
+    <div style="width: 100%; max-width: 1000px; display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div style="color:#fff; font-size:1.2rem; font-weight:bold;">
+            Modo Apresentação
+        </div>
+        <div style="display:flex; gap:12px;">
+            <button id="btnPrevSlide" style="padding:8px 16px; background:#3b82f6; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer;"><i class="bi bi-chevron-left"></i> Anterior</button>
+            <button id="btnNextSlide" style="padding:8px 16px; background:#3b82f6; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">Próximo <i class="bi bi-chevron-right"></i></button>
+            <button id="btnClosePreview" style="padding:8px 16px; background:#ef4444; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer;"><i class="bi bi-x-lg"></i> Fechar</button>
+        </div>
+    </div>
+
+    <div id="previewContainer" style="width:100%; max-width:1000px; max-height: calc(100vh - 120px); aspect-ratio:16/9; background:#fff; border-radius:12px; overflow:hidden; display:flex; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+        <!-- Clone do slide irá aqui -->
+    </div>
+</div>
+
+<!-- SAVE MODAL -->
+<div id="saveModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.6); z-index:9998; flex-direction:column; align-items:center; justify-content:center; padding:20px; backdrop-filter: blur(3px);">
+    <div style="width: 100%; max-width: 500px; background: #ffffff; border-radius: 12px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+            <h3 style="margin:0; font-size:1.25rem; color:#0f172a; font-weight:700;">Salvar Apresentação</h3>
+            <button id="btnCloseSave" style="background:none; border:none; font-size:1.5rem; color:#64748b; cursor:pointer;"><i class="bi bi-x"></i></button>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 16px;">
+            <label style="font-size:0.85rem; font-weight:600; color:#334155; margin-bottom:6px; display:block;">Nome da Apresentação</label>
+            <input type="text" class="form-control" id="inputSaveNome" placeholder="Ex: Resultados Q3 2026" style="padding: 10px 14px;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 24px;">
+            <label style="font-size:0.85rem; font-weight:600; color:#334155; margin-bottom:6px; display:block;">Salvar no Projeto (Pasta)</label>
+            <select class="form-control" id="selectSaveProjeto" style="padding: 10px 14px;">
+                <option value="">Selecione uma pasta...</option>
+                {% if projetos %}
+                    {% for proj in projetos %}
+                    <option value="{{ proj.id }}" {% if (apresentacao and apresentacao.projeto_id == proj.id) or (request.args.get('projeto_id')|int == proj.id) %}selected{% endif %}>{{ proj.nome }}</option>
+                    {% endfor %}
+                {% else %}
+                    <option value="1" selected>Projeto Geral</option>
+                {% endif %}
+            </select>
+            <small style="color: #64748b; font-size: 0.75rem; display:block; margin-top: 6px;">
+                A apresentação ficará disponível dentro da pasta deste projeto.
+            </small>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:12px;">
+            <button id="btnCancelSave" style="padding:10px 20px; background:#f1f5f9; color:#475569; border:none; border-radius:6px; font-weight:600; cursor:pointer;">Cancelar</button>
+            <button id="btnConfirmSave" style="padding:10px 20px; background:#3b82f6; color:#fff; border:none; border-radius:6px; font-weight:600; cursor:pointer;"><i class="bi bi-floppy" style="margin-right: 6px;"></i> Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST SALVAR -->
+<div id="saveToast" style="display:none; position:fixed; top:20px; right:20px; background:#10b981; color:#fff; padding:12px 24px; border-radius:8px; font-weight:bold; box-shadow:0 4px 12px rgba(0,0,0,0.15); z-index:9999; align-items:center; gap:8px;">
+    <i class="bi bi-check-circle" style="font-size:1.2rem;"></i> <span>Apresentação salva com sucesso!</span>
+</div>
+
+<style>
+    /* Redimensionamento Proporcional (Container Queries) para o Slide */
+    .slide-surface {
+        container-type: inline-size;
+    }
+
+    /* Textos Gerais */
+    .slide-surface .it-text-content h1 { font-size: 4cqw !important; margin-bottom: 2cqw !important; }
+    .slide-surface .it-text-content p { font-size: 2cqw !important; line-height: 1.5; }
+    .slide-surface .it-label { font-size: 1.2cqw !important; margin-bottom: 0.5cqw !important; }
+
+    .slots-header[aria-expanded="true"] .bi-chevron-down {
+        transform: rotate(180deg);
+    }
+    .slots-header .bi-chevron-down {
+        transition: transform 0.3s ease;
+    }
+
+    .slide-surface .preview-titulo { font-size: 4cqw !important; margin-bottom: 1cqw !important; }
+    .slide-surface .preview-subtitulo { font-size: 1.8cqw !important; line-height: 1.4; }
+
+    /* Logos e Marcas */
+    .slide-surface .slide-brand-text span { font-size: 1cqw !important; }
+    .slide-surface .slide-brand-text strong { font-size: 1.8cqw !important; }
+    .slide-surface .slide-logo { width: 5cqw !important; height: 5cqw !important; }
+
+    /* Elementos Extras */
+    .slide-surface .ods-badge-box { transform: none !important; padding: 0.6cqw 1.2cqw !important; border-radius: 0.6cqw !important; gap: 0.9cqw !important; }
+    .slide-surface .ods-number { font-size: 2.5cqw !important; }
+    .slide-surface .ods-desc { font-size: 1cqw !important; }
+    .slide-surface .ods-desc small { font-size: 0.8cqw !important; }
+    .slide-surface .qr-code-box { transform: none !important; width: 5.2cqw !important; height: 5.2cqw !important; font-size: 3cqw !important; border-radius: 0.6cqw !important; }
+
+    /* Indicadores */
+    .slide-surface .ind-header h1 { font-size: 3.5cqw !important; margin-bottom: 1cqw !important; }
+    .slide-surface .ind-header p { font-size: 1.8cqw !important; }
+    .slide-surface .ind-info h3 { font-size: 5cqw !important; margin-top: 1cqw !important; }
+    .slide-surface .ind-info span { font-size: 1.5cqw !important; }
+    .slide-surface .ind-icon { font-size: 3.5cqw !important; padding: 1.5cqw !important; border-radius: 1cqw !important;}
+    .slide-surface .ind-card { padding: 3cqw !important; gap: 2cqw !important; border-radius: 1.5cqw !important; border-width: 2px !important; }
+
+    /* Gráficos */
+    .slide-surface .gra-header h1 { font-size: 3.5cqw !important; margin-bottom: 1cqw !important; }
+    .slide-surface .gra-header p { font-size: 1.8cqw !important; }
+    .slide-surface .gra-main-chart h4 { font-size: 2.2cqw !important; margin: 0 !important; }
+    .slide-surface .gra-tag {
+        font-size: 1.3cqw !important;
+        background: #eff6ff !important;
+        color: #2563eb !important;
+        border: 1px solid #bfdbfe !important;
+        padding: 0.3cqw 1cqw !important;
+        border-radius: 9999px !important;
+        font-weight: 600 !important;
+        margin: 0 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const ODS_OPTIONS = {
+        "1":  { num: "1",  label: "Erradicação da Pobreza",            color: "#E5243B" },
+        "2":  { num: "2",  label: "Fome Zero",                          color: "#DDA63A" },
+        "3":  { num: "3",  label: "Saúde e Bem-Estar",                  color: "#4C9F38" },
+        "4":  { num: "4",  label: "Educação de Qualidade",              color: "#C5192D" },
+        "5":  { num: "5",  label: "Igualdade de Género",                color: "#FF3A21" },
+        "6":  { num: "6",  label: "Água Potável e Saneamento",          color: "#26BDE2" },
+        "7":  { num: "7",  label: "Energia Acessível e Limpa",          color: "#FCC30B" },
+        "8":  { num: "8",  label: "Trabalho e Crescimento",             color: "#A21942" },
+        "9":  { num: "9",  label: "Inovação e Infraestrutura",          color: "#FD6925" },
+        "10": { num: "10", label: "Redução das Desigualdades",          color: "#DD1367" },
+        "11": { num: "11", label: "Cidades Sustentáveis",               color: "#FD9D24" },
+        "12": { num: "12", label: "Consumo Responsável",                color: "#BF8B2E" },
+        "13": { num: "13", label: "Ação Climática",                     color: "#3F7E44" },
+        "14": { num: "14", label: "Vida na Água",                       color: "#0A97D9" },
+        "15": { num: "15", label: "Vida Terrestre",                     color: "#56C02B" },
+        "16": { num: "16", label: "Paz e Instituições Eficazes",        color: "#00689D" },
+        "17": { num: "17", label: "Parcerias e Meios de Implementação", color: "#19486A" }
+    };
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialTemplate = urlParams.get('template') || "capa";
+
+    let slides = {{ (slides_iniciais or [{
+        "id": 1,
+        "template": "capa",
+        "titulo": (apresentacao.nome if apresentacao else "Capa"),
+        "subtitulo": "Apresentação Executiva - Indicadores Municipais",
+        "logos": ["barueri"],
+        "customLogoImg": None,
+        "ods": true,
+        "odsNums": ["11"],
+        "qr": false,
+        "qrLink": "",
+        "bgCapa": None,
+        "imgTexto": None,
+        "chartType": "line",
+        "chartIndicador": 1,
+        "periodo": "Últimos 12 meses",
+        "indicadores": [],
+        "tamanhoTitulo": 4.0,
+        "tamanhoSubtitulo": 1.8,
+        "corTitulo": "#0f172a",
+        "corSubtitulo": "#64748b"
+    }]) | tojson }};
+
+    window.apresentacaoId = {{ apresentacao.id if apresentacao else 'null' }};
+    window.projetoId = {{ apresentacao.projeto_id if apresentacao and apresentacao.projeto_id else 'null' }};
+
+    let activeSlideId = (slides && slides.length > 0) ? slides[0].id : 1;
+    let slideCounter = (slides && slides.length > 0) ? slides.reduce((max, s) => Math.max(max, Number(s.id) || 0), 0) : 1;
+    if (slideCounter < 1) slideCounter = 1;
+
+    let slideChartInstance = null;
+
+    const selectTemplate = document.getElementById("selectTemplate");
+    const layoutCapa = document.querySelector(".layout-capa");
+    const layoutImgTexto = document.querySelector(".layout-imagem-texto");
+    const layoutIndicadores = document.querySelector(".layout-indicadores");
+    const layoutGrafico = document.querySelector(".layout-grafico");
+
+    const tplCapa = document.querySelectorAll(".tpl-capa");
+    const tplImgTexto = document.querySelectorAll(".tpl-imgtexto");
+    const tplIndicadores = document.querySelectorAll(".tpl-indicadores");
+    const tplGrafico = document.querySelectorAll(".tpl-grafico");
+
+    const labelTitulo = document.getElementById("labelTitulo");
+    const labelSubtitulo = document.getElementById("labelSubtitulo");
+    const fgSubtitulo = document.querySelector(".fg-subtitulo");
+
+    const inputTitulo = document.getElementById("inputTitulo");
+    const inputSubtitulo = document.getElementById("inputSubtitulo");
+
+    const slotODS = document.getElementById("slotODS");
+    const slotQRCode = document.getElementById("slotQRCode");
+
+    const chkLogoItems = document.querySelectorAll(".chk-logo-item");
+    const chkLogoCustom = document.getElementById("chkLogoCustom");
+    const fgLogoCustom = document.getElementById("fgLogoCustom");
+    const inputUploadLogoCustom = document.getElementById("inputUploadLogoCustom");
+
+    const toggleODS = document.getElementById("toggleODS");
+    const toggleQR = document.getElementById("toggleQR");
+    const fgODSSelect = document.getElementById("fgODSSelect");
+    const odsSelectsContainer = document.getElementById("odsSelectsContainer");
+    const btnAddOds = document.getElementById("btnAddOds");
+    const fgQRLink = document.getElementById("fgQRLink");
+    const inputQRLink = document.getElementById("inputQRLink");
+    const qrCodeImg = document.getElementById("qrCodeImg");
+    const qrCodePlaceholder = document.getElementById("qrCodePlaceholder");
+
+    const btnNovoSlide = document.getElementById("btnNovoSlide");
+    const slidesThumbsList = document.getElementById("slidesThumbsList");
+
+    // Novos elementos para upload de imagem
+    const btnUploadBgCapa = document.getElementById("btnUploadBgCapa");
+    const inputUploadBgCapa = document.getElementById("inputUploadBgCapa");
+    const bgCapaThumbPreview = document.getElementById("bgCapaThumbPreview");
+
+    const btnUploadImgTexto = document.getElementById("btnUploadImgTexto");
+    const inputUploadImgTexto = document.getElementById("inputUploadImgTexto");
+    const imgTextoThumbPreview = document.getElementById("imgTextoThumbPreview");
+    const activeSlideSurface = document.getElementById("activeSlideSurface");
+    const imgTextoCanvasImg = document.querySelector(".it-img"); // a imagem no template Imagem+Texto
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function buildLogosHtml(slide, isMini = false) {
+        const logos = slide.logos || ["barueri"];
+        if (logos.length === 0) return "";
+
+        const hasBg = !!slide.bgGeral; // For main canvas, css classes handle color usually, but we will force white if it has bg.
+        const textColor = hasBg ? '#ffffff' : '#0f172a';
+        const barueriColor = hasBg ? '#ffffff' : '#0284c7';
+
+        // Base scales
+        const scale = isMini ? 1 : 2; // mini uses fixed px, main uses cqw (approximated here)
+
+        let html = `<div style="display:flex; align-items:center; gap:${isMini ? '6px' : '2cqw'}; flex-wrap:wrap; margin-bottom:${isMini ? '2px' : '0'};">`;
+
+        if (logos.includes('barueri')) {
+            if (isMini) {
+                html += `
+                <div style="display:flex; align-items:center; gap:2px;">
+                    <img src="/static/img/logo-barueri.jpeg" style="width:6px; height:6px; object-fit:contain; border-radius:1px;">
+                    <div style="display:flex; flex-direction:column; line-height:1;">
+                        <span style="font-size:2px; font-weight:600; color:${textColor};">Prefeitura de</span>
+                        <span style="font-size:3.5px; font-weight:700; color:${barueriColor};">Barueri</span>
+                    </div>
+                </div>`;
+            } else {
+                html += `
+                <div style="display:flex; align-items:center; gap:1cqw;">
+                    <img src="/static/img/logo-barueri.jpeg" style="width:5cqw; height:5cqw; object-fit:contain; border-radius:0.5cqw;">
+                    <div style="display:flex; flex-direction:column; line-height:1;">
+                        <span style="font-size:1.5cqw; font-weight:600; color:${textColor};">Prefeitura de</span>
+                        <span style="font-size:2.5cqw; font-weight:800; color:${barueriColor};">Barueri</span>
+                    </div>
+                </div>`;
+            }
+        }
+        if (logos.includes('sit')) {
+            html += `
+            <div style="display:flex; flex-direction:column; line-height:1; text-align:right;">
+                <span style="font-size:${isMini ? '2px' : '1.5cqw'}; font-weight:800; color:${textColor};">SECRETARIA DE</span>
+                <span style="font-size:${isMini ? '2.5px' : '2cqw'}; font-weight:900; color:${textColor};">INOVAÇÃO E TECNOLOGIA</span>
+            </div>`;
+        }
+        if (logos.includes('inovacao')) {
+            html += `
+            <div style="display:flex; align-items:center; gap:${isMini ? '1px' : '0.5cqw'};">
+                <i class="bi bi-cpu" style="font-size:${isMini ? '5px' : '3.5cqw'}; color:${textColor};"></i>
+                <div style="display:flex; flex-direction:column; line-height:1;">
+                    <span style="font-size:${isMini ? '3px' : '2cqw'}; font-weight:900; color:${textColor};">INOVAÇÃO</span>
+                    <span style="font-size:${isMini ? '2px' : '1.2cqw'}; font-weight:600; color:${textColor};">BARUERI</span>
+                </div>
+            </div>`;
+        }
+        if (logos.includes('tv')) {
+            html += `
+            <div style="display:flex; align-items:center; gap:${isMini ? '1px' : '0.5cqw'};">
+                <i class="bi bi-play-btn" style="font-size:${isMini ? '5px' : '3.5cqw'}; color:${textColor};"></i>
+                <span style="font-size:${isMini ? '3px' : '2cqw'}; font-weight:900; color:${textColor}; line-height:1;">TV INOVAÇÃO</span>
+            </div>`;
+        }
+        if (logos.includes('onu')) {
+            html += `
+            <div style="display:flex; align-items:center; gap:${isMini ? '1px' : '0.5cqw'};">
+                <i class="bi bi-globe-americas" style="font-size:${isMini ? '5px' : '3.5cqw'}; color:${textColor};"></i>
+                <div style="display:flex; flex-direction:column; line-height:1;">
+                    <span style="font-size:${isMini ? '2px' : '1.2cqw'}; font-weight:600; color:${textColor};">Projetos alinhados</span>
+                    <span style="font-size:${isMini ? '3px' : '2cqw'}; font-weight:900; color:${textColor};">ONU BR</span>
+                </div>
+            </div>`;
+        }
+        if (logos.includes('custom') && slide.customLogoImg) {
+            html += `
+            <div style="display:flex; align-items:center;">
+                <img src="${slide.customLogoImg}" style="height:${isMini ? '6px' : '4cqw'}; max-width:${isMini ? '15px' : '15cqw'}; object-fit:contain;">
+            </div>`;
+        }
+
+        html += `</div>`;
+        return html;
+    }
+
+    function renderMiniSlidePreview(slide) {
+        const tpl = slide.template || 'capa';
+        const title = escapeHtml(slide.titulo || '');
+        const subtitle = escapeHtml(slide.subtitulo || '');
+
+        let odsBadge = '';
+        if (slide.ods && slide.odsNums && slide.odsNums.length > 0) {
+            odsBadge = `<div style="position:absolute; top:4px; right:6px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; z-index: 2;">`;
+            odsBadge += slide.odsNums.map(num => {
+                const opt = ODS_OPTIONS[num];
+                if(!opt) return '';
+                return `<div style="width:7px; height:7px; background:${opt.color}; color:#fff; font-size:3.5px; font-weight:900; border-radius:1px; display:flex; align-items:center; justify-content:center; line-height:1;">${opt.num}</div>`;
+            }).join('');
+            odsBadge += `</div>`;
+        }
+
+        const qrBadge = slide.qr ? `
+            <div style="position: absolute; bottom: 2px; right: 2px; width: 10px; height: 10px; background: #fff; border: 0.5px solid #cbd5e1; border-radius: 1px; display: flex; align-items: center; justify-content: center; font-size: 6px; color: #0f172a; z-index: 2; line-height: 1; overflow:hidden; padding: 0.5px;">
+                ${(slide.qrLink && slide.qrLink.trim() !== '') ? `<img src="https://api.qrserver.com/v1/create-qr-code/?size=50x50&data=${encodeURIComponent(slide.qrLink)}" style="width:100%; height:100%; object-fit:contain;">` : `<i class="bi bi-qr-code" style="font-size: 6px;"></i>`}
+            </div>` : '';
+
+        const globalBgStyle = slide.bgGeral ? `background: url(${slide.bgGeral}) center/cover no-repeat;` : `background: ${slide.corFundo || '#ffffff'};`;
+        const hasBgImg = !!slide.bgGeral;
+
+        if (tpl === 'capa') {
+            const defaultTextColor = hasBgImg ? '#ffffff' : '#0f172a';
+            const defaultSubColor = hasBgImg ? 'rgba(255,255,255,0.85)' : '#64748b';
+            const textColor = slide.corTitulo || defaultTextColor;
+            const subColor = slide.corSubtitulo || defaultSubColor;
+            const titleSize = slide.tamanhoTitulo ? (slide.tamanhoTitulo * 1.5) + 'px' : '7px';
+            const subSize = slide.tamanhoSubtitulo ? (slide.tamanhoSubtitulo * 1.5) + 'px' : '4.5px';
+
+            const logoHtml = buildLogosHtml(slide, true);
+            return `
+                <div style="width:100%; height:100%; position:relative; padding: 4px 6px; display:flex; flex-direction:column; justify-content:space-between; ${globalBgStyle} box-sizing: border-box; overflow:hidden;">
+                    ${hasBgImg ? '<div style="position:absolute; inset:0; background:rgba(0,0,0,0.35); z-index:0;"></div>' : ''}
+                    ${logoHtml}
+                    <div style="position:relative; z-index:1; margin-bottom:2px;">
+                        <div style="font-size:${titleSize}; font-weight:800; color:${textColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.1;">${title || 'Capa'}</div>
+                        <div style="font-size:${subSize}; color:${subColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.1;">${subtitle || 'Apresentação Executiva'}</div>
+                    </div>
+                    ${odsBadge}
+                    ${qrBadge}
+                </div>
+            `;
+        }
+
+        if (tpl === 'imagem_texto') {
+            const imgSrc = slide.imgTexto || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb';
+            const defaultTextColor = hasBgImg ? '#ffffff' : '#0f172a';
+            const defaultSubColor = hasBgImg ? 'rgba(255,255,255,0.85)' : '#64748b';
+            const textColor = slide.corTitulo || defaultTextColor;
+            const subColor = slide.corSubtitulo || defaultSubColor;
+            const titleSize = slide.tamanhoTitulo ? (slide.tamanhoTitulo * 1.5) + 'px' : '6px';
+            const subSize = slide.tamanhoSubtitulo ? (slide.tamanhoSubtitulo * 1.5) + 'px' : '4.5px';
+
+            const logoHtml = buildLogosHtml(slide, true);
+            return `
+                <div style="width:100%; height:100%; position:relative; padding:3px; display:flex; flex-direction:column; ${globalBgStyle} box-sizing:border-box; overflow:hidden;">
+                    ${hasBgImg ? '<div style="position:absolute; inset:0; background:rgba(255,255,255,0.7); z-index:0;"></div>' : ''}
+                    <div style="position:relative; z-index:1; display:flex; flex-direction:column; height:100%;">
+                        ${logoHtml}
+                        <div style="display:flex; flex:1; gap:4px; align-items:center; min-height:0;">
+                            <div style="width:45%; height:100%; border-radius:2px; overflow:hidden; flex-shrink:0; background:#f1f5f9; position:relative;">
+                                <img src="${imgSrc}" style="width:100%; height:100%; object-fit:cover; display:block;">
+                            </div>
+                            <div style="flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; gap:2px;">
+                                <div style="font-size:3.5px; font-weight:700; color:#64748b; text-transform:uppercase; line-height:1;">TÍTULO</div>
+                                <div style="font-size:${titleSize}; font-weight:800; color:${textColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1;">${title || 'Título'}</div>
+                                <div style="font-size:${subSize}; color:${subColor}; line-height:1.1; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${subtitle || 'Texto de apoio'}</div>
+                            </div>
+                        </div>
+                    </div>
+                    ${odsBadge}
+                    ${qrBadge}
+                </div>
+            `;
+        }
+
+        if (tpl === 'indicadores') {
+            const indArray = slide.indicadores || [];
+            const indHtml = indArray.map(ind => `
+                <div style="background:#f8fafc; border:0.5px solid #e2e8f0; border-radius:2px; padding:1.5px 2px; text-align:center;">
+                    <div style="font-size:5px; font-weight:800; color:#0f172a; line-height:1;">${ind.valor}</div>
+                    <div style="font-size:3px; color:#64748b; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1;">${ind.nome}</div>
+                </div>
+            `).join("");
+
+            const defaultTextColor = hasBgImg ? '#ffffff' : '#0f172a';
+            const textColor = slide.corTitulo || defaultTextColor;
+            const titleSize = slide.tamanhoTitulo ? (slide.tamanhoTitulo * 1.5) + 'px' : '5.5px';
+
+            const logoHtml = buildLogosHtml(slide, true);
+
+            return `
+                <div style="width:100%; height:100%; position:relative; padding:3px 4px; display:flex; flex-direction:column; ${globalBgStyle} box-sizing:border-box; overflow:hidden;">
+                    ${hasBgImg ? '<div style="position:absolute; inset:0; background:rgba(255,255,255,0.6); z-index:0;"></div>' : ''}
+                    <div style="position:relative; z-index:1; display:flex; flex-direction:column; height:100%;">
+                        ${logoHtml}
+                        <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                            <div style="text-align:center; margin-bottom:2px;">
+                                <div style="font-size:${titleSize}; font-weight:800; color:${textColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1;">${title || 'Indicadores'}</div>
+                            </div>
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:2px;">
+                                ${indHtml}
+                            </div>
+                        </div>
+                    </div>
+                    ${odsBadge}
+                    ${qrBadge}
+                </div>
+            `;
+        }
+
+        if (tpl === 'grafico') {
+            const cType = slide.chartType || 'line';
+            let chartSvg = '';
+            if (cType === 'pie') {
+                chartSvg = `<div style="width:18px; height:18px; border-radius:50%; background:conic-gradient(#3b82f6 0% 45%, #60a5fa 45% 80%, #93c5fd 80% 100%);"></div>`;
+            } else if (cType === 'bar') {
+                chartSvg = `
+                    <svg viewBox="0 0 60 22" style="width:80%; height:80%;">
+                        <rect x="3" y="11" width="6" height="11" fill="#3b82f6" rx="1"/>
+                        <rect x="13" y="5" width="6" height="17" fill="#3b82f6" rx="1"/>
+                        <rect x="23" y="9" width="6" height="13" fill="#3b82f6" rx="1"/>
+                        <rect x="33" y="2" width="6" height="20" fill="#3b82f6" rx="1"/>
+                        <rect x="43" y="6" width="6" height="16" fill="#3b82f6" rx="1"/>
+                        <rect x="53" y="1" width="6" height="21" fill="#3b82f6" rx="1"/>
+                    </svg>`;
+            } else {
+                chartSvg = `
+                    <svg viewBox="0 0 60 22" style="width:85%; height:85%;">
+                        <path d="M 2,16 Q 12,12 20,14 T 38,6 T 58,2 L 58,22 L 2,22 Z" fill="rgba(59,130,246,0.15)"/>
+                        <polyline fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" points="2,16 12,11 20,14 30,8 38,6 50,8 58,2"/>
+                        <circle cx="20" cy="14" r="1.5" fill="#3b82f6"/>
+                        <circle cx="38" cy="6" r="1.5" fill="#3b82f6"/>
+                        <circle cx="58" cy="2" r="1.5" fill="#3b82f6"/>
+                    </svg>`;
+            }
+
+            const defaultTextColor = hasBgImg ? '#ffffff' : '#0f172a';
+            const textColor = slide.corTitulo || defaultTextColor;
+            const titleSize = slide.tamanhoTitulo ? (slide.tamanhoTitulo * 1.5) + 'px' : '5.5px';
+
+            const logoHtml = buildLogosHtml(slide, true);
+
+            return `
+                <div style="width:100%; height:100%; position:relative; padding:3px 4px; display:flex; flex-direction:column; ${globalBgStyle} box-sizing:border-box; overflow:hidden;">
+                    ${hasBgImg ? '<div style="position:absolute; inset:0; background:rgba(255,255,255,0.6); z-index:0;"></div>' : ''}
+                    <div style="position:relative; z-index:1; display:flex; flex-direction:column; height:100%;">
+                        ${logoHtml}
+                        <div style="font-size:${titleSize}; font-weight:800; color:${textColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; line-height:1;">${title || 'Gráfico'}</div>
+                        <div style="flex:1; margin-top:2px; background:#f8fafc; border:0.5px solid #e2e8f0; border-radius:2px; display:flex; flex-direction:column; padding:2px;">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
+                                <span style="font-size:3px; font-weight:700; color:#1e293b;">Total</span>
+                                <span style="font-size:2.5px; background:#e2e8f0; color:#475569; padding:0.5px 1.5px; border-radius:1px;">${slide.periodo || '12 meses'}</span>
+                            </div>
+                            <div style="flex:1; display:flex; align-items:flex-end; justify-content:center;">
+                                ${chartSvg}
+                            </div>
+                        </div>
+                    </div>
+                    ${odsBadge}
+                    ${qrBadge}
+                </div>
+            `;
+        }
+
+        return '';
+    }
+
+    function updateActiveThumbnail() {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (!slide) return;
+        const thumbCanvas = slidesThumbsList.querySelector(`.slide-thumb-item[data-slide-id="${slide.id}"] .thumb-canvas-mini`);
+        if (thumbCanvas) {
+            thumbCanvas.innerHTML = renderMiniSlidePreview(slide);
+        }
+    }
+
+    function renderThumbnails() {
+        slidesThumbsList.innerHTML = "";
+        slides.forEach((slide, index) => {
+            const div = document.createElement("div");
+            div.className = `slide-thumb-item ${slide.id === activeSlideId ? 'active' : ''}`;
+            div.setAttribute("data-slide-id", slide.id);
+
+            const deleteBtnHtml = slides.length > 1 ? `<button class="btn-delete-slide" data-id="${slide.id}" style="position:absolute; top:-6px; right:-6px; width:22px; height:22px; background:#ef4444; color:#fff; border:none; border-radius:50%; font-size:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 4px rgba(0,0,0,0.2); z-index:10;"><i class="bi bi-x-lg"></i></button>` : '';
+
+            div.innerHTML = `
+                <span class="slide-index">${index + 1}</span>
+                <div class="thumb-card" style="position:relative;">
+                    ${deleteBtnHtml}
+                    <div class="thumb-canvas-mini" style="height:62px; aspect-ratio:16/9; width:100%; padding:0; overflow:hidden; border-radius:4px; border:1px solid #e2e8f0; background:#fff;">
+                        ${renderMiniSlidePreview(slide)}
+                    </div>
+                    <span class="thumb-label">Slide ${index + 1}</span>
+                </div>
+            `;
+
+            div.addEventListener("click", (e) => {
+                if(e.target.closest('.btn-delete-slide')) return;
+                activeSlideId = slide.id;
+                renderThumbnails();
+                renderActiveSlide();
+            });
+
+            slidesThumbsList.appendChild(div);
+
+            const deleteBtn = div.querySelector('.btn-delete-slide');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    slides = slides.filter(s => s.id !== slide.id);
+                    if (activeSlideId === slide.id) {
+                        activeSlideId = slides[0].id;
+                    }
+                    renderThumbnails();
+                    renderActiveSlide();
+                });
+            }
+        });
+    }
+
+    function renderActiveSlide() {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (!slide) return;
+
+        selectTemplate.value = slide.template;
+        inputTitulo.value = slide.titulo;
+        inputSubtitulo.value = slide.subtitulo;
+
+        // Sync text styles
+        const inputCorFundo = document.getElementById("inputCorFundo");
+        const inputCorTitulo = document.getElementById("inputCorTitulo");
+        const inputCorSubtitulo = document.getElementById("inputCorSubtitulo");
+        const inputRangeTitulo = document.getElementById("inputRangeTitulo");
+        const inputRangeSubtitulo = document.getElementById("inputRangeSubtitulo");
+
+        if(inputCorFundo) inputCorFundo.value = slide.corFundo || "#ffffff";
+        if(inputCorTitulo) inputCorTitulo.value = slide.corTitulo || "#0f172a";
+        if(inputCorSubtitulo) inputCorSubtitulo.value = slide.corSubtitulo || "#64748b";
+        if(inputRangeTitulo) {
+            inputRangeTitulo.value = slide.tamanhoTitulo || 4.0;
+        }
+        if(inputRangeSubtitulo) {
+            inputRangeSubtitulo.value = slide.tamanhoSubtitulo || 1.8;
+        }
+
+        const currentLogos = slide.logos || ["barueri"];
+        chkLogoItems.forEach(chk => {
+            chk.checked = currentLogos.includes(chk.value);
+        });
+        if (chkLogoCustom) {
+            chkLogoCustom.checked = currentLogos.includes("custom");
+            fgLogoCustom.style.display = chkLogoCustom.checked ? "block" : "none";
+        }
+
+        toggleODS.checked = slide.ods;
+        toggleQR.checked = slide.qr;
+
+        switchTemplate();
+        updatePreviewTexts();
+        updateSlotsVisibility();
+        syncOdsSelects(slide);
+        updatePreviewMedia();
+        if(slide.template === "grafico") renderChart(slide);
+        if(slide.template === "indicadores") renderIndicadores(slide);
+    }
+
+    // --- ODS SELECTS ---
+    function syncOdsSelects(slide) {
+        if (!odsSelectsContainer) return;
+        odsSelectsContainer.innerHTML = "";
+        const nums = slide.odsNums || [];
+
+        nums.forEach((num, index) => {
+            const group = document.createElement("div");
+            group.className = "form-group";
+            group.style.margin = "0";
+
+            const labelRow = document.createElement("div");
+            labelRow.style.display = "flex";
+            labelRow.style.justifyContent = "space-between";
+            labelRow.style.alignItems = "center";
+            labelRow.style.marginBottom = "2px";
+
+            const label = document.createElement("label");
+            label.style.fontSize = "0.82rem";
+            label.style.color = "var(--text-muted)";
+            label.textContent = `ODS ${index + 1}`;
+
+            const btnRemove = document.createElement("i");
+            btnRemove.className = "bi bi-x-circle text-danger";
+            btnRemove.style.cursor = "pointer";
+            btnRemove.style.fontSize = "0.82rem";
+            btnRemove.title = "Remover ODS";
+            btnRemove.onclick = () => {
+                slide.odsNums.splice(index, 1);
+                syncOdsSelects(slide);
+                updateSlotsVisibility();
+                updateActiveThumbnail();
+            };
+
+            labelRow.appendChild(label);
+            labelRow.appendChild(btnRemove);
+
+            const select = document.createElement("select");
+            select.className = "form-control ods-select";
+            select.style.fontSize = "0.82rem";
+            select.style.padding = "6px 10px";
+
+            const defOpt = document.createElement("option");
+            defOpt.value = "";
+            defOpt.textContent = "Selecionar ODS...";
+            select.appendChild(defOpt);
+
+            Object.values(ODS_OPTIONS).forEach(opt => {
+                const o = document.createElement("option");
+                o.value = opt.num;
+                o.textContent = `ODS ${opt.num} — ${opt.label}`;
+                select.appendChild(o);
+            });
+
+            select.value = num || "";
+
+            select.addEventListener("change", (e) => {
+                slide.odsNums[index] = e.target.value;
+                updateSlotsVisibility();
+                updateActiveThumbnail();
+            });
+
+            group.appendChild(labelRow);
+            group.appendChild(select);
+            odsSelectsContainer.appendChild(group);
+        });
+    }
+
+    if (btnAddOds) {
+        btnAddOds.addEventListener("click", () => {
+            const slide = slides.find(s => s.id === activeSlideId);
+            if (slide) {
+                if (!slide.odsNums) slide.odsNums = [];
+                slide.odsNums.push("");
+                syncOdsSelects(slide);
+            }
+        });
+    }
+
+
+    function renderIndicadores(slide) {
+        const gridPreview = document.getElementById("indGridPreview");
+        const listEdit = document.getElementById("indListEdit");
+
+        // Ensure array exists
+        if (!slide.indicadores) slide.indicadores = [];
+
+        // Render Canvas Preview
+        gridPreview.innerHTML = slide.indicadores.map(ind => `
+            <div class="ind-card">
+                <i class="bi ${ind.icone} ind-icon" style="color: ${ind.cor};"></i>
+                <div class="ind-info">
+                    <h3>${ind.valor}</h3>
+                    <span>${ind.nome}</span>
+                </div>
+            </div>
+        `).join("");
+
+        // Render Sidebar Edit List
+        listEdit.innerHTML = slide.indicadores.map(ind => `
+            <div class="ind-edit-item" style="display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 6px; background: #fff; margin-bottom: 4px;">
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <i class="bi ${ind.icone}" style="color: ${ind.cor};"></i>
+                    <span style="font-size: 0.85rem; font-weight: 600;">${ind.nome} (${ind.valor})</span>
+                </div>
+                <div class="ind-actions" style="cursor: pointer;" onclick="window.removeIndicador(${ind.id})">
+                    <i class="bi bi-trash text-danger"></i>
+                </div>
+            </div>
+        `).join("");
+    }
+
+    // Global function to remove indicator
+    window.removeIndicador = function(indId) {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (slide && slide.indicadores) {
+            slide.indicadores = slide.indicadores.filter(i => i.id !== indId);
+            renderIndicadores(slide);
+            updateActiveThumbnail();
+        }
+    };
+
+    function updatePreviewTexts() {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (!slide) return;
+        document.querySelectorAll(".preview-titulo").forEach(el => {
+            el.textContent = slide.titulo || "Título";
+            if (slide.corTitulo) el.style.setProperty('color', slide.corTitulo, 'important');
+            if (slide.tamanhoTitulo) el.style.setProperty('font-size', `${slide.tamanhoTitulo}cqw`, 'important');
+        });
+        document.querySelectorAll(".preview-subtitulo").forEach(el => {
+            el.textContent = slide.subtitulo || "Subtítulo";
+            if (slide.corSubtitulo) el.style.setProperty('color', slide.corSubtitulo, 'important');
+            if (slide.tamanhoSubtitulo) el.style.setProperty('font-size', `${slide.tamanhoSubtitulo}cqw`, 'important');
+        });
+    }
+
+    function updateSlotsVisibility() {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (!slide) return;
+
+        // Build Logos HTML
+        const logosHtml = buildLogosHtml(slide, false);
+
+        // Update Logo visibility & content
+        document.querySelectorAll(".slide-top-brand").forEach(el => {
+            if (logosHtml === "") {
+                el.style.display = "none";
+                el.innerHTML = "";
+            } else {
+                el.style.display = "flex";
+                el.innerHTML = logosHtml;
+            }
+        });
+
+        // Ensure sidebar controls match current state
+        if(fgODSSelect) fgODSSelect.style.display = slide.ods ? "flex" : "none";
+        if(fgQRLink) fgQRLink.style.display = slide.qr ? "block" : "none";
+        if (slide.qr && inputQRLink) inputQRLink.value = slide.qrLink || "";
+
+        // Build HTML for ODS
+        const nums = (slide.odsNums || []).filter(v => v !== "");
+        const hasOds = slide.ods && nums.length > 0;
+        let odsHtml = '';
+        if (hasOds) {
+            odsHtml = `<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6cqw; z-index: 1000;">`;
+            nums.forEach(num => {
+                const opt = ODS_OPTIONS[num];
+                if(opt) {
+                    odsHtml += `
+                    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: ${opt.color}; color: #ffffff; width: 4.5cqw; height: 4.5cqw; border-radius: 0.6cqw; flex-shrink: 0; box-shadow: 0 0.3cqw 0.8cqw rgba(0,0,0,0.2); text-align: center;">
+                        <span style="font-size: 2.2cqw; font-weight: 900; line-height: 1;">${opt.num}</span>
+                    </div>`;
+                }
+            });
+            odsHtml += `</div>`;
+        }
+
+        // Build HTML for QR Code
+        let qrHtml = '';
+        if (slide.qr) {
+            let qrInner = `<i class="bi bi-qr-code" style="font-size: 3cqw; color: #64748b;"></i>`;
+            if (slide.qrLink && slide.qrLink.trim() !== "") {
+                qrInner = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(slide.qrLink)}" style="width:100%; height:100%; object-fit:contain;">`;
+            }
+            qrHtml = `
+            <div style="display: flex; align-items: center; justify-content: center; width: 5.2cqw; height: 5.2cqw; background: #ffffff; border: 0.2cqw solid #cbd5e1; border-radius: 0.6cqw; padding: 0.3cqw; overflow: hidden; flex-shrink: 0; z-index: 1000; box-shadow: 0 0.3cqw 0.8cqw rgba(0,0,0,0.1);">
+                ${qrInner}
+            </div>`;
+        }
+
+        const combinedHtml = `<div style="display: flex; gap: 1.5cqw; align-items: flex-end;">${qrHtml}</div>`;
+
+        // Inject into current template slots (for QR)
+        const tpl = slide.template || "capa";
+        const globalContainer = document.querySelector('.global-slots-container');
+        const itOdsSlot = document.querySelector('.it-ods-slot');
+        const itQrSlot = document.querySelector('.it-qr-slot');
+        const indContent = document.querySelector('.ind-content-wrapper');
+
+        // Global ODS container at Top Right
+        let odsContainer = document.getElementById('global-ods-top-right');
+        if (!odsContainer) {
+            odsContainer = document.createElement('div');
+            odsContainer.id = 'global-ods-top-right';
+            odsContainer.style.cssText = "position: absolute; top: 3cqw; right: 4cqw; z-index: 1000;";
+            document.getElementById('activeSlideSurface').appendChild(odsContainer);
+        }
+        odsContainer.innerHTML = odsHtml;
+
+        // Reset all specific slot containers
+        if(globalContainer) globalContainer.innerHTML = '';
+        if(itOdsSlot) itOdsSlot.innerHTML = '';
+        if(itQrSlot) itQrSlot.innerHTML = '';
+        const oldInd = document.getElementById('dyn-ind-slots');
+        if(oldInd) oldInd.remove();
+
+        if (tpl === "capa" || tpl === "grafico") {
+            if(globalContainer) globalContainer.innerHTML = combinedHtml;
+        } else if (tpl === "imagem_texto") {
+            // itOdsSlot is no longer used for ODS, but we can leave it empty
+            if(itQrSlot) itQrSlot.innerHTML = qrHtml;
+        } else if (tpl === "indicadores") {
+            if(indContent) {
+                const w = document.createElement("div");
+                w.id = "dyn-ind-slots";
+                w.style.cssText = "position: absolute; bottom: 1.5cqw; right: 1.5cqw; z-index: 1000;";
+                w.innerHTML = combinedHtml;
+                indContent.appendChild(w);
+            }
+        }
+    }
+
+        function renderChart(slide) {
+        if (slideChartInstance) {
+            slideChartInstance.destroy();
+        }
+
+        document.querySelectorAll(".btn-chart-type").forEach(btn => {
+            if (btn.dataset.type === slide.chartType) {
+                btn.classList.add("active");
+            } else {
+                btn.classList.remove("active");
+            }
+        });
+
+        const selectChartIndicador = document.getElementById("selectChartIndicador");
+        if(selectChartIndicador) selectChartIndicador.value = slide.chartIndicador || 1;
+
+        const selectPeriodo = document.getElementById("selectPeriodo");
+        if(selectPeriodo) selectPeriodo.value = slide.periodo || "Últimos 12 meses";
+
+        const previewPeriodo = document.getElementById("previewPeriodo");
+        if(previewPeriodo) previewPeriodo.textContent = slide.periodo || "Últimos 12 meses";
+
+        const ctx = document.getElementById('slideChart');
+        if(!ctx) return;
+
+        let type = slide.chartType || "line";
+        let data, options;
+
+        const idInd = slide.chartIndicador || 1;
+        const ind = INDICADORES_PREDEFINIDOS.find(i => i.id_padrao === idInd) || INDICADORES_PREDEFINIDOS[0];
+        const baseVal = parseFloat(ind.valor.replace('.', ''));
+
+        if (type === "line" || type === "bar") {
+            data = {
+                labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                datasets: [{
+                    label: ind.nome,
+                    data: [
+                        Math.round(baseVal * 0.75), 
+                        Math.round(baseVal * 0.82), 
+                        Math.round(baseVal * 0.90), 
+                        Math.round(baseVal * 0.85), 
+                        Math.round(baseVal * 0.95), 
+                        baseVal
+                    ],
+                    borderColor: ind.cor,
+                    backgroundColor: type === "line" ? ind.cor + '33' : ind.cor,
+                    borderWidth: type === "line" ? 3 : 0,
+                    tension: 0.4,
+                    fill: type === "line",
+                    borderRadius: type === "bar" ? 4 : 0
+                }]
+            };
+            options = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#f1f5f9' }, border: { display: false } },
+                    x: { grid: { display: false }, border: { display: false } }
+                }
+            };
+        } else if (type === "pie") {
+            data = {
+                labels: ['Região Norte', 'Região Sul', 'Região Centro'],
+                datasets: [{
+                    data: [45, 35, 20],
+                    backgroundColor: [ind.cor, ind.cor + '99', ind.cor + '44'],
+                    borderWidth: 0
+                }]
+            };
+            options = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 8, font: { size: 10 } } }
+                }
+            };
+        }
+
+        slideChartInstance = new Chart(ctx, {
+            type: type,
+            data: data,
+            options: options
+        });
+    }
+
+    function updatePreviewMedia() {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (!slide) return;
+
+        // Tratar imagem de fundo global (todos os templates) e cor de fundo
+        const bgGeralThumbPreview = document.getElementById("bgGeralThumbPreview");
+        const btnRemoveBgGeral = document.getElementById("btnRemoveBgGeral");
+
+        if (slide.bgGeral) {
+            activeSlideSurface.style.backgroundImage = `url(${slide.bgGeral})`;
+            activeSlideSurface.style.backgroundSize = "cover";
+            activeSlideSurface.style.backgroundPosition = "center";
+            activeSlideSurface.style.backgroundColor = "transparent";
+            if(bgGeralThumbPreview) {
+                bgGeralThumbPreview.src = slide.bgGeral;
+                bgGeralThumbPreview.style.display = "block";
+            }
+            if(btnRemoveBgGeral) btnRemoveBgGeral.style.display = "block";
+        } else {
+            activeSlideSurface.style.backgroundImage = "";
+            activeSlideSurface.style.backgroundColor = slide.corFundo || "#ffffff";
+            if(bgGeralThumbPreview) bgGeralThumbPreview.style.display = "none";
+            if(btnRemoveBgGeral) btnRemoveBgGeral.style.display = "none";
+        }
+
+        // Tratar imagem para Imagem + Texto
+        if (slide.template === "imagem_texto") {
+            if (slide.imgTexto) {
+                imgTextoCanvasImg.src = slide.imgTexto;
+                imgTextoThumbPreview.src = slide.imgTexto;
+            } else {
+                imgTextoCanvasImg.src = "https://images.unsplash.com/photo-1506744038136-46273834b3fb";
+                imgTextoThumbPreview.src = "https://images.unsplash.com/photo-1506744038136-46273834b3fb";
+            }
+        }
+    }
+
+    function switchTemplate() {
+        const val = selectTemplate.value;
+
+        layoutCapa.style.display = "none";
+        layoutImgTexto.style.display = "none";
+        layoutIndicadores.style.display = "none";
+        layoutGrafico.style.display = "none";
+
+        tplCapa.forEach(el => el.style.display = "none");
+        tplImgTexto.forEach(el => el.style.display = "none");
+        tplIndicadores.forEach(el => el.style.display = "none");
+        tplGrafico.forEach(el => el.style.display = "none");
+
+        document.getElementById("activeSlideSurface").className = "slide-surface template-" + val;
+
+        if(val === "capa") {
+            layoutCapa.style.display = "block";
+            tplCapa.forEach(el => el.style.display = "flex");
+            labelTitulo.textContent = "Título";
+            labelSubtitulo.textContent = "Subtítulo";
+            fgSubtitulo.style.display = "flex";
+        } else if(val === "imagem_texto") {
+            layoutImgTexto.style.display = "flex";
+            tplImgTexto.forEach(el => el.style.display = "flex");
+            labelTitulo.textContent = "Título do Slide";
+            labelSubtitulo.textContent = "Texto de Apoio";
+            fgSubtitulo.style.display = "flex";
+        } else if(val === "indicadores") {
+            layoutIndicadores.style.display = "flex";
+            tplIndicadores.forEach(el => el.style.display = "block");
+            labelTitulo.textContent = "Título";
+            labelSubtitulo.textContent = "Texto Introdutório";
+            fgSubtitulo.style.display = "flex";
+        } else if(val === "grafico") {
+            layoutGrafico.style.display = "flex";
+            tplGrafico.forEach(el => el.style.display = "block");
+            labelTitulo.textContent = "Título";
+            labelSubtitulo.textContent = "Texto Introdutório";
+            fgSubtitulo.style.display = "flex";
+        }
+
+        updateSlotsVisibility();
+    }
+
+    inputTitulo.addEventListener("input", (e) => {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (slide) slide.titulo = e.target.value;
+        updatePreviewTexts();
+        updateActiveThumbnail();
+    });
+
+    inputSubtitulo.addEventListener("input", (e) => {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (slide) slide.subtitulo = e.target.value;
+        updatePreviewTexts();
+        updateActiveThumbnail();
+    });
+
+    const inputRangeTitulo = document.getElementById("inputRangeTitulo");
+    const lblRangeTitulo = document.getElementById("lblRangeTitulo");
+    const inputRangeSubtitulo = document.getElementById("inputRangeSubtitulo");
+    const lblRangeSubtitulo = document.getElementById("lblRangeSubtitulo");
+    const inputCorTitulo = document.getElementById("inputCorTitulo");
+    const inputCorSubtitulo = document.getElementById("inputCorSubtitulo");
+
+    if (inputRangeTitulo) {
+        inputRangeTitulo.addEventListener("input", (e) => {
+            const val = parseFloat(e.target.value).toFixed(1);
+            if (lblRangeTitulo) lblRangeTitulo.textContent = val;
+            const slide = slides.find(s => s.id === activeSlideId);
+            if (slide) { slide.tamanhoTitulo = val; updatePreviewTexts(); updateActiveThumbnail(); }
+        });
+    }
+    if (inputRangeSubtitulo) {
+        inputRangeSubtitulo.addEventListener("input", (e) => {
+            const val = parseFloat(e.target.value).toFixed(1);
+            if (lblRangeSubtitulo) lblRangeSubtitulo.textContent = val;
+            const slide = slides.find(s => s.id === activeSlideId);
+            if (slide) { slide.tamanhoSubtitulo = val; updatePreviewTexts(); updateActiveThumbnail(); }
+        });
+    }
+    if (inputCorTitulo) {
+        inputCorTitulo.addEventListener("input", (e) => {
+            const slide = slides.find(s => s.id === activeSlideId);
+            if (slide) { slide.corTitulo = e.target.value; updatePreviewTexts(); updateActiveThumbnail(); }
+        });
+    }
+    if (inputCorSubtitulo) {
+        inputCorSubtitulo.addEventListener("input", (e) => {
+            const slide = slides.find(s => s.id === activeSlideId);
+            if (slide) { slide.corSubtitulo = e.target.value; updatePreviewTexts(); updateActiveThumbnail(); }
+        });
+    }
+
+    selectTemplate.addEventListener("change", (e) => {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (slide) {
+            slide.template = e.target.value;
+            switchTemplate();
+            updatePreviewMedia();
+            if(slide.template === "grafico") renderChart(slide);
+            if(slide.template === "indicadores") renderIndicadores(slide);
+            renderThumbnails();
+        }
+    });
+
+    function syncSlideLogos() {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (!slide) return;
+        slide.logos = [];
+        chkLogoItems.forEach(chk => {
+            if (chk.checked) slide.logos.push(chk.value);
+        });
+        if (chkLogoCustom && chkLogoCustom.checked) {
+            slide.logos.push("custom");
+        }
+        updateSlotsVisibility();
+        updateActiveThumbnail();
+    }
+
+    chkLogoItems.forEach(chk => chk.addEventListener("change", syncSlideLogos));
+
+    if (chkLogoCustom) {
+        chkLogoCustom.addEventListener("change", (e) => {
+            fgLogoCustom.style.display = e.target.checked ? "block" : "none";
+            syncSlideLogos();
+        });
+    }
+
+    if (inputUploadLogoCustom) {
+        inputUploadLogoCustom.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const slide = slides.find(s => s.id === activeSlideId);
+                    if (slide) {
+                        slide.customLogoImg = event.target.result;
+                        updateSlotsVisibility();
+                        updateActiveThumbnail();
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    toggleODS.addEventListener("change", (e) => {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (slide) slide.ods = e.target.checked;
+        updateSlotsVisibility();
+        updateActiveThumbnail();
+    });
+
+    toggleQR.addEventListener("change", (e) => {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (slide) slide.qr = e.target.checked;
+        updateSlotsVisibility();
+        updateActiveThumbnail();
+    });
+
+    if (inputQRLink) {
+        inputQRLink.addEventListener("input", (e) => {
+            const slide = slides.find(s => s.id === activeSlideId);
+            if (slide) {
+                slide.qrLink = e.target.value;
+                updateSlotsVisibility();
+                updateActiveThumbnail();
+            }
+        });
+    }
+
+    // Fundo do Slide
+    const btnUploadBgGeral = document.getElementById("btnUploadBgGeral");
+    const inputUploadBgGeral = document.getElementById("inputUploadBgGeral");
+    const btnRemoveBgGeral = document.getElementById("btnRemoveBgGeral");
+    const inputCorFundo = document.getElementById("inputCorFundo");
+
+    if(btnUploadBgGeral) {
+        btnUploadBgGeral.addEventListener("click", () => inputUploadBgGeral.click());
+    }
+    if(inputUploadBgGeral) {
+        inputUploadBgGeral.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const slide = slides.find(s => s.id === activeSlideId);
+                    if (slide) {
+                        slide.bgGeral = event.target.result;
+                        updatePreviewMedia();
+                        updateActiveThumbnail();
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    if(btnRemoveBgGeral) {
+        btnRemoveBgGeral.addEventListener("click", () => {
+            const slide = slides.find(s => s.id === activeSlideId);
+            if(slide) {
+                slide.bgGeral = null;
+                updatePreviewMedia();
+                updateActiveThumbnail();
+            }
+        });
+    }
+    if(inputCorFundo) {
+        inputCorFundo.addEventListener("input", (e) => {
+            const slide = slides.find(s => s.id === activeSlideId);
+            if(slide) {
+                slide.corFundo = e.target.value;
+                updatePreviewMedia();
+                updateActiveThumbnail();
+            }
+        });
+    }
+
+    // Upload de Imagem para Imagem+Texto
+    btnUploadImgTexto.addEventListener("click", () => {
+        inputUploadImgTexto.click();
+    });
+
+    inputUploadImgTexto.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const slide = slides.find(s => s.id === activeSlideId);
+                if (slide) {
+                    slide.imgTexto = event.target.result;
+                    updatePreviewMedia();
+                    updateActiveThumbnail();
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    document.querySelectorAll(".btn-chart-type").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            const slide = slides.find(s => s.id === activeSlideId);
+            if (slide && slide.template === "grafico") {
+                slide.chartType = e.currentTarget.dataset.type;
+                renderChart(slide);
+                updateActiveThumbnail();
+            }
+        });
+    });
+
+    const selectChartIndicador = document.getElementById("selectChartIndicador");
+    if(selectChartIndicador) {
+        selectChartIndicador.addEventListener("change", (e) => {
+            const slide = slides.find(s => s.id === activeSlideId);
+            if (slide && slide.template === "grafico") {
+                slide.chartIndicador = parseInt(e.target.value);
+                renderChart(slide);
+                updateActiveThumbnail();
+            }
+        });
+    }
+
+    const selectPeriodo = document.getElementById("selectPeriodo");
+    if(selectPeriodo) {
+        selectPeriodo.addEventListener("change", (e) => {
+            const slide = slides.find(s => s.id === activeSlideId);
+            if (slide && slide.template === "grafico") {
+                slide.periodo = e.target.value;
+                const previewPeriodo = document.getElementById("previewPeriodo");
+                if(previewPeriodo) previewPeriodo.textContent = slide.periodo;
+                updateActiveThumbnail();
+            }
+        });
+    }
+
+    const INDICADORES_PREDEFINIDOS = [
+        { id_padrao: 1, nome: "Saúde", valor: "3.237", icone: "bi-heart-pulse", cor: "#3b82f6" },
+        { id_padrao: 2, nome: "Segurança", valor: "3.847", icone: "bi-shield-check", cor: "#a855f7" },
+        { id_padrao: 3, nome: "Educação", valor: "3.755", icone: "bi-book", cor: "#f59e0b" },
+        { id_padrao: 4, nome: "Mobilidade", valor: "4.687", icone: "bi-car-front", cor: "#10b981" },
+        { id_padrao: 5, nome: "Meio Ambiente", valor: "1.240", icone: "bi-tree", cor: "#84cc16" },
+        { id_padrao: 6, nome: "Economia", valor: "8.921", icone: "bi-graph-up-arrow", cor: "#ef4444" }
+    ];
+
+    const btnAddIndicador = document.getElementById("btnAddIndicador");
+    if (btnAddIndicador) {
+        btnAddIndicador.addEventListener("click", () => {
+            const selectInd = document.getElementById("selectIndicadorNovo");
+            const val = parseInt(selectInd.value);
+            const template = INDICADORES_PREDEFINIDOS.find(i => i.id_padrao === val);
+
+            if (template) {
+                const slide = slides.find(s => s.id === activeSlideId);
+                if (slide && slide.template === "indicadores") {
+                    if (!slide.indicadores) slide.indicadores = [];
+
+                    if (slide.indicadores.length >= 4) {
+                        alert("Você só pode adicionar no máximo 4 indicadores por slide.");
+                        return;
+                    }
+
+                    // Verify if it's already added
+                    if (slide.indicadores.some(i => i.id_padrao === val)) {
+                        alert("Este indicador já está no slide.");
+                        return;
+                    }
+
+                    slide.indicadores.push({
+                        id: Date.now(),
+                        id_padrao: template.id_padrao,
+                        nome: template.nome,
+                        valor: template.valor,
+                        icone: template.icone,
+                        cor: template.cor
+                    });
+
+                    renderIndicadores(slide);
+                    updateActiveThumbnail();
+                }
+            }
+        });
+    }
+
+    btnNovoSlide.addEventListener("click", () => {
+        slideCounter++;
+        const currentSlide = slides.find(s => s.id === activeSlideId) || {};
+
+        slides.push({
+            id: slideCounter,
+            template: "capa",
+            titulo: "Novo Slide",
+            subtitulo: "Subtítulo do novo slide",
+            logos: currentSlide.logos ? [...currentSlide.logos] : ["barueri"],
+            customLogoImg: currentSlide.customLogoImg || null,
+            ods: false,
+            odsNums: [],
+            qr: false,
+            qrLink: "",
+            bgCapa: null,
+            imgTexto: null,
+            chartType: "line",
+            periodo: "Últimos 12 meses",
+            indicadores: [],
+            tamanhoTitulo: currentSlide.tamanhoTitulo || 4.0,
+            tamanhoSubtitulo: currentSlide.tamanhoSubtitulo || 1.8,
+            corTitulo: currentSlide.corTitulo || "#0f172a",
+            corSubtitulo: currentSlide.corSubtitulo || "#64748b"
+        });
+        activeSlideId = slideCounter;
+        renderThumbnails();
+        renderActiveSlide();
+        slidesThumbsList.scrollTop = slidesThumbsList.scrollHeight;
+    });
+
+    // --- Lógica de Salvar ---
+    const btnSalvar = document.getElementById("btnSalvar");
+    const saveToast = document.getElementById("saveToast");
+    const saveModal = document.getElementById("saveModal");
+    const btnCloseSave = document.getElementById("btnCloseSave");
+    const btnCancelSave = document.getElementById("btnCancelSave");
+    const btnConfirmSave = document.getElementById("btnConfirmSave");
+    const inputSaveNome = document.getElementById("inputSaveNome");
+    const selectSaveProjeto = document.getElementById("selectSaveProjeto");
+
+    // Sincronização entre o input do cabeçalho e o modal de salvar
+    const displayTituloInput = document.getElementById("displayApresentacaoTitulo");
+    if (displayTituloInput) {
+        displayTituloInput.addEventListener("input", (e) => {
+            if (inputSaveNome) inputSaveNome.value = e.target.value;
+        });
+    }
+
+    btnSalvar.addEventListener("click", () => {
+        // Preenche o nome padrão baseado no input do cabeçalho ou no primeiro slide
+        const currentTitle = displayTituloInput ? (displayTituloInput.value || displayTituloInput.innerText || "").trim() : "";
+        if (currentTitle) {
+            inputSaveNome.value = currentTitle;
+        } else if (slides.length > 0 && !inputSaveNome.value) {
+            inputSaveNome.value = slides[0].titulo || "Nova Apresentação";
+        }
+        if (window.projetoId && selectSaveProjeto) {
+            selectSaveProjeto.value = window.projetoId;
+        }
+        saveModal.style.display = "flex";
+    });
+
+    function fecharSaveModal() {
+        saveModal.style.display = "none";
+    }
+
+    if (btnCloseSave) btnCloseSave.addEventListener("click", fecharSaveModal);
+    if (btnCancelSave) btnCancelSave.addEventListener("click", fecharSaveModal);
+
+    if (btnConfirmSave) {
+        btnConfirmSave.addEventListener("click", async () => {
+            const originalBtnHtml = btnConfirmSave.innerHTML;
+            btnConfirmSave.disabled = true;
+            btnConfirmSave.innerHTML = `<i class="bi bi-arrow-repeat spin"></i> <span>Salvando...</span>`;
+
+            const nomeStr = inputSaveNome.value.trim() || (slides[0]?.titulo || "Apresentação sem título");
+            const projetoIdVal = selectSaveProjeto.value ? parseInt(selectSaveProjeto.value) : window.projetoId;
+
+            const payload = {
+                apresentacao_id: window.apresentacaoId,
+                projeto_id: projetoIdVal,
+                titulo: nomeStr,
+                slides: slides
+            };
+
+            try {
+                const response = await fetch("{{ url_for('apresentacao.salvar_apresentacao') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.status === 'sucesso') {
+                    if (data.apresentacao_id) {
+                        window.apresentacaoId = data.apresentacao_id;
+                        window.projetoId = projetoIdVal;
+                        // Atualiza a URL no navegador sem recarregar a página
+                        if (!window.location.pathname.includes('/apresentacao/editar/')) {
+                            window.history.replaceState(null, '', `/apresentacao/editar/${data.apresentacao_id}`);
+                        }
+                    }
+
+                    // Atualiza o título exibido no header
+                    const displayTitulo = document.getElementById("displayApresentacaoTitulo");
+                    if (displayTitulo) {
+                        if ('value' in displayTitulo) displayTitulo.value = nomeStr;
+                        else displayTitulo.textContent = nomeStr;
+                    }
+
+                    fecharSaveModal();
+
+                    if (saveToast) {
+                        const msgSpan = saveToast.querySelector('span');
+                        if (msgSpan) msgSpan.textContent = data.mensagem || "Apresentação salva com sucesso no banco!";
+                        saveToast.style.display = "flex";
+                        setTimeout(() => {
+                            saveToast.style.display = "none";
+                        }, 3500);
+                    }
+                } else {
+                    alert("Erro ao salvar apresentação: " + (data.mensagem || "Falha no servidor."));
+                }
+            } catch (error) {
+                console.error("Erro na requisição ao salvar:", error);
+                alert("Erro de conexão ao salvar apresentação no banco de dados.");
+            } finally {
+                btnConfirmSave.disabled = false;
+                btnConfirmSave.innerHTML = originalBtnHtml;
+            }
+        });
+    }
+
+    // --- Lógica de Visualizar (Apresentação Tela Cheia) ---
+    const btnVisualizar = document.getElementById("btnVisualizar");
+    const previewModal = document.getElementById("previewModal");
+    const previewContainer = document.getElementById("previewContainer");
+    const btnPrevSlide = document.getElementById("btnPrevSlide");
+    const btnNextSlide = document.getElementById("btnNextSlide");
+    const btnClosePreview = document.getElementById("btnClosePreview");
+
+    const canvasStage = document.querySelector(".canvas-stage");
+
+    btnVisualizar.addEventListener("click", () => {
+        previewContainer.innerHTML = "";
+        previewContainer.appendChild(activeSlideSurface);
+        activeSlideSurface.style.maxWidth = "none";
+        activeSlideSurface.style.height = "100%";
+        activeSlideSurface.style.borderRadius = "0";
+        activeSlideSurface.style.boxShadow = "none";
+
+        previewModal.style.display = "flex";
+    });
+
+    btnClosePreview.addEventListener("click", () => {
+        canvasStage.innerHTML = "";
+        canvasStage.appendChild(activeSlideSurface);
+        activeSlideSurface.style.maxWidth = "660px";
+        activeSlideSurface.style.height = "auto";
+        activeSlideSurface.style.borderRadius = "var(--radius-lg)";
+        activeSlideSurface.style.boxShadow = "0 6px 20px rgba(0, 0, 0, 0.06)";
+
+        previewModal.style.display = "none";
+    });
+
+    btnPrevSlide.addEventListener("click", () => {
+        const currentIndex = slides.findIndex(s => s.id === activeSlideId);
+        if (currentIndex > 0) {
+            activeSlideId = slides[currentIndex - 1].id;
+            renderThumbnails();
+            renderActiveSlide();
+        }
+    });
+
+    btnNextSlide.addEventListener("click", () => {
+        const currentIndex = slides.findIndex(s => s.id === activeSlideId);
+        if (currentIndex < slides.length - 1) {
+            activeSlideId = slides[currentIndex + 1].id;
+            renderThumbnails();
+            renderActiveSlide();
+        }
+    });
+
+
+    // Fallback manual para as abas retráteis (caso o JS do Bootstrap não esteja carregado/funcionando)
+    document.querySelectorAll('.slots-header[data-bs-toggle="collapse"]').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('data-bs-target');
+            if (targetId) {
+                const targetEl = document.querySelector(targetId);
+                if (targetEl) {
+                    const isExpanded = this.getAttribute('aria-expanded') === 'true';
+
+                    if (isExpanded) {
+                        targetEl.classList.remove('show');
+                        this.setAttribute('aria-expanded', 'false');
+                    } else {
+                        targetEl.classList.add('show');
+                        this.setAttribute('aria-expanded', 'true');
+                    }
+                }
+            }
+        });
+    });
+
+    renderThumbnails();
+    renderActiveSlide();
+});
+</script>
+{% endblock %}

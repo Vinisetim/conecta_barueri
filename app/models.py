@@ -3,28 +3,59 @@ from flask_login import UserMixin
 
 @login_manager.user_loader
 def load_user(user_id):
-    #busca ID na tabela usuarios
-    return Usuario.query.get(int(user_id))
+    """
+    Callback obrigatório do Flask-Login para restaurar o objeto de usuário a partir do ID da sessão.
+    Utiliza db.session.get() (padrão moderno do SQLAlchemy) e trata conversões inválidas de forma segura.
+    """
+    try:
+        return db.session.get(Usuario, int(user_id))
+    except (ValueError, TypeError):
+        return None
 
 class Usuario(UserMixin, db.Model):
-    #configurações da tabela
+    # Configurações da tabela e isolamento no schema 'login'
     __tablename__ = 'usuario'
-    __table_args__ = {'schema':'login'}
+    __table_args__ = {'schema': 'login'}
 
-    #colunas
-    #id chave primaria e numero inteiro
+    # Colunas de identificação e perfil
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(255))
     email = db.Column(db.Text)
     admin = db.Column(db.Boolean, default=False)
     status = db.Column(db.Boolean, default=True)
-    #relacionamento com a tabela senha
+
+    # Relacionamento 1:1 com a tabela de credenciais (isolamento de segurança)
     senha_obj = db.relationship('Senha', backref='usuario', uselist=False)
     projetos = db.relationship('Projeto', backref='dono', lazy=True)
 
+    @property
+    def is_active(self):
+        """
+        Determina se a conta do usuário está ativa no sistema.
+        Contas desativadas (status=False) são impedidas de autenticar pelo Flask-Login.
+        """
+        return bool(self.status)
+
+    @property
+    def senha(self):
+        """
+        Propriedade de compatibilidade: permite acessar o registro de senha
+        tanto via usuario.senha quanto usuario.senha_obj.
+        """
+        return self.senha_obj
+
+    def verificar_senha(self, senha_digitada):
+        """
+        Verifica com segurança se a senha informada corresponde ao hash Bcrypt gravado.
+        Retorna False se o usuário não possuir registro de credencial associado.
+        """
+        if not self.senha_obj or not self.senha_obj.senha:
+            return False
+        return bcrypt.check_password_hash(self.senha_obj.senha, senha_digitada)
+
 class Senha(db.Model):
     __tablename__ = 'senhas'
-    __table_args__ = {'schema':'login'}
+    __table_args__ = {'schema': 'login'}
 
     #colunas
 
@@ -70,7 +101,7 @@ class Apresentacao(db.Model):
 
     data_criacao = db.Column(db.DateTime, default=db.func.current_timestamp())
 
-    slides = db.relationship('Slide', backref='apresentacao_pai', lazy=True)
+    slides = db.relationship('Slide', backref='apresentacao_pai', lazy=True, cascade='all, delete-orphan')
 
 
 class Templates(db.Model):
@@ -114,15 +145,7 @@ class Slide(db.Model):
     #numero da página (para definir ordem)
     ordem = db.Column(db.Integer, nullable=False)
 
-    # Controles visuais de estilo e legibilidade
-    alinhamento_texto = db.Column(db.String(20), default='left')
-    cor_texto = db.Column(db.String(10), default='#212529')
-    filtro_fundo = db.Column(db.String(20), default='nenhum')
-    estilo_fundo = db.Column(db.String(30), default='contained')
-
-    # Relacionamentos com os filhos
-    campos = db.relationship('CampoPreenchido', backref='slide_pai', lazy=True)
-    slots = db.relationship('SlotFlexivel', backref='slide_pai', lazy=True)
+    campos = db.relationship('CampoPreenchido', backref='slide_pai', lazy=True, cascade='all, delete-orphan')
 
 class CampoPreenchido(db.Model):
     """
