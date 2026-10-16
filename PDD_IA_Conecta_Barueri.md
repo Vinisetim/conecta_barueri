@@ -202,4 +202,12 @@ Para qualquer solicitação de código ou alteração de arquivos pelo usuário,
 4. **Revisar:** Validar conformidade com este PDD (segurança, ORM, escopo e convenções).
 
 ---
-*PDD Especificação IA v2.0 — Fonte da verdade técnica para assistentes LLM.*
+
+## 6. DOCUMENTAÇÃO OPERACIONAL E PRÓXIMAS ETAPAS (SPRINTS)
+Para o detalhamento das responsabilidades de cada membro da equipe (Vinicius, Marianna, Lucas e Belloni), matriz de módulos para a Pré-Banca e checklist do GitHub Projects, consulte os documentos complementares:
+- **Plano de Ação e Especificação Técnica:** `PDDs/PDD_Plano_Acao_Proximas_Etapas.md`
+- **Checklist para GitHub Projects:** `PDDs/CHECKLIST_GITHUB_PROJECTS.md`
+- **Guia PDF de Divisão de Responsabilidades:** `PDDs/Divisao_Tarefas_Equipe_Conecta_Barueri.pdf`
+
+---
+*PDD Especificação IA v2.1 — Fonte da verdade técnica e operacional para assistentes LLM.*

@@ -178,13 +178,14 @@ def salvar_apresentacao():
                 'tamanhoSubtitulo': item.get('tamanhoSubtitulo'),
                 'corTitulo': item.get('corTitulo'),
                 'corSubtitulo': item.get('corSubtitulo'),
+                'corFundo': item.get('corFundo', '#ffffff'),
                 'ods': 'true' if item.get('ods') else 'false',
                 'odsNums': json.dumps(item.get('odsNums') or []) if item.get('odsNums') is not None else None,
                 'qr': 'true' if item.get('qr') else 'false',
                 'qrLink': item.get('qrLink', ''),
                 'logos': json.dumps(item.get('logos') or ['barueri']) if item.get('logos') is not None else None,
                 'customLogoImg': item.get('customLogoImg'),
-                'bgCapa': item.get('bgCapa'),
+                'bgCapa': item.get('bgCapa') or item.get('bgGeral'),
                 'imgTexto': item.get('imgTexto'),
                 'chartType': item.get('chartType', 'line'),
                 'chartIndicador': item.get('chartIndicador'),
@@ -192,12 +193,16 @@ def salvar_apresentacao():
                 'indicadores': json.dumps(item.get('indicadores') or []) if item.get('indicadores') is not None else None
             }
 
+            origens_campos = item.get('origens_campos') or {}
+
             for chave, valor in campos_para_salvar.items():
                 if valor is not None:
+                    origem_id = origens_campos.get(chave)
                     campo = CampoPreenchido(
                         slide_id=slide.id,
                         chave_campo=chave,
-                        valor_manual=str(valor)
+                        valor_manual=str(valor),
+                        campo_origem_id=origem_id if isinstance(origem_id, int) else None
                     )
                     db.session.add(campo)
 
@@ -269,6 +274,7 @@ def editar_apresentacao(id):
             'tamanhoSubtitulo': 1.8,
             'corTitulo': '#0f172a',
             'corSubtitulo': '#64748b',
+            'corFundo': '#ffffff',
             'logos': ['barueri'],
             'customLogoImg': None,
             'ods': False,
@@ -276,18 +282,25 @@ def editar_apresentacao(id):
             'qr': False,
             'qrLink': '',
             'bgCapa': None,
+            'bgGeral': None,
             'imgTexto': None,
             'chartType': 'line',
             'chartIndicador': 1,
             'periodo': 'Últimos 12 meses',
-            'indicadores': []
+            'indicadores': [],
+            'origens_campos': {}
         }
 
         # Reconstrói os dados a partir de CampoPreenchido
         for campo in slide.campos:
             val = campo.valor_manual
+            if campo.campo_origem_id:
+                slide_dict['origens_campos'][campo.chave_campo] = campo.campo_origem_id
             if campo.chave_campo in ('ods', 'qr'):
                 slide_dict[campo.chave_campo] = (val == 'true')
+            elif campo.chave_campo in ('bgCapa', 'bgGeral'):
+                slide_dict['bgCapa'] = val
+                slide_dict['bgGeral'] = val
             elif campo.chave_campo in ('tamanhoTitulo', 'tamanhoSubtitulo'):
                 try:
                     slide_dict[campo.chave_campo] = float(val) if val else (4.0 if campo.chave_campo == 'tamanhoTitulo' else 1.8)

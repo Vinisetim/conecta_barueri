@@ -54,6 +54,10 @@
                 <i class="bi bi-plus-lg"></i>
                 <span>Novo Slide</span>
             </button>
+            <button type="button" class="btn-novo-slide" id="btnAcervoPasta" style="margin-top: 8px; background: #eff6ff; color: #0052ff; border: 1.5px dashed #bfdbfe; font-weight: 600; display:flex; align-items:center; justify-content:center; gap:6px;" title="Reutilizar slide completo existente de outra apresentação desta pasta">
+                <i class="bi bi-folder-symlink"></i>
+                <span>Reutilizar Slide da Pasta</span>
+            </button>
         </aside>
 
         <!-- CANVAS -->
@@ -213,7 +217,10 @@
                 </div>
 
                 <div class="form-group-ap fg-titulo">
-                    <label for="inputTitulo" id="labelTitulo">Título</label>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <label for="inputTitulo" id="labelTitulo" style="margin: 0;">Título</label>
+                        <button type="button" class="btn btn-link p-0 text-decoration-none btn-abrir-acervo-dados" data-tipo="textos" style="font-size: 0.78rem; color: #0052ff; font-weight: 500;" title="Reaproveitar textos salvos nesta pasta"><i class="bi bi-folder-symlink me-1"></i>Textos da Pasta</button>
+                    </div>
                     <input type="text" id="inputTitulo" class="form-control-ap" value="Capa">
                 </div>
 
@@ -241,6 +248,7 @@
                             <div class="media-upload-preview" style="margin-top: 4px;">
                                 <div class="media-thumb-box"><img id="bgGeralThumbPreview" src="" alt="BG" style="display:none;"></div>
                                 <button type="button" class="btn-media-action" id="btnUploadBgGeral" style="flex:1;">Upload Imagem</button>
+                                <button type="button" class="btn-media-action btn-abrir-acervo-midia" data-target="bgCapa" style="background:#eff6ff; color:#0052ff; border:1px solid #bfdbfe;" title="Escolher imagem do acervo da pasta"><i class="bi bi-folder-symlink"></i> Acervo</button>
                                 <button type="button" class="btn-media-action" id="btnRemoveBgGeral" style="background:#fee2e2; color:#ef4444; border:1px solid #f87171; display:none;"><i class="bi bi-trash"></i></button>
                                 <input type="file" id="inputUploadBgGeral" accept="image/*" style="display: none;">
                             </div>
@@ -250,9 +258,13 @@
 
                 <!-- Imagem+Texto específicos -->
                 <div class="form-group-ap tpl-imgtexto" style="display: none;">
-                    <label>Upload de Imagem</label>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <label style="margin: 0;">Upload de Imagem</label>
+                        <button type="button" class="btn btn-link p-0 text-decoration-none btn-abrir-acervo-midia" data-target="imgTexto" style="font-size: 0.78rem; color: #0052ff; font-weight: 500;"><i class="bi bi-folder-symlink me-1"></i>Acervo da Pasta</button>
+                    </div>
                     <div class="media-upload-preview">
                         <button type="button" class="btn-editor-visualizar" style="flex:1;" id="btnUploadImgTexto">Upload + Thumbnail</button>
+                        <button type="button" class="btn-media-action btn-abrir-acervo-midia" data-target="imgTexto" style="background:#eff6ff; color:#0052ff; border:1px solid #bfdbfe; font-size:0.82rem;" title="Escolher imagem do acervo da pasta"><i class="bi bi-folder-symlink"></i> Acervo</button>
                         <input type="file" id="inputUploadImgTexto" accept="image/*" style="display: none;">
                         <div class="media-thumb-box" style="width: 40px; flex: none;"><img id="imgTextoThumbPreview" src="https://images.unsplash.com/photo-1506744038136-46273834b3fb" alt="IMG"></div>
                     </div>
@@ -260,7 +272,10 @@
 
                 <!-- Indicadores específicos -->
                 <div class="form-group-ap tpl-indicadores" style="display: none;">
-                    <label>Indicadores (Máximo 4)</label>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <label style="margin: 0;">Indicadores (Máximo 4)</label>
+                        <button type="button" class="btn btn-link p-0 text-decoration-none btn-abrir-acervo-dados" data-tipo="indicadores" style="font-size: 0.78rem; color: #0052ff; font-weight: 500;" title="Reaproveitar indicadores cadastrados nesta pasta"><i class="bi bi-folder-symlink me-1"></i>Da Pasta</button>
+                    </div>
                     <div style="display: flex; gap: 8px; margin-bottom: 12px;">
                         <select id="selectIndicadorNovo" class="form-control-ap" style="flex: 1;">
                             <option value="1">Saúde (3.237)</option>
@@ -368,6 +383,7 @@
                             <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="chkLogoCustom"> Logo Personalizada</label>
                             <div id="fgLogoCustom" style="display:none; padding-left: 20px;">
                                 <input type="file" id="inputUploadLogoCustom" accept="image/*" class="form-control" style="font-size:0.75rem; padding:4px;">
+                                <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none btn-abrir-acervo-midia mt-1" data-target="customLogoImg" style="font-size: 0.75rem; color: #0052ff; display: inline-flex; align-items: center; gap: 4px;"><i class="bi bi-folder-symlink"></i> Escolher Logo do Acervo</button>
                             </div>
                         </div>
                     </div>
@@ -476,7 +492,93 @@
 
 <!-- TOAST SALVAR -->
 <div id="saveToast" style="display:none; position:fixed; top:20px; right:20px; background:#10b981; color:#fff; padding:12px 24px; border-radius:8px; font-weight:bold; box-shadow:0 4px 12px rgba(0,0,0,0.15); z-index:9999; align-items:center; gap:8px;">
-    <i class="bi bi-check-circle" style="font-size:1.2rem;"></i> <span>Apresentação salva com sucesso!</span>
+    <i class="bi bi-check-circle" style="font-size:1.2rem;"></i> <span id="saveToastText">Apresentação salva com sucesso!</span>
+</div>
+
+<!-- MODAL ACERVO DA PASTA (COMPARTILHAMENTO DE SLIDES E DADOS) -->
+<div id="modalAcervoPasta" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.65); z-index:9998; align-items:center; justify-content:center; padding:20px; backdrop-filter: blur(4px);">
+    <div style="width: 100%; max-width: 880px; max-height: 90vh; background: #ffffff; border-radius: 14px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); display: flex; flex-direction: column; overflow: hidden;">
+        <!-- Header do Modal -->
+        <div style="padding: 18px 24px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; background: #f8fafc;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 42px; height: 42px; border-radius: 10px; background: #eff6ff; display: flex; align-items: center; justify-content: center; color: #0052ff; font-size: 1.3rem;">
+                    <i class="bi bi-folder-symlink-fill"></i>
+                </div>
+                <div>
+                    <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700; color: #0f172a;">Acervo Compartilhado da Pasta: <span id="spanAcervoNomePasta" style="color:#0052ff;">...</span></h3>
+                    <p style="margin: 2px 0 0; font-size: 0.8rem; color: #64748b;">Compartilhe slides completos ou reutilize imagens e dados manuais desta pasta.</p>
+                </div>
+            </div>
+            <button type="button" id="btnCloseAcervoModal" style="background: none; border: none; font-size: 1.3rem; color: #64748b; cursor: pointer; padding: 4px;"><i class="bi bi-x-lg"></i></button>
+        </div>
+
+        <!-- Abas do Modal -->
+        <div style="display: flex; border-bottom: 1px solid #e2e8f0; padding: 0 24px; background: #fff; gap: 20px;">
+            <button type="button" class="tab-acervo-btn active" id="tabBtnAcervoSlides" style="padding: 12px 6px; border: none; background: none; font-weight: 600; font-size: 0.9rem; color: #0052ff; border-bottom: 2px solid #0052ff; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                <i class="bi bi-collection-play"></i> Slides Completos (<span id="countAcervoSlides">0</span>)
+            </button>
+            <button type="button" class="tab-acervo-btn" id="tabBtnAcervoDados" style="padding: 12px 6px; border: none; background: none; font-weight: 500; font-size: 0.9rem; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                <i class="bi bi-images"></i> Mídias e Dados Manuais (<span id="countAcervoDados">0</span>)
+            </button>
+        </div>
+
+        <!-- Corpo do Modal -->
+        <div style="padding: 20px 24px; overflow-y: auto; flex: 1; min-height: 380px;">
+            <!-- Painel 1: Slides Completos -->
+            <div id="painelAcervoSlides">
+                <!-- Filtros e busca -->
+                <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+                    <div style="flex: 1; position: relative;">
+                        <i class="bi bi-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.85rem;"></i>
+                        <input type="text" id="inputBuscaAcervoSlides" placeholder="Buscar slide por título ou apresentação..." style="width: 100%; padding: 8px 12px 8px 34px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.85rem;">
+                    </div>
+                    <select id="selectFiltroTemplateAcervo" style="padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.85rem; color: #334155; background: #fff;">
+                        <option value="">Todos os Templates</option>
+                        <option value="capa">Capa / Abertura</option>
+                        <option value="imagem_texto">Imagem + Texto</option>
+                        <option value="grafico">Gráfico</option>
+                        <option value="indicadores">Indicadores</option>
+                    </select>
+                </div>
+
+                <!-- Grade de Slides -->
+                <div id="gridAcervoSlides" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px;">
+                    <!-- Preenchido dinamicamente via JS -->
+                </div>
+                <div id="emptyAcervoSlides" style="display: none; text-align: center; padding: 40px 20px; color: #64748b;">
+                    <i class="bi bi-folder2-open" style="font-size: 2.5rem; color: #cbd5e1; display: block; margin-bottom: 10px;"></i>
+                    <p style="margin: 0; font-weight: 500;">Nenhum outro slide encontrado nesta pasta.</p>
+                    <small>Ao criar outras apresentações nesta pasta, seus slides ficarão disponíveis aqui para reuso imediato.</small>
+                </div>
+            </div>
+
+            <!-- Painel 2: Mídias e Dados Manuais -->
+            <div id="painelAcervoDados" style="display: none;">
+                <div style="margin-bottom: 14px; display: flex; gap: 8px; flex-wrap: wrap;" id="filtrosTipoDados">
+                    <button type="button" class="btn btn-sm btn-primary filter-dado-btn" data-tipo="todos">Todas as Mídias</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary filter-dado-btn" data-tipo="bgCapa">Fundos</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary filter-dado-btn" data-tipo="imgTexto">Imagens</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary filter-dado-btn" data-tipo="customLogoImg">Logos</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary filter-dado-btn" data-tipo="textos">Textos</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary filter-dado-btn" data-tipo="indicadores">Indicadores</button>
+                </div>
+
+                <div id="gridAcervoDados" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px;">
+                    <!-- Preenchido dinamicamente via JS -->
+                </div>
+                <div id="emptyAcervoDados" style="display: none; text-align: center; padding: 40px 20px; color: #64748b;">
+                    <i class="bi bi-images" style="font-size: 2.5rem; color: #cbd5e1; display: block; margin-bottom: 10px;"></i>
+                    <p style="margin: 0; font-weight: 500;">Nenhuma mídia ou dado manual encontrado nesta pasta.</p>
+                    <small>Imagens enviadas e indicadores manuais criados nas apresentações desta pasta aparecerão aqui.</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer do Modal -->
+        <div style="padding: 12px 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; background: #f8fafc;">
+            <button type="button" id="btnFecharAcervoModal" class="btn btn-light px-4" style="border: 1px solid #cbd5e1; font-weight: 500;">Fechar</button>
+        </div>
+    </div>
 </div>
 
 <style>
@@ -1893,6 +1995,483 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                 }
             }
+        });
+    });
+    // ==========================================
+    // --- LÓGICA DO ACERVO COMPARTILHADO DA PASTA ---
+    // ==========================================
+    let acervoCache = null;
+    let acervoTargetField = null;
+    let acervoFiltroDadoAtual = 'todos';
+
+    function getEffectiveProjetoId() {
+        if (window.projetoId) return window.projetoId;
+        if (selectSaveProjeto && selectSaveProjeto.value) return parseInt(selectSaveProjeto.value);
+        const urlParams = new URLSearchParams(window.location.search);
+        const pId = urlParams.get('projeto_id');
+        if (pId) return parseInt(pId);
+        return null;
+    }
+
+    const modalAcervoPasta = document.getElementById("modalAcervoPasta");
+    const btnCloseAcervoModal = document.getElementById("btnCloseAcervoModal");
+    const btnFecharAcervoModal = document.getElementById("btnFecharAcervoModal");
+    const tabBtnAcervoSlides = document.getElementById("tabBtnAcervoSlides");
+    const tabBtnAcervoDados = document.getElementById("tabBtnAcervoDados");
+    const painelAcervoSlides = document.getElementById("painelAcervoSlides");
+    const painelAcervoDados = document.getElementById("painelAcervoDados");
+    const spanAcervoNomePasta = document.getElementById("spanAcervoNomePasta");
+    const countAcervoSlides = document.getElementById("countAcervoSlides");
+    const countAcervoDados = document.getElementById("countAcervoDados");
+    const gridAcervoSlides = document.getElementById("gridAcervoSlides");
+    const emptyAcervoSlides = document.getElementById("emptyAcervoSlides");
+    const gridAcervoDados = document.getElementById("gridAcervoDados");
+    const emptyAcervoDados = document.getElementById("emptyAcervoDados");
+    const inputBuscaAcervoSlides = document.getElementById("inputBuscaAcervoSlides");
+    const selectFiltroTemplateAcervo = document.getElementById("selectFiltroTemplateAcervo");
+    const btnAcervoPasta = document.getElementById("btnAcervoPasta");
+
+    function fecharAcervoModal() {
+        if (modalAcervoPasta) modalAcervoPasta.style.display = "none";
+    }
+
+    if (btnCloseAcervoModal) btnCloseAcervoModal.addEventListener("click", fecharAcervoModal);
+    if (btnFecharAcervoModal) btnFecharAcervoModal.addEventListener("click", fecharAcervoModal);
+    if (modalAcervoPasta) {
+        modalAcervoPasta.addEventListener("click", (e) => {
+            if (e.target === modalAcervoPasta) fecharAcervoModal();
+        });
+    }
+
+    function alternarAbaAcervo(aba) {
+        if (aba === 'slides') {
+            if (painelAcervoSlides) painelAcervoSlides.style.display = 'block';
+            if (painelAcervoDados) painelAcervoDados.style.display = 'none';
+            if (tabBtnAcervoSlides) {
+                tabBtnAcervoSlides.style.color = '#0052ff';
+                tabBtnAcervoSlides.style.borderBottom = '2px solid #0052ff';
+            }
+            if (tabBtnAcervoDados) {
+                tabBtnAcervoDados.style.color = '#64748b';
+                tabBtnAcervoDados.style.borderBottom = '2px solid transparent';
+            }
+        } else {
+            if (painelAcervoSlides) painelAcervoSlides.style.display = 'none';
+            if (painelAcervoDados) painelAcervoDados.style.display = 'block';
+            if (tabBtnAcervoDados) {
+                tabBtnAcervoDados.style.color = '#0052ff';
+                tabBtnAcervoDados.style.borderBottom = '2px solid #0052ff';
+            }
+            if (tabBtnAcervoSlides) {
+                tabBtnAcervoSlides.style.color = '#64748b';
+                tabBtnAcervoSlides.style.borderBottom = '2px solid transparent';
+            }
+        }
+    }
+
+    if (tabBtnAcervoSlides) tabBtnAcervoSlides.addEventListener("click", () => alternarAbaAcervo('slides'));
+    if (tabBtnAcervoDados) tabBtnAcervoDados.addEventListener("click", () => alternarAbaAcervo('dados'));
+
+    function mostrarToastNotificacao(msg, cor = "#10b981") {
+        if (saveToast) {
+            saveToast.style.background = cor;
+            const msgSpan = document.getElementById("saveToastText") || saveToast.querySelector('span');
+            if (msgSpan) msgSpan.textContent = msg;
+            saveToast.style.display = "flex";
+            setTimeout(() => { saveToast.style.display = "none"; }, 3500);
+        }
+    }
+
+    async function carregarAcervoPasta(tabPadrao = 'slides', targetFilter = null) {
+        acervoTargetField = targetFilter;
+        const projId = getEffectiveProjetoId();
+
+        if (!projId) {
+            alert("Esta apresentação ainda não está vinculada a uma pasta salva. Salve a apresentação em uma pasta primeiro para habilitar o compartilhamento de acervo.");
+            return;
+        }
+
+        if (modalAcervoPasta) modalAcervoPasta.style.display = "flex";
+        alternarAbaAcervo(tabPadrao);
+
+        if (targetFilter) {
+            acervoFiltroDadoAtual = targetFilter;
+            document.querySelectorAll('.filter-dado-btn').forEach(btn => {
+                if (btn.dataset.tipo === targetFilter) {
+                    btn.classList.remove('btn-outline-secondary');
+                    btn.classList.add('btn-primary');
+                } else {
+                    btn.classList.remove('btn-primary');
+                    btn.classList.add('btn-outline-secondary');
+                }
+            });
+        }
+
+        if (gridAcervoSlides) {
+            gridAcervoSlides.innerHTML = `
+                <div style="grid-column: 1/-1; text-align:center; padding: 40px; color: #64748b;">
+                    <i class="bi bi-arrow-repeat spin" style="font-size: 2rem; color: #0052ff; display:block; margin-bottom: 8px;"></i>
+                    Carregando slides compartilhados da pasta...
+                </div>
+            `;
+        }
+        if (gridAcervoDados) {
+            gridAcervoDados.innerHTML = `
+                <div style="grid-column: 1/-1; text-align:center; padding: 40px; color: #64748b;">
+                    <i class="bi bi-arrow-repeat spin" style="font-size: 2rem; color: #0052ff; display:block; margin-bottom: 8px;"></i>
+                    Carregando mídias e dados do acervo...
+                </div>
+            `;
+        }
+
+        try {
+            const resp = await fetch(`/projetos/${projId}/acervo`);
+            const data = await resp.json();
+
+            if (!resp.ok || data.status !== 'sucesso') {
+                alert("Erro ao consultar acervo: " + (data.mensagem || "Erro inesperado"));
+                return;
+            }
+
+            acervoCache = data;
+            if (spanAcervoNomePasta) spanAcervoNomePasta.textContent = data.projeto.nome;
+            if (countAcervoSlides) countAcervoSlides.textContent = data.total_slides;
+
+            const totalDados = (data.dados_manuais.midias?.length || 0) +
+                               (data.dados_manuais.textos?.length || 0) +
+                               (data.dados_manuais.indicadores?.length || 0) +
+                               (data.dados_manuais.links?.length || 0);
+            if (countAcervoDados) countAcervoDados.textContent = totalDados;
+
+            renderGradeAcervoSlides();
+            renderGradeAcervoDados(acervoFiltroDadoAtual);
+        } catch (err) {
+            console.error("Falha ao carregar acervo da pasta:", err);
+            if (gridAcervoSlides) gridAcervoSlides.innerHTML = '<p class="text-danger text-center w-100">Erro de conexão ao buscar acervo.</p>';
+            if (gridAcervoDados) gridAcervoDados.innerHTML = '<p class="text-danger text-center w-100">Erro de conexão ao buscar acervo.</p>';
+        }
+    }
+
+    function renderGradeAcervoSlides() {
+        if (!gridAcervoSlides || !acervoCache) return;
+
+        const termo = (inputBuscaAcervoSlides ? inputBuscaAcervoSlides.value : '').toLowerCase().trim();
+        const tplFiltro = selectFiltroTemplateAcervo ? selectFiltroTemplateAcervo.value : '';
+
+        const slidesFiltrados = (acervoCache.slides || []).filter(s => {
+            const matchBusca = !termo ||
+                (s.titulo && s.titulo.toLowerCase().includes(termo)) ||
+                (s.subtitulo && s.subtitulo.toLowerCase().includes(termo)) ||
+                (s.apresentacao_nome && s.apresentacao_nome.toLowerCase().includes(termo));
+            const matchTpl = !tplFiltro || s.template === tplFiltro;
+            return matchBusca && matchTpl;
+        });
+
+        if (slidesFiltrados.length === 0) {
+            gridAcervoSlides.innerHTML = "";
+            if (emptyAcervoSlides) emptyAcervoSlides.style.display = "block";
+            return;
+        }
+
+        if (emptyAcervoSlides) emptyAcervoSlides.style.display = "none";
+
+        gridAcervoSlides.innerHTML = slidesFiltrados.map(s => {
+            const tplBadge = {
+                'capa': { label: 'Capa', bg: '#eff6ff', color: '#1d4ed8' },
+                'imagem_texto': { label: 'Imagem + Texto', bg: '#f0fdf4', color: '#15803d' },
+                'grafico': { label: 'Gráfico', bg: '#fef3c7', color: '#b45309' },
+                'indicadores': { label: 'Indicadores', bg: '#f5f3ff', color: '#6d28d9' }
+            }[s.template] || { label: 'Slide', bg: '#f1f5f9', color: '#475569' };
+
+            return `
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+                    <div style="padding: 10px 12px; background: #f8fafc; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.75rem; font-weight: 700; color: #334155; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px;" title="${escapeHtml(s.apresentacao_nome)}">
+                            <i class="bi bi-file-earmark-slides text-primary me-1"></i>${escapeHtml(s.apresentacao_nome)}
+                        </span>
+                        <span style="font-size: 0.7rem; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: ${tplBadge.bg}; color: ${tplBadge.color};">
+                            ${tplBadge.label}
+                        </span>
+                    </div>
+                    <div style="padding: 10px; display: flex; justify-content: center; align-items: center; background: #f1f5f9;">
+                        <div class="thumb-canvas-mini" style="height: 90px; aspect-ratio: 16/9; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); background: #fff; position: relative;">
+                            ${renderMiniSlidePreview(s)}
+                        </div>
+                    </div>
+                    <div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; flex: 1; justify-content: space-between;">
+                        <div style="font-size: 0.8rem; font-weight: 600; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(s.titulo || 'Sem título')}">
+                            ${escapeHtml(s.titulo || 'Slide sem título')}
+                        </div>
+                        <button type="button" class="btn btn-sm btn-primary w-100 d-inline-flex align-items-center justify-content-center gap-1" onclick="window.importarSlideDoAcervo(${s.slide_id})" style="background: #0052ff; border: none; font-size: 0.8rem; padding: 6px 10px; border-radius: 6px; font-weight: 600;">
+                            <i class="bi bi-plus-circle"></i> Inserir este Slide
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join("");
+    }
+
+    window.importarSlideDoAcervo = function(slideOrigemId) {
+        if (!acervoCache || !acervoCache.slides) return;
+        const sOrigem = acervoCache.slides.find(s => s.slide_id === slideOrigemId);
+        if (!sOrigem) return;
+
+        slideCounter++;
+        const novoSlide = {
+            id: slideCounter,
+            template: sOrigem.template || 'capa',
+            titulo: sOrigem.titulo || '',
+            subtitulo: sOrigem.subtitulo || '',
+            tamanhoTitulo: sOrigem.tamanhoTitulo || 4.0,
+            tamanhoSubtitulo: sOrigem.tamanhoSubtitulo || 1.8,
+            corTitulo: sOrigem.corTitulo || '#0f172a',
+            corSubtitulo: sOrigem.corSubtitulo || '#64748b',
+            corFundo: sOrigem.corFundo || '#ffffff',
+            logos: Array.isArray(sOrigem.logos) ? [...sOrigem.logos] : ['barueri'],
+            customLogoImg: sOrigem.customLogoImg || null,
+            ods: !!sOrigem.ods,
+            odsNums: Array.isArray(sOrigem.odsNums) ? [...sOrigem.odsNums] : [],
+            qr: !!sOrigem.qr,
+            qrLink: sOrigem.qrLink || '',
+            bgCapa: sOrigem.bgCapa || null,
+            bgGeral: sOrigem.bgGeral || sOrigem.bgCapa || null,
+            imgTexto: sOrigem.imgTexto || null,
+            chartType: sOrigem.chartType || 'line',
+            chartIndicador: sOrigem.chartIndicador || 1,
+            periodo: sOrigem.periodo || 'Últimos 12 meses',
+            indicadores: Array.isArray(sOrigem.indicadores) ? JSON.parse(JSON.stringify(sOrigem.indicadores)) : [],
+            origens_campos: {}
+        };
+
+        slides.push(novoSlide);
+        activeSlideId = novoSlide.id;
+        renderThumbnails();
+        renderActiveSlide();
+        if (slidesThumbsList) slidesThumbsList.scrollTop = slidesThumbsList.scrollHeight;
+
+        fecharAcervoModal();
+        mostrarToastNotificacao(`Slide importado com sucesso da pasta!`);
+    };
+
+    function renderGradeAcervoDados(filtro = 'todos') {
+        if (!gridAcervoDados || !acervoCache || !acervoCache.dados_manuais) return;
+
+        const { midias = [], textos = [], indicadores = [], links = [] } = acervoCache.dados_manuais;
+        let htmlCards = '';
+        let totalExibidos = 0;
+
+        // Renderização de Mídias (Fundos, Imagens, Logos)
+        if (filtro === 'todos' || filtro === 'bgCapa' || filtro === 'imgTexto' || filtro === 'customLogoImg') {
+            const midiasFiltradas = midias.filter(m => filtro === 'todos' || m.tipo === filtro);
+            midiasFiltradas.forEach(m => {
+                totalExibidos++;
+                const tipoBadge = m.tipo === 'bgCapa' ? 'Fundo' : (m.tipo === 'imgTexto' ? 'Imagem' : 'Logotipo');
+                htmlCards += `
+                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column;">
+                        <div style="height: 100px; background: #f8fafc; display: flex; align-items: center; justify-content: center; position: relative; border-bottom: 1px solid #f1f5f9; overflow: hidden;">
+                            <img src="${m.valor}" alt="${tipoBadge}" style="width: 100%; height: 100%; object-fit: contain; padding: 4px;">
+                            <span style="position: absolute; top: 6px; right: 6px; background: rgba(15,23,42,0.7); color: #fff; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 600;">
+                                ${tipoBadge}
+                            </span>
+                        </div>
+                        <div style="padding: 10px; display: flex; flex-direction: column; gap: 6px; flex: 1; justify-content: space-between;">
+                            <span style="font-size: 0.72rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(m.apresentacao_nome)}">
+                                De: ${escapeHtml(m.apresentacao_nome)}
+                            </span>
+                            <button type="button" class="btn btn-sm btn-outline-primary w-100" onclick="window.aplicarMidiaAcervo('${m.tipo}', ${JSON.stringify(m.valor)}, ${m.campo_id})" style="font-size: 0.78rem; font-weight: 600; padding: 5px;">
+                                <i class="bi bi-box-arrow-in-down me-1"></i> Usar Mídia
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Renderização de Textos (Títulos e Subtítulos)
+        if (filtro === 'todos' || filtro === 'textos') {
+            textos.forEach(t => {
+                totalExibidos++;
+                const chaveRotulo = t.chave === 'titulo' ? 'Título' : 'Subtítulo';
+                htmlCards += `
+                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; gap: 8px;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <span style="font-size: 0.7rem; font-weight: 700; color: #0052ff; text-transform: uppercase;">${chaveRotulo}</span>
+                                <span style="font-size: 0.7rem; color: #94a3b8;">${escapeHtml(t.apresentacao_nome)}</span>
+                            </div>
+                            <p style="margin: 0; font-size: 0.85rem; color: #1e293b; font-weight: 600; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;" title="${escapeHtml(t.valor)}">
+                                "${escapeHtml(t.valor)}"
+                            </p>
+                        </div>
+                        <div style="display: flex; gap: 6px; margin-top: 4px;">
+                            <button type="button" class="btn btn-sm btn-outline-primary flex-fill" onclick="window.aplicarTextoAcervo('titulo', ${JSON.stringify(t.valor)}, ${t.campo_id})" style="font-size: 0.72rem; padding: 4px;">
+                                Como Título
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary flex-fill" onclick="window.aplicarTextoAcervo('subtitulo', ${JSON.stringify(t.valor)}, ${t.campo_id})" style="font-size: 0.72rem; padding: 4px;">
+                                Como Subtítulo
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Renderização de Indicadores
+        if (filtro === 'todos' || filtro === 'indicadores') {
+            indicadores.forEach(ind => {
+                totalExibidos++;
+                htmlCards += `
+                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 38px; height: 38px; border-radius: 8px; background: #eff6ff; display: flex; align-items: center; justify-content: center; color: ${ind.cor || '#0052ff'}; font-size: 1.2rem; flex-shrink: 0;">
+                                <i class="bi ${ind.icone || 'bi-graph-up'}"></i>
+                            </div>
+                            <div style="min-width: 0; flex: 1;">
+                                <div style="font-size: 1rem; font-weight: 800; color: #0f172a; line-height: 1.1;">${escapeHtml(ind.valor)}</div>
+                                <div style="font-size: 0.75rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(ind.nome)}</div>
+                            </div>
+                        </div>
+                        <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 2px;">
+                            De: ${escapeHtml(ind.apresentacao_nome)}
+                        </div>
+                        <button type="button" class="btn btn-sm btn-primary w-100" onclick="window.aplicarIndicadorAcervo(${JSON.stringify(ind).replace(/"/g, '&quot;')}, ${ind.campo_id})" style="font-size: 0.75rem; font-weight: 600; padding: 5px; background: #0052ff; border: none;">
+                            <i class="bi bi-plus-circle me-1"></i> Inserir no Slide
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        if (totalExibidos === 0) {
+            gridAcervoDados.innerHTML = "";
+            if (emptyAcervoDados) emptyAcervoDados.style.display = "block";
+            return;
+        }
+
+        if (emptyAcervoDados) emptyAcervoDados.style.display = "none";
+        gridAcervoDados.innerHTML = htmlCards;
+    }
+
+    window.aplicarMidiaAcervo = function(tipo, valor, campoId) {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (!slide) return;
+        if (!slide.origens_campos) slide.origens_campos = {};
+
+        if (tipo === 'bgCapa') {
+            slide.bgGeral = valor;
+            slide.bgCapa = valor;
+            slide.origens_campos['bgCapa'] = campoId;
+            updatePreviewMedia();
+        } else if (tipo === 'imgTexto') {
+            slide.imgTexto = valor;
+            slide.origens_campos['imgTexto'] = campoId;
+            updatePreviewMedia();
+        } else if (tipo === 'customLogoImg') {
+            slide.customLogoImg = valor;
+            if (!slide.logos) slide.logos = [];
+            if (!slide.logos.includes('custom')) slide.logos.push('custom');
+            slide.origens_campos['customLogoImg'] = campoId;
+            if (chkLogoCustom) chkLogoCustom.checked = true;
+            if (fgLogoCustom) fgLogoCustom.style.display = 'block';
+            updateSlotsVisibility();
+        }
+
+        updateActiveThumbnail();
+        fecharAcervoModal();
+        mostrarToastNotificacao("Mídia aplicada ao slide com sucesso!");
+    };
+
+    window.aplicarTextoAcervo = function(campoAlvo, valor, campoId) {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (!slide) return;
+        if (!slide.origens_campos) slide.origens_campos = {};
+
+        if (campoAlvo === 'titulo') {
+            slide.titulo = valor;
+            if (inputTitulo) inputTitulo.value = valor;
+        } else {
+            slide.subtitulo = valor;
+            if (inputSubtitulo) inputSubtitulo.value = valor;
+        }
+        slide.origens_campos[campoAlvo] = campoId;
+
+        updatePreviewTexts();
+        updateActiveThumbnail();
+        fecharAcervoModal();
+        mostrarToastNotificacao(`Texto inserido como ${campoAlvo}!`);
+    };
+
+    window.aplicarIndicadorAcervo = function(item, campoId) {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (!slide) return;
+
+        if (slide.template !== 'indicadores') {
+            if (confirm("O slide atual não está usando o template de Indicadores. Deseja alternar o template deste slide para Indicadores para adicionar este item?")) {
+                slide.template = 'indicadores';
+                if (selectTemplate) selectTemplate.value = 'indicadores';
+                switchTemplate();
+            } else {
+                return;
+            }
+        }
+
+        if (!slide.indicadores) slide.indicadores = [];
+        if (slide.indicadores.length >= 4) {
+            alert("Você só pode adicionar no máximo 4 indicadores por slide.");
+            return;
+        }
+
+        slide.indicadores.push({
+            id: Date.now(),
+            id_padrao: null,
+            nome: item.nome,
+            valor: item.valor,
+            icone: item.icone || 'bi-graph-up',
+            cor: item.cor || '#0284c7'
+        });
+
+        if (!slide.origens_campos) slide.origens_campos = {};
+        slide.origens_campos['indicadores'] = campoId;
+
+        renderIndicadores(slide);
+        updateActiveThumbnail();
+        fecharAcervoModal();
+        mostrarToastNotificacao(`Indicador "${item.nome}" inserido no slide!`);
+    };
+
+    if (btnAcervoPasta) {
+        btnAcervoPasta.addEventListener("click", () => {
+            carregarAcervoPasta('slides');
+        });
+    }
+
+    document.querySelectorAll(".btn-abrir-acervo-midia").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const target = btn.getAttribute("data-target") || 'bgCapa';
+            carregarAcervoPasta('dados', target);
+        });
+    });
+
+    document.querySelectorAll(".btn-abrir-acervo-dados").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const tipo = btn.getAttribute("data-tipo") || 'textos';
+            carregarAcervoPasta('dados', tipo);
+        });
+    });
+
+    if (inputBuscaAcervoSlides) inputBuscaAcervoSlides.addEventListener("input", renderGradeAcervoSlides);
+    if (selectFiltroTemplateAcervo) selectFiltroTemplateAcervo.addEventListener("change", renderGradeAcervoSlides);
+
+    document.querySelectorAll('.filter-dado-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-dado-btn').forEach(b => {
+                b.classList.remove('btn-primary');
+                b.classList.add('btn-outline-secondary');
+            });
+            btn.classList.remove('btn-outline-secondary');
+            btn.classList.add('btn-primary');
+            acervoFiltroDadoAtual = btn.dataset.tipo;
+            renderGradeAcervoDados(acervoFiltroDadoAtual);
         });
     });
 

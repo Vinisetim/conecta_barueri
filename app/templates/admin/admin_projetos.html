@@ -337,11 +337,28 @@
             </div>
             <button type="button" class="btn-close-modal" id="btnCloseVerModal"><i class="bi bi-x-lg"></i></button>
         </div>
-        <div class="modal-body-proj">
-            <p class="text-muted small mb-3">Veja abaixo todas as apresentações salvas nesta pasta:</p>
-            
-            <div id="modalApresentacoesConteudo" class="modal-apresentacoes-list">
-                <!-- Preenchido dinamicamente via JS -->
+        <div class="modal-body-proj p-0">
+            <div style="display: flex; border-bottom: 1px solid #e2e8f0; padding: 0 20px; background: #fff; gap: 16px;">
+                <button type="button" id="tabBtnVerApresentacoes" style="padding: 10px 4px; border: none; background: none; font-weight: 600; font-size: 0.88rem; color: #0052ff; border-bottom: 2px solid #0052ff; cursor: pointer;">
+                    <i class="bi bi-file-earmark-slides me-1"></i> Apresentações Salvas
+                </button>
+                <button type="button" id="tabBtnVerAcervo" style="padding: 10px 4px; border: none; background: none; font-weight: 500; font-size: 0.88rem; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer;">
+                    <i class="bi bi-folder-symlink me-1"></i> Acervo Compartilhado da Pasta
+                </button>
+            </div>
+            <div style="padding: 16px 20px;">
+                <div id="painelVerApresentacoes">
+                    <p class="text-muted small mb-3">Veja abaixo todas as apresentações salvas nesta pasta:</p>
+                    <div id="modalApresentacoesConteudo" class="modal-apresentacoes-list">
+                        <!-- Preenchido dinamicamente via JS -->
+                    </div>
+                </div>
+                <div id="painelVerAcervo" style="display: none;">
+                    <p class="text-muted small mb-2">Slides e mídias compartilhados entre as apresentações desta pasta:</p>
+                    <div id="modalAcervoPastaConteudo" class="modal-apresentacoes-list" style="max-height: 340px; overflow-y: auto;">
+                        <!-- Preenchido dinamicamente via fetch acervo -->
+                    </div>
+                </div>
             </div>
         </div>
         <div class="modal-footer-proj d-flex justify-content-between">
@@ -477,6 +494,13 @@ document.addEventListener("DOMContentLoaded", function() {
     const modalVerProjTitulo = document.getElementById("modalVerProjTitulo");
     const modalApresentacoesConteudo = document.getElementById("modalApresentacoesConteudo");
     const modalBtnCriarNestaPasta = document.getElementById("modalBtnCriarNestaPasta");
+    const tabBtnVerApresentacoes = document.getElementById("tabBtnVerApresentacoes");
+    const tabBtnVerAcervo = document.getElementById("tabBtnVerAcervo");
+    const painelVerApresentacoes = document.getElementById("painelVerApresentacoes");
+    const painelVerAcervo = document.getElementById("painelVerAcervo");
+    const modalAcervoPastaConteudo = document.getElementById("modalAcervoPastaConteudo");
+
+    let currentModalProjId = null;
 
     function fecharModalVer() {
         if (modalVer) modalVer.classList.remove("show");
@@ -490,6 +514,102 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    function alternarAbaVerModal(aba) {
+        if (aba === 'apresentacoes') {
+            if (painelVerApresentacoes) painelVerApresentacoes.style.display = 'block';
+            if (painelVerAcervo) painelVerAcervo.style.display = 'none';
+            if (tabBtnVerApresentacoes) {
+                tabBtnVerApresentacoes.style.color = '#0052ff';
+                tabBtnVerApresentacoes.style.borderBottom = '2px solid #0052ff';
+            }
+            if (tabBtnVerAcervo) {
+                tabBtnVerAcervo.style.color = '#64748b';
+                tabBtnVerAcervo.style.borderBottom = '2px solid transparent';
+            }
+        } else {
+            if (painelVerApresentacoes) painelVerApresentacoes.style.display = 'none';
+            if (painelVerAcervo) painelVerAcervo.style.display = 'block';
+            if (tabBtnVerAcervo) {
+                tabBtnVerAcervo.style.color = '#0052ff';
+                tabBtnVerAcervo.style.borderBottom = '2px solid #0052ff';
+            }
+            if (tabBtnVerApresentacoes) {
+                tabBtnVerApresentacoes.style.color = '#64748b';
+                tabBtnVerApresentacoes.style.borderBottom = '2px solid transparent';
+            }
+            carregarAcervoDaPastaNoModal(currentModalProjId);
+        }
+    }
+
+    if (tabBtnVerApresentacoes) tabBtnVerApresentacoes.addEventListener("click", () => alternarAbaVerModal('apresentacoes'));
+    if (tabBtnVerAcervo) tabBtnVerAcervo.addEventListener("click", () => alternarAbaVerModal('acervo'));
+
+    async function carregarAcervoDaPastaNoModal(projId) {
+        if (!projId || !modalAcervoPastaConteudo) return;
+        modalAcervoPastaConteudo.innerHTML = `
+            <div class="text-center py-4 text-muted">
+                <i class="bi bi-arrow-repeat spin fs-2 text-primary d-block mb-2"></i>
+                <p>Carregando acervo compartilhado...</p>
+            </div>
+        `;
+
+        try {
+            const resp = await fetch(`/projetos/${projId}/acervo`);
+            const data = await resp.json();
+            if (!resp.ok || data.status !== 'sucesso') {
+                modalAcervoPastaConteudo.innerHTML = `<div class="text-danger text-center py-3">Erro ao carregar acervo.</div>`;
+                return;
+            }
+
+            const slides = data.slides || [];
+            const midias = data.dados_manuais?.midias || [];
+
+            if (slides.length === 0) {
+                modalAcervoPastaConteudo.innerHTML = `
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-folder-x fs-1 text-secondary opacity-50 d-block mb-2"></i>
+                        <p class="mb-0">Nenhum slide compartilhado nesta pasta ainda.</p>
+                        <small>Crie apresentações nesta pasta para que os slides fiquem acessíveis para reuso.</small>
+                    </div>
+                `;
+                return;
+            }
+
+            let acervoHtml = `
+                <div class="alert alert-info py-2 px-3 small mb-3 d-flex align-items-center justify-content-between">
+                    <span><i class="bi bi-info-circle me-1"></i> <strong>${slides.length}</strong> slide(s) e <strong>${midias.length}</strong> mídia(s) disponíveis para reuso entre as apresentações desta pasta.</span>
+                </div>
+            `;
+
+            slides.forEach((s, idx) => {
+                acervoHtml += `
+                    <div class="apresentacao-row-item">
+                        <div style="min-width: 0;">
+                            <div class="fw-semibold text-dark mb-1 d-flex align-items-center gap-2">
+                                <span class="badge bg-light text-primary border" style="font-size: 0.72rem;">Slide #${s.ordem}</span>
+                                <span class="text-truncate" style="max-width: 250px;">${s.titulo || 'Slide sem título'}</span>
+                            </div>
+                            <div class="text-muted small">
+                                <span>Apresentação: <strong>${s.apresentacao_nome}</strong></span> • 
+                                <span class="badge bg-secondary-subtle text-secondary" style="font-size: 0.7rem;">${s.template_nome || s.template}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <a href="/apresentacao/editar/${s.apresentacao_id}" class="btn btn-sm btn-outline-primary rounded-3 px-3 d-inline-flex align-items-center gap-1">
+                                <i class="bi bi-pencil-square"></i> Abrir
+                            </a>
+                        </div>
+                    </div>
+                `;
+            });
+
+            modalAcervoPastaConteudo.innerHTML = acervoHtml;
+        } catch (err) {
+            console.error("Erro ao buscar acervo da pasta:", err);
+            modalAcervoPastaConteudo.innerHTML = `<div class="text-danger text-center py-3">Erro ao buscar dados do acervo.</div>`;
+        }
+    }
+
     // Clique em "Ver Projetos" nos cards
     document.querySelectorAll(".btn-ver-projeto").forEach(btn => {
         btn.addEventListener("click", function(e) {
@@ -497,10 +617,13 @@ document.addEventListener("DOMContentLoaded", function() {
             e.stopPropagation();
             const projId = this.getAttribute("data-proj-id");
             const projNome = this.getAttribute("data-proj-nome");
+            currentModalProjId = projId;
             const projData = projetosMap[projId] || { nome: projNome, apresentacoes: [] };
 
+            alternarAbaVerModal('apresentacoes');
+
             if (modalVerProjTitulo) {
-                modalVerProjTitulo.textContent = `Apresentações: ${projData.nome}`;
+                modalVerProjTitulo.textContent = `Pasta: ${projData.nome}`;
             }
 
             if (modalBtnCriarNestaPasta) {
