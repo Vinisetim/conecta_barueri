@@ -65,7 +65,7 @@ database:
   engine: "PostgreSQL"
   schemas:
     login: ["usuario", "senha"]
-    apresentacao: ["projeto", "apresentacao", "slide", "template", "campo_preenchido", "slot_flexivel", "ods", "apresentador"]
+    apresentacao: ["projeto", "apresentacao", "slide", "template", "campo_preenchido", "slot_flexivel", "ods", "apresentador", "indicador"]
 ```
 
 ---
@@ -89,19 +89,20 @@ apresentacao.projeto (id, usuario_id FK, nome, descricao, capa_url)
      │ 1:N
 apresentacao.apresentacao (id, projeto_id FK, nome, categoria_id FK, data_criacao)
      │ 1:N
-apresentacao.slide (id, apresentacao_id FK, ordem INT, template_id FK, alinhamento_texto, estilo_fundo, filtro_fundo)
+apresentacao.slide (id, apresentacao_id FK, ordem INT, template_id FK, alinhamento_texto, estilo_fundo, filtro_fundo, cabecalho_ativo)
      │ 1:N
-     ├── apresentacao.template (id PK, nome, codigo, descricao) [Lookup estática referenciada por template_id]
+     ├── apresentacao.template (id PK, nome, codigo, descricao) [Lookup estática dos 8 templates homologados]
      ├── apresentacao.campo_preenchido (id, slide_id FK, chave_campo, tipo_fonte, valor_manual, indicador_id FK, campo_origem_id FK, tamanho_texto, cor_texto, fonte)
      └── apresentacao.slot_flexivel (id, slide_id FK, tipo_elemento, posicao_matriz, config_json)
 
 apresentacao.ods (id PK, numero UNIQUE INT, titulo, descricao, icone_url, cor_hex) [Catálogo estático de apoio aos slots flexíveis]
-apresentacao.apresentador (id PK, criado_por_id FK opcional, nome, cargo, biografia, foto_url, topicos JSONB, midias_extras JSONB) [Catálogo institucional global de autoridades e palestrantes]
+apresentacao.apresentador (id PK, criado_por_id FK opcional, nome, cargo, biografia, foto_url, topicos JSON, midias_extras JSON) [Catálogo institucional global de autoridades e palestrantes]
+apresentacao.indicador (id PK, secretaria, nome_metrica, valor_numerico, unidade_medida, data_atualizacao, historico_json JSON) [Mock Engine de dados tratados municipais de Barueri]
 ```
 
 ### 3.2. Regra das 3 Origens do `CampoPreenchido`
 1. `tipo_fonte = 'manual'`: Utiliza `valor_manual` (TEXT/String/URL). Foco primário do MVP.
-2. `tipo_fonte = 'indicador'`: Utiliza `indicador_id` (FK para tabela de dados tratados).
+2. `tipo_fonte = 'indicador'`: Utiliza `indicador_id` (FK para tabela de dados tratados `apresentacao.indicador`).
 3. `tipo_fonte = 'reuso_midia'`: Utiliza `campo_origem_id` (FK auto-referencial para outro `CampoPreenchido` de mídia pertencente a uma apresentação do **mesmo** `projeto_id`).
 
 ### 3.3. Estilização Tipográfica Individual (`campo_preenchido`) e Controles do Slide
@@ -117,6 +118,7 @@ apresentacao.apresentador (id PK, criado_por_id FK opcional, nome, cargo, biogra
   - `alinhamento_texto`: `'left'` (padrão), `'center'`, `'right'`, `'justify'`.
   - `filtro_fundo`: `'nenhum'` (padrão), `'escurecer'`, `'borrar'`.
   - `estilo_fundo`: `'full_scrim'` (overlay escuro de legibilidade WCAG sobre foto) ou `'contained'` (área parcial/card).
+  - `cabecalho_ativo`: boolean indicando se o Header Strip institucional sobre o slide está ativo.
 
 ### 3.4. Dicionário de Dados Técnico e Regras de Uso (MVP)
 
@@ -126,23 +128,21 @@ apresentacao.apresentador (id PK, criado_por_id FK opcional, nome, cargo, biogra
 | **`senha`** | `login` | `usuario_id` (PK/FK `usuario.id`), `senha` (VARCHAR 255) | Relação 1:1 estrita. Armazena apenas o hash Bcrypt. NUNCA texto puro. |
 | **`projeto`** | `apresentacao` | `id` (PK), `usuario_id` (FK `usuario.id`), `nome`, `descricao`, `capa_url` | Pasta temática que delimita o agrupamento e o escopo de reuso de mídia. Um usuário tem vários projetos. |
 | **`apresentacao`** | `apresentacao` | `id` (PK), `projeto_id` (FK `projeto.id`), `nome`, `categoria_id` (FK opcional), `data_criacao` (TIMESTAMP) | Arquivo de apresentação executável. Contém múltiplos slides ordenados. Pertence a 1 projeto. |
-| **`slide`** | `apresentacao` | `id` (PK), `apresentacao_id` (FK `apresentacao.id`), `template_id` (FK `template.id`), `ordem` (INT), `alinhamento_texto`, `filtro_fundo`, `estilo_fundo` | Página individual. Controla ordenação e enquadramento de plano de fundo da página. |
-| **`template`** | `apresentacao` | `id` (PK), `nome`, `codigo` (UNIQUE VARCHAR 50), `descricao` | Tabela de referência/lookup estática (7 templates fixos: `capa`, `imagem_texto`, `indicadores`, `grafico`, `mapa`, `video`, `encerramento`). |
-| **`campo_preenchido`** | `apresentacao` | `id` (PK), `slide_id` (FK `slide.id`), `chave_campo`, `tipo_fonte`, `valor_manual`, `indicador_id`, `campo_origem_id` (FK auto-relacional), `tamanho_texto`, `cor_texto`, `fonte` | Modelo EAV. Armazena conteúdos dos slots, reuso de mídias e formatação tipográfica individual (`tamanho_texto`, `cor_texto`, `fonte`). |
-| **`slot_flexivel`** | `apresentacao` | `id` (PK), `slide_id` (FK `slide.id`), `tipo_elemento`, `posicao_matriz`, `config_json` (JSONB) | Elementos sobrepostos (ODS, QR Code gerado em tempo real por URL, logos/bandeiras) ancorados na matriz 3×3. |
+| **`slide`** | `apresentacao` | `id` (PK), `apresentacao_id` (FK `apresentacao.id`), `template_id` (FK `template.id`), `ordem` (INT), `alinhamento_texto`, `filtro_fundo`, `estilo_fundo`, `cabecalho_ativo` | Página individual. Controla ordenação, enquadramento de plano de fundo e barra de cabeçalho. |
+| **`template`** | `apresentacao` | `id` (PK), `nome`, `codigo` (UNIQUE VARCHAR 50), `descricao` | Tabela de referência/lookup estática com os 8 templates homologados (`capa`, `imagem_texto`, `indicadores`, `grafico`, `mapa`, `video`, `apresentador`, `encerramento`). |
+| **`campo_preenchido`** | `apresentacao` | `id` (PK), `slide_id` (FK `slide.id`), `chave_campo`, `tipo_fonte`, `valor_manual`, `indicador_id` (FK), `campo_origem_id` (FK), `tamanho_texto`, `cor_texto`, `fonte` | Modelo EAV. Armazena conteúdos dos slots, reuso de mídias e formatação tipográfica individual (`tamanho_texto`, `cor_texto`, `fonte`). |
+| **`slot_flexivel`** | `apresentacao` | `id` (PK), `slide_id` (FK `slide.id`), `tipo_elemento`, `posicao_matriz`, `config_json` (JSON) | Elementos sobrepostos (ODS, QR Code gerado em tempo real por URL, logos/bandeiras) ancorados na matriz 3×3. |
 | **`ods`** | `apresentacao` | `id` (PK), `numero` (UNIQUE INT 1-17), `titulo` (VARCHAR 150), `descricao` (TEXT), `icone_url` (VARCHAR 255), `cor_hex` (VARCHAR 10) | Catálogo oficial dos 17 Objetivos de Desenvolvimento Sustentável da ONU. Alimenta os badges dos slots flexíveis. Populada via seed. |
-| **`apresentador`** | `apresentacao` | `id` (PK), `criado_por_id` (FK opcional `usuario.id`), `nome`, `cargo`, `biografia`, `foto_url`, `topicos` (JSONB), `midias_extras` (JSONB) | Catálogo institucional COMPARTILHADO e GLOBAL de palestrantes, secretários e autoridades. `topicos` armazena lista de destaques (`[{"destaque": "+27 anos", "rotulo": "Na política"}]`). `midias_extras` armazena inovações (`[{"tipo": "Avatar", "titulo": "...", "url": "..."}]`). Visível globalmente para todos os usuários no template de Perfil/Bio. |
+| **`apresentador`** | `apresentacao` | `id` (PK), `criado_por_id` (FK opcional `usuario.id`), `nome`, `cargo`, `biografia`, `foto_url`, `topicos` (JSON), `midias_extras` (JSON) | Catálogo institucional COMPARTILHADO e GLOBAL de autoridades e secretários de Barueri. Visível para todos no template de Perfil/Bio. |
+| **`indicador`** | `apresentacao` | `id` (PK), `secretaria` (VARCHAR 100), `nome_metrica` (VARCHAR 150), `valor_numerico` (FLOAT), `unidade_medida` (VARCHAR 30), `data_atualizacao`, `historico_json` (JSON) | Mock Engine de indicadores tratados municipais de Barueri para preenchimento dinâmico de cards e gráficos Chart.js. |
 
 ### 3.5. Backlog de Dados e Pendências Futuras (Issue #29 & Próximas Entregas)
 
 Os itens abaixo foram formalizados e mapeados, divididos entre a próxima entrega e extensões futuras:
-1. **Modelar tabela de Indicadores / Dados Tratados (`apresentacao.indicador`):**
-   - *Estrutura planejada:* `id` (PK), `nome`, `valor`, `fonte`, `data_referencia`, `categoria_id`.
-   - *Status:* Prioridade da próxima entrega (base para alimentação dinâmica de slides via `campo_preenchido.indicador_id`).
-2. **Modelar estrutura de Pontos do Mapa (`apresentacao.ponto_mapa`):**
+1. **Modelar estrutura de Pontos do Mapa (`apresentacao.ponto_mapa`):**
    - *Estrutura planejada:* `id` (PK), `slide_id` (FK), `latitude`, `longitude`, `titulo`, `descricao`, `indicador_id` (FK opcional).
-   - *Status:* Prioridade da próxima entrega (para o template específico de mapa municipal Leaflet.js).
-3. **Colaboradores por Projeto (`apresentacao.projeto_colaborador`):**
+   - *Status:* Prioridade para o template específico de mapa municipal Leaflet.js.
+2. **Colaboradores por Projeto (`apresentacao.projeto_colaborador`):**
    - *Estrutura planejada:* Tabela associativa N:N com `papel` (`'editor'` ou `'visualizador'`).
    - *Status:* Pós-MVP (no MVP apenas o criador `usuario_id` gerencia seu projeto).
 
@@ -150,16 +150,17 @@ Os itens abaixo foram formalizados e mapeados, divididos entre a próxima entreg
 
 | Tabela | Schema | Status no Supabase | Ação Atual da Equipe de Dados | Impacto no Backend |
 | :--- | :--- | :--- | :--- | :--- |
-| **`usuario`** | `login` | 🟢 Ativa no banco | Estrutura concluída (com `status` boolean). | Liberado para rotas de autenticação e sessão. |
+| **`usuario`** | `login` | 🟢 Ativa no banco | Estrutura concluída (com `status` boolean). Seed pronto em `02_seed_usuarios.py`. | Liberado para rotas de autenticação e sessão. |
 | **`senha`** | `login` | 🟢 Ativa no banco | Estrutura 1:1 concluída com Bcrypt. | Liberado para validação de login. |
 | **`projeto`** | `apresentacao` | 🟢 Ativa no banco | Estrutura concluída (pasta e reuso). | Liberado para CRUD de projetos. |
 | **`apresentacao`** | `apresentacao` | 🟢 Ativa no banco | Estrutura concluída (arquivos de slides). | Liberado para CRUD de apresentações. |
-| **`template`** | `apresentacao` | 🟢 Ativa no banco | Populada com os 7 templates fixos via seed. | Liberado para dropdowns de seleção de template. |
-| **`slide`** | `apresentacao` | 🟢 Codificada em `models.py` | Configurações de fundo (`filtro_fundo`, `estilo_fundo`) e alinhamento (`alinhamento_texto`). Tipografia transferida para `campo_preenchido`. | Backend deve salvar os controles de fundo nos endpoints de slide. |
-| **`slot_flexivel`** | `apresentacao` | 🟢 Codificada em `models.py` | Suporte a ODS, QR Code e Logos sobrepostos na matriz 3×3 via JSONB. | Backend pode montar endpoints para ancorar elementos. |
+| **`template`** | `apresentacao` | 🟢 Ativa no banco | 8 templates homologados semeados via `03_seed_templates.py`. | Liberado para dropdowns de seleção de template. |
+| **`slide`** | `apresentacao` | 🟢 Codificada em `models.py` | Configurações de fundo (`filtro_fundo`, `estilo_fundo`), alinhamento (`alinhamento_texto`) e cabeçalho (`cabecalho_ativo`). | Backend deve salvar os controles nos endpoints de slide. |
+| **`slot_flexivel`** | `apresentacao` | 🟢 Codificada em `models.py` | Suporte a ODS, QR Code e Logos sobrepostos na matriz 3×3 via JSON. | Backend pode montar endpoints para ancorar elementos. |
 | **`campo_preenchido`** | `apresentacao` | 🟢 Codificada em `models.py` | Suporte a preenchimento manual, reuso de mídias e estilização tipográfica individual (`tamanho_texto`, `cor_texto`, `fonte`). | Backend utilizará para salvar o conteúdo e estilo tipográfico dos templates. |
-| **`ods`** | `apresentacao` | 🟢 Ativa e Semeada | Populada com os 17 selos da ONU, cores hex e URLs web oficiais em português. | Liberada para consumo em dropdowns/switches de slots flexíveis. |
-| **`apresentador`** | `apresentacao` | 🟢 Codificada em `models.py` | Catálogo global de autoridades com `topicos` e `midias_extras` em JSONB. | Liberada para rotas do catálogo de autoridades e template Perfil/Bio. |
+| **`ods`** | `apresentacao` | 🟢 Ativa e Semeada | Populada com os 17 selos da ONU, cores hex e URLs web oficiais em português via `04_seed_ods.py`. | Liberada para consumo em dropdowns/switches de slots flexíveis. |
+| **`apresentador`** | `apresentacao` | 🟢 Codificada em `models.py` | Catálogo global de autoridades com `topicos` e `midias_extras` em JSON via `05_seed_apresentadores.py`. | Liberada para rotas do catálogo de autoridades e template Perfil/Bio. |
+| **`indicador`** | `apresentacao` | 🟢 Codificada em `models.py` | Mock Engine de indicadores tratados municipais semeada via `06_seed_indicadores.py`. | Liberada para preenchimento dinâmico e gráficos Chart.js. |
 
 ### 3.7. Próxima Entrega de Dados (Roadmap Imediato)
 * **`apresentacao.indicador`:** Tabela de dados tratados socioeconômicos e operacionais do município (`id`, `nome`, `valor`, `fonte`, `data_referencia`, `categoria_id`).
