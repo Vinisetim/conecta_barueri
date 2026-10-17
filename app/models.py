@@ -145,38 +145,47 @@ class Slide(db.Model):
     #numero da página (para definir ordem)
     ordem = db.Column(db.Integer, nullable=False)
 
+    # Configurações visuais do slide (plano de fundo, alinhamento geral e cabeçalho)
+    alinhamento_texto = db.Column(db.String(20), default='left')
+    filtro_fundo = db.Column(db.String(20), default='nenhum')
+    estilo_fundo = db.Column(db.String(30), default='contained')
+    cabecalho_ativo = db.Column(db.Boolean, default=False)
+
     campos = db.relationship('CampoPreenchido', backref='slide_pai', lazy=True, cascade='all, delete-orphan')
+    slots_flexiveis = db.relationship('SlotFlexivel', backref='slide_pai', lazy=True, cascade='all, delete-orphan')
 
 class CampoPreenchido(db.Model):
     """
     Mapeia a tabela apresentacao.campo_preenchido
     Guarda os dados flexíveis de cada template, permitindo reuso de mídias
+    e estilização tipográfica individual por campo de texto.
     """
 
     __tablename__ = 'campo_preenchido'
     __table_args__ = {'schema':'apresentacao'}
 
-
     id = db.Column(db.Integer, primary_key=True)
 
-    #De qual slide esse campo foi preenchido:
+    # De qual slide esse campo foi preenchido:
     slide_id = db.Column(db.Integer, db.ForeignKey('apresentacao.slide.id'), nullable=False)
 
-    #o "slot" que esse campo ocupa. Ex: "titulo_principal, "imagem_fundo", "video_url"
+    # O "slot" que esse campo ocupa. Ex: "titulo_principal", "imagem_fundo", "video_url"
     chave_campo = db.Column(db.String(100), nullable=False)
 
-    #Da onde veio o dado ('manual', 'inidicador' ou 'reuso_midia')
-
-    # As três fontes de dados possiveis:
-
-    #Fonte 1: Manual (o editor adicionou um texto ou imagem nova)
+    # As três fontes de dados possíveis:
+    # Fonte 1: Manual (o editor adicionou um texto ou imagem nova)
     valor_manual = db.Column(db.Text)
 
-    #Fonte 2: Reúso Mídia (auto-relacionamento)
+    # Fonte 2: Reúso Mídia (auto-relacionamento)
     campo_origem_id = db.Column(db.Integer, db.ForeignKey('apresentacao.campo_preenchido.id'))
 
-    #Fonte 3: indicador (Futuro)
-    indicador_id = db.Column(db.Integer)
+    # Fonte 3: Indicador oficial tratado de Barueri
+    indicador_id = db.Column(db.Integer, db.ForeignKey('apresentacao.indicador.id'), nullable=True)
+
+    # Estilização tipográfica individual por campo de texto (quando aplicável)
+    tamanho_texto = db.Column(db.String(20))   # Ex: '32px', '1.5rem' ou '24'
+    cor_texto = db.Column(db.String(20))       # Ex: '#0052FF', '#FFFFFF', '#212529'
+    fonte = db.Column(db.String(50))           # Ex: 'Montserrat', 'Inter', 'Roboto'
 
     data_criacao = db.Column(db.DateTime, default=db.func.current_timestamp())
 
@@ -234,4 +243,23 @@ class Apresentador(db.Model):
     # Estruturas dinâmicas em JSON
     topicos = db.Column(db.JSON, default=list)
     midias_extras = db.Column(db.JSON, default=list)
+
+
+class Indicador(db.Model):
+    """
+    Mapeia apresentacao.indicador
+    Tabela de dados tratados municipais de Barueri para preenchimento dinâmico.
+    Alimenta cards de métricas e gráficos nos templates de slides.
+    """
+    __tablename__ = 'indicador'
+    __table_args__ = {'schema': 'apresentacao'}
+
+    id = db.Column(db.Integer, primary_key=True)
+    secretaria = db.Column(db.String(100), nullable=False)
+    nome_metrica = db.Column(db.String(150), nullable=False)
+    valor_numerico = db.Column(db.Float, nullable=False)
+    unidade_medida = db.Column(db.String(30), default='')
+    data_atualizacao = db.Column(db.DateTime, default=db.func.current_timestamp())
+    historico_json = db.Column(db.JSON, default=list)
+
 
