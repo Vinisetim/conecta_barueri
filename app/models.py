@@ -29,6 +29,20 @@ class Usuario(UserMixin, db.Model):
     projetos = db.relationship('Projeto', backref='dono', lazy=True)
 
     @property
+    def iniciais(self):
+        """
+        Retorna as iniciais do nome do usuário (ex: 'Equipe de DEV' -> 'ED') para o avatar.
+        """
+        if not self.nome or not self.nome.strip():
+            return "US"
+        partes = [p for p in self.nome.strip().split() if p.lower() not in ('de', 'da', 'do', 'dos', 'das', 'e')]
+        if not partes:
+            partes = self.nome.strip().split()
+        if len(partes) >= 2:
+            return (partes[0][0] + partes[-1][0]).upper()
+        return partes[0][:2].upper()
+
+    @property
     def is_active(self):
         """
         Determina se a conta do usuário está ativa no sistema.
