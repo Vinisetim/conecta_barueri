@@ -14,11 +14,11 @@
     <div class="admin-header">
         <div>
             <h1>Administrador</h1>
-            <p>Visão geral do sistema e monitoramento de dados</p>
+            <p>Visão geral do sistema e monitoramento de dados em tempo real no PostgreSQL</p>
         </div>
     </div>
 
-    <!-- CARDS SUPERIORES -->
+    <!-- CARDS SUPERIORES (DADOS REAIS DO BANCO) -->
     <section class="admin-stats-grid">
 
         <article class="admin-stat-card">
@@ -29,8 +29,8 @@
 
                 <div>
                     <span>Usuários</span>
-                    <strong>48</strong>
-                    <small>Ativos</small>
+                    <strong>{{ total_usuarios }}</strong>
+                    <small>{{ usuarios_ativos }} ativo(s) • {{ usuarios_admins }} admin(s)</small>
                 </div>
             </div>
 
@@ -43,17 +43,17 @@
         <article class="admin-stat-card">
             <div class="stat-main">
                 <div class="stat-icon purple">
-                    <i class="bi bi-diagram-3"></i>
+                    <i class="bi bi-easel2"></i>
                 </div>
 
                 <div>
-                    <span>Equipes</span>
-                    <strong>1</strong>
-                    <small>Ativas</small>
+                    <span>Apresentações</span>
+                    <strong>{{ total_apresentacoes }}</strong>
+                    <small>{{ total_slides }} slide(s) no banco</small>
                 </div>
             </div>
 
-            <a href="{{ url_for('admin.equipes') }}" class="stat-link">
+            <a href="{{ url_for('apresentacao.apresentacao') }}" class="stat-link">
                 Gerenciar
                 <i class="bi bi-arrow-right"></i>
             </a>
@@ -67,8 +67,8 @@
 
                 <div>
                     <span>Projetos</span>
-                    <strong>36</strong>
-                    <small>Ativos</small>
+                    <strong>{{ total_projetos }}</strong>
+                    <small>Pastas ativas no banco</small>
                 </div>
             </div>
 
@@ -86,8 +86,8 @@
 
                 <div>
                     <span>Fontes de dados</span>
-                    <strong>24</strong>
-                    <small>Conectadas</small>
+                    <strong>{{ total_indicadores }}</strong>
+                    <small>{{ secretarias_conectadas }} secretaria(s) • {{ total_ods }} ODS</small>
                 </div>
             </div>
 
@@ -99,7 +99,7 @@
 
     </section>
 
-    <!-- CARDS CENTRAIS -->
+    <!-- CARDS CENTRAIS (DADOS REAIS DO BANCO) -->
     <section class="admin-feature-grid">
 
         <!-- GESTÃO ORGANIZACIONAL -->
@@ -129,41 +129,41 @@
                     <h2>Gestão Organizacional</h2>
                 </div>
 
-                <p>Gerencie usuários, equipes e projetos da plataforma.</p>
+                <p>Gerencie usuários, projetos (pastas) e apresentações salvas na plataforma.</p>
 
                 <div class="admin-info-list">
 
                     <div class="admin-info-row">
                         <div>
                             <i class="bi bi-people"></i>
-                            <span>Usuários</span>
+                            <span>Usuários cadastrados</span>
                         </div>
 
-                        <strong>48</strong>
-                    </div>
-
-                    <div class="admin-info-row">
-                        <div>
-                            <i class="bi bi-diagram-3"></i>
-                            <span>Equipes</span>
-                        </div>
-
-                        <strong>12</strong>
+                        <strong>{{ total_usuarios }} ({{ usuarios_ativos }} ativos)</strong>
                     </div>
 
                     <div class="admin-info-row">
                         <div>
                             <i class="bi bi-folder"></i>
-                            <span>Projetos</span>
+                            <span>Projetos / Pastas</span>
                         </div>
 
-                        <strong>36</strong>
+                        <strong>{{ total_projetos }}</strong>
+                    </div>
+
+                    <div class="admin-info-row">
+                        <div>
+                            <i class="bi bi-easel2"></i>
+                            <span>Apresentações e Slides</span>
+                        </div>
+
+                        <strong>{{ total_apresentacoes }} apres. / {{ total_slides }} slides</strong>
                     </div>
 
                 </div>
 
-                <a href="{{ url_for('admin.equipes') }}" class="admin-primary-button">
-                    Gerenciar
+                <a href="{{ url_for('projetos.projetos') }}" class="admin-primary-button">
+                    Gerenciar projetos
                     <i class="bi bi-arrow-right"></i>
                 </a>
 
@@ -197,35 +197,35 @@
                     <h2>Monitoramento de Dados</h2>
                 </div>
 
-                <p>Acompanhe o status das fontes de dados, requisições e logs do sistema.</p>
+                <p>Acompanhe os indicadores municipais, templates homologados e registros gravados no PostgreSQL.</p>
 
                 <div class="admin-info-list">
 
                     <div class="admin-info-row">
                         <div>
-                            <i class="bi bi-database"></i>
-                            <span>Fontes conectadas</span>
+                            <i class="bi bi-bar-chart-line"></i>
+                            <span>Indicadores municipais conectados</span>
                         </div>
 
-                        <strong>24</strong>
+                        <strong>{{ total_indicadores }} ({{ secretarias_conectadas }} secretarias)</strong>
                     </div>
 
-                    <div class="admin-info-row danger">
+                    <div class="admin-info-row">
                         <div>
-                            <i class="bi bi-exclamation-circle"></i>
-                            <span>Falhas nas últimas 24h</span>
+                            <i class="bi bi-layers"></i>
+                            <span>Templates de slide / Catálogo ODS</span>
                         </div>
 
-                        <strong>3</strong>
+                        <strong>{{ total_templates }} templates / {{ total_ods }} ODS</strong>
                     </div>
 
                     <div class="admin-info-row success">
                         <div>
                             <i class="bi bi-cloud-check"></i>
-                            <span>Requisições bem sucedidas (24h)</span>
+                            <span>Campos preenchidos no banco</span>
                         </div>
 
-                        <strong>1.286</strong>
+                        <strong>{{ total_campos }} registros</strong>
                     </div>
 
                 </div>
@@ -241,12 +241,12 @@
 
     </section>
 
-    <!-- TABELA -->
-    <section class="admin-table-card">
+    <!-- TABELA 1: USUÁRIOS REAIS DO BANCO DE DADOS -->
+    <section class="admin-table-card" style="margin-bottom: 24px;">
 
         <div class="table-title-row">
-            <h2>Usuários recentes</h2>
-            <a href="#">Ver todos</a>
+            <h2>Usuários cadastrados ({{ total_usuarios }})</h2>
+            <a href="{{ url_for('admin.usuario') }}">Ver todos</a>
         </div>
 
         <div class="table-responsive">
@@ -257,128 +257,127 @@
                         <th>Usuário</th>
                         <th>E-mail</th>
                         <th>Perfil</th>
-                        <th>Último acesso</th>
+                        <th>Projetos</th>
+                        <th>Status</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
 
                 <tbody>
-
+                    {% set cores_avatar = ['blue', 'purple', 'yellow', 'green', 'pink'] %}
+                    {% for u in usuarios %}
+                    {% set cor_classe = cores_avatar[loop.index0 % (cores_avatar|length)] %}
                     <tr>
                         <td>
                             <div class="user-cell">
-                                <span class="user-avatar blue">ML</span>
-                                <strong>Mariana Lima</strong>
+                                <span class="user-avatar {{ cor_classe }}">{{ u.iniciais }}</span>
+                                <strong>{{ u.nome }}</strong>
                             </div>
                         </td>
 
-                        <td>mariana.lima@barueri.sp.gov.br</td>
+                        <td>{{ u.email }}</td>
 
                         <td>
-                            <span class="role-badge editor">Editor</span>
-                        </td>
-
-                        <td>Hoje, 10:45</td>
-
-                        <td>
-                            <button class="action-button" type="button">
-                                <i class="bi bi-three-dots-vertical"></i>
-                            </button>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>
-                            <div class="user-cell">
-                                <span class="user-avatar purple">RC</span>
-                                <strong>Ricardo Castro</strong>
-                            </div>
-                        </td>
-
-                        <td>ricardo.castro@barueri.sp.gov.br</td>
-
-                        <td>
-                            <span class="role-badge viewer">Visualizador</span>
-                        </td>
-
-                        <td>Hoje, 09:32</td>
-
-                        <td>
-                            <button class="action-button" type="button">
-                                <i class="bi bi-three-dots-vertical"></i>
-                            </button>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>
-                            <div class="user-cell">
-                                <span class="user-avatar yellow">AF</span>
-                                <strong>Ana Ferreira</strong>
-                            </div>
-                        </td>
-
-                        <td>ana.ferreira@barueri.sp.gov.br</td>
-
-                        <td>
+                            {% if u.admin %}
                             <span class="role-badge admin">Administrador</span>
-                        </td>
-
-                        <td>Ontem, 16:20</td>
-
-                        <td>
-                            <button class="action-button" type="button">
-                                <i class="bi bi-three-dots-vertical"></i>
-                            </button>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>
-                            <div class="user-cell">
-                                <span class="user-avatar green">JS</span>
-                                <strong>João Silva</strong>
-                            </div>
-                        </td>
-
-                        <td>joao.silva@barueri.sp.gov.br</td>
-
-                        <td>
+                            {% else %}
                             <span class="role-badge editor">Editor</span>
+                            {% endif %}
                         </td>
 
-                        <td>Ontem, 15:10</td>
+                        <td>{{ u.projetos|length }} pasta(s)</td>
 
                         <td>
-                            <button class="action-button" type="button">
+                            {% if u.status %}
+                            <span class="role-badge viewer">Ativo</span>
+                            {% else %}
+                            <span class="role-badge inactive">Inativo</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <a href="{{ url_for('admin.usuario') }}" class="action-button" title="Gerenciar usuário">
                                 <i class="bi bi-three-dots-vertical"></i>
-                            </button>
+                            </a>
                         </td>
                     </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6">Nenhum usuário cadastrado no banco de dados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
 
+            </table>
+        </div>
+
+    </section>
+
+    <!-- TABELA 2: PROJETOS E APRESENTAÇÕES REAIS DO BANCO DE DADOS -->
+    <section class="admin-table-card">
+
+        <div class="table-title-row">
+            <h2>Apresentações e projetos recentes no banco ({{ total_apresentacoes }})</h2>
+            <a href="{{ url_for('projetos.projetos') }}">Ver todos</a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="admin-table">
+
+                <thead>
+                    <tr>
+                        <th>Apresentação</th>
+                        <th>Projeto / Pasta</th>
+                        <th>Responsável</th>
+                        <th>Slides</th>
+                        <th>Data de criação</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for ap in apresentacoes[:8] %}
+                    {% set cor_pasta = ap.projeto.capa_uri if (ap.projeto and ap.projeto.capa_uri and ap.projeto.capa_uri.startswith('#')) else '#0d6efd' %}
                     <tr>
                         <td>
                             <div class="user-cell">
-                                <span class="user-avatar pink">CP</span>
-                                <strong>Camila Pereira</strong>
+                                <span class="user-avatar blue">
+                                    <i class="bi bi-easel2"></i>
+                                </span>
+                                <strong>{{ ap.nome }}</strong>
                             </div>
                         </td>
 
-                        <td>camila.pereira@barueri.sp.gov.br</td>
-
                         <td>
-                            <span class="role-badge viewer">Visualizador</span>
+                            <div class="folder-badge-dot">
+                                <span style="background: {{ cor_pasta }};"></span>
+                                {{ ap.projeto.nome if ap.projeto else 'Geral' }}
+                            </div>
                         </td>
 
-                        <td>Ontem, 11:08</td>
+                        <td>
+                            {{ ap.projeto.dono.nome if (ap.projeto and ap.projeto.dono) else 'Sistema' }}
+                        </td>
 
                         <td>
-                            <button class="action-button" type="button">
-                                <i class="bi bi-three-dots-vertical"></i>
-                            </button>
+                            <span class="role-badge editor">{{ ap.slides|length }} slide(s)</span>
+                        </td>
+
+                        <td>
+                            {{ ap.data_criacao.strftime('%d/%m/%Y, %H:%M') if ap.data_criacao else '—' }}
+                        </td>
+
+                        <td>
+                            <a href="{{ url_for('apresentacao.editar_apresentacao', id=ap.id) }}" class="action-button" title="Abrir no editor">
+                                <i class="bi bi-box-arrow-up-right"></i>
+                            </a>
                         </td>
                     </tr>
-
+                    {% else %}
+                    <tr>
+                        <td colspan="6">Nenhuma apresentação encontrada no banco de dados.</td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
 
             </table>
