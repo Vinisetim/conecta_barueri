@@ -68,16 +68,23 @@ def criar_apresentacao():
     # Popula dinamicamente as opções do select com os projetos do usuário
     form.projeto_id.choices = [(p.id, p.nome) for p in projetos_usuario] if projetos_usuario else [(1, 'Projeto Geral')]
 
-    # Pré-seleciona a pasta caso informada via query param (?projeto_id=X)
-    if request.method == 'GET' and request.args.get('projeto_id'):
-        try:
-            form.projeto_id.data = int(request.args.get('projeto_id'))
-        except (ValueError, TypeError):
-            pass
+    # Pré-seleciona a pasta e o template inicial caso informados via query param (?projeto_id=X&template=Y)
+    if request.method == 'GET':
+        if request.args.get('projeto_id'):
+            try:
+                form.projeto_id.data = int(request.args.get('projeto_id'))
+            except (ValueError, TypeError):
+                pass
+        tpl_arg = (request.args.get('template') or '').strip()
+        if tpl_arg in ('capa', 'indicadores', 'grafico', 'imagem_texto'):
+            form.template_inicial.data = tpl_arg
 
     if form.validate_on_submit():
         nome_ap = form.nome.data.strip()
         proj_id = form.projeto_id.data
+        tpl_escolhido = (form.template_inicial.data or request.args.get('template') or 'capa').strip()
+        if tpl_escolhido not in ('capa', 'indicadores', 'grafico', 'imagem_texto'):
+            tpl_escolhido = 'capa'
 
         # Criação da entidade Apresentacao apontando para a pasta (projeto_id) escolhida
         nova_ap = Apresentacao(
@@ -87,39 +94,81 @@ def criar_apresentacao():
         db.session.add(nova_ap)
         db.session.flush()
 
-        # Adiciona o slide inicial padrão (Capa) com o título escolhido
-        template_capa = Templates.query.filter_by(codigo='capa').first()
-        if template_capa:
+        # Busca o template selecionado no banco (ou fallback para capa)
+        template_obj = Templates.query.filter_by(codigo=tpl_escolhido).first()
+        if not template_obj:
+            template_obj = Templates.query.filter_by(codigo='capa').first()
+
+        if template_obj:
             slide_inicial = Slide(
                 apresentacao_id=nova_ap.id,
-                template_id=template_capa.id,
+                template_id=template_obj.id,
                 ordem=1
             )
             db.session.add(slide_inicial)
             db.session.flush()
 
-            campo_titulo = CampoPreenchido(
-                slide_id=slide_inicial.id,
-                chave_campo='titulo',
-                valor_manual=nome_ap
-            )
-            campo_subtitulo = CampoPreenchido(
-                slide_id=slide_inicial.id,
-                chave_campo='subtitulo',
-                valor_manual='Apresentação Executiva'
-            )
-            campo_ods = CampoPreenchido(
-                slide_id=slide_inicial.id,
-                chave_campo='ods',
-                valor_manual='true'
-            )
-            db.session.add_all([campo_titulo, campo_subtitulo, campo_ods])
+            # Define subtítulo e campos padrão de acordo com o template inicial escolhido
+            subtitulos_padrao = {
+                'capa': 'Apresentação Executiva - Indicadores Municipais',
+                'indicadores': 'Plataforma integrada de dados da cidade.',
+                'grafico': 'Evolução no número de atendimentos e métricas setoriais.',
+                'imagem_texto': 'Resumo comparativo dos principais dados socioeconômicos.'
+            }
+
+            campos_iniciais = [
+                CampoPreenchido(
+                    slide_id=slide_inicial.id,
+                    chave_campo='titulo',
+                    valor_manual=nome_ap
+                ),
+                CampoPreenchido(
+                    slide_id=slide_inicial.id,
+                    chave_campo='subtitulo',
+                    valor_manual=subtitulos_padrao.get(tpl_escolhido, 'Apresentação Executiva')
+                ),
+                CampoPreenchido(
+                    slide_id=slide_inicial.id,
+                    chave_campo='ods',
+                    valor_manual='true'
+                ),
+                CampoPreenchido(
+                    slide_id=slide_inicial.id,
+                    chave_campo='odsNums',
+                    valor_manual=json.dumps(['11'])
+                )
+            ]
+
+            # Se o usuário escolheu começar por Indicadores, já pré-carrega os 4 principais indicadores municipais
+            if tpl_escolhido == 'indicadores':
+                indicadores_iniciais = [
+                    {"id": 101, "id_padrao": 1, "nome": "Saúde", "valor": "3.237", "icone": "bi-heart-pulse", "cor": "#3b82f6"},
+                    {"id": 102, "id_padrao": 2, "nome": "Segurança", "valor": "3.847", "icone": "bi-shield-check", "cor": "#a855f7"},
+                    {"id": 103, "id_padrao": 3, "nome": "Educação", "valor": "3.755", "icone": "bi-book", "cor": "#f59e0b"},
+                    {"id": 104, "id_padrao": 4, "nome": "Mobilidade", "valor": "4.687", "icone": "bi-car-front", "cor": "#10b981"}
+                ]
+                campos_iniciais.append(
+                    CampoPreenchido(
+                        slide_id=slide_inicial.id,
+                        chave_campo='indicadores',
+                        valor_manual=json.dumps(indicadores_iniciais)
+                    )
+                )
+            elif tpl_escolhido == 'grafico':
+                campos_iniciais.extend([
+                    CampoPreenchido(slide_id=slide_inicial.id, chave_campo='chartType', valor_manual='bar'),
+                    CampoPreenchido(slide_id=slide_inicial.id, chave_campo='chartIndicador', valor_manual='1'),
+                    CampoPreenchido(slide_id=slide_inicial.id, chave_campo='periodo', valor_manual='Últimos 12 meses')
+                ])
+
+            db.session.add_all(campos_iniciais)
 
         db.session.commit()
-        flash(f'Apresentação "{nome_ap}" criada com sucesso na pasta selecionada!', 'success')
-        return redirect(url_for('apresentacao.editar_apresentacao', id=nova_ap.id))
+        flash(f'Apresentação "{nome_ap}" criada com sucesso!', 'success')
+        return redirect(url_for('apresentacao.editar_apresentacao', id=nova_ap.id, template=tpl_escolhido))
 
     return render_template('apresentacao/nova_apresentacao.html', form=form)
+
 
 @apresentacao_bp.route('/apresentacao/salvar', methods=['POST'])
 @login_required

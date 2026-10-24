@@ -49,4 +49,11 @@ class CriarApresentacaoForm(FlaskForm):
         DataRequired(message='Selecione uma pasta para salvar sua apresentação.')
     ])
 
-    submit = SubmitField('Criar e Ir para o Editor')
+    template_inicial = SelectField('Template do Primeiro Slide', choices=[
+        ('capa', 'Slide de Capa Oficial'),
+        ('indicadores', 'Indicadores & Métricas'),
+        ('grafico', 'Gráficos com Chart.js'),
+        ('imagem_texto', 'Imagem + Texto')
+    ], default='capa')
+
+    submit = SubmitField('Criar e Ir para o Editor')

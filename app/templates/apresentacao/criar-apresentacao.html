@@ -664,7 +664,9 @@ document.addEventListener("DOMContentLoaded", function() {
     };
 
     const urlParams = new URLSearchParams(window.location.search);
-    const initialTemplate = urlParams.get('template') || "capa";
+    const paramTemplate = urlParams.get('template');
+    const validTemplates = ["capa", "indicadores", "grafico", "imagem_texto"];
+    const initialTemplate = (paramTemplate && validTemplates.includes(paramTemplate)) ? paramTemplate : "capa";
 
     let slides = {{ (slides_iniciais or [{
         "id": 1,
@@ -688,6 +690,27 @@ document.addEventListener("DOMContentLoaded", function() {
         "corTitulo": "#0f172a",
         "corSubtitulo": "#64748b"
     }]) | tojson }};
+
+    // Se a URL especificou ?template=... ao abrir o criador, garante que o 1º slide inicie com o template e dados homologados
+    if (paramTemplate && validTemplates.includes(paramTemplate) && slides.length > 0) {
+        slides[0].template = initialTemplate;
+        if (initialTemplate === "indicadores" && (!slides[0].indicadores || slides[0].indicadores.length === 0)) {
+            slides[0].indicadores = [
+                { id: 101, id_padrao: 1, nome: "Saúde", valor: "3.237", icone: "bi-heart-pulse", cor: "#3b82f6" },
+                { id: 102, id_padrao: 2, nome: "Segurança", valor: "3.847", icone: "bi-shield-check", cor: "#a855f7" },
+                { id: 103, id_padrao: 3, nome: "Educação", valor: "3.755", icone: "bi-book", cor: "#f59e0b" },
+                { id: 104, id_padrao: 4, nome: "Mobilidade", valor: "4.687", icone: "bi-car-front", cor: "#10b981" }
+            ];
+            if (slides[0].titulo === "Capa") slides[0].titulo = "Principais Indicadores Municipais";
+            if (slides[0].subtitulo.includes("Apresentação Executiva")) slides[0].subtitulo = "Plataforma integrada de dados da cidade.";
+        } else if (initialTemplate === "grafico") {
+            if (slides[0].titulo === "Capa") slides[0].titulo = "Evolução de Indicadores Municipais";
+            if (slides[0].subtitulo.includes("Apresentação Executiva")) slides[0].subtitulo = "Acompanhamento de métricas e resultados setoriais.";
+        } else if (initialTemplate === "imagem_texto") {
+            if (slides[0].titulo === "Capa") slides[0].titulo = "Visão Geral dos Indicadores";
+            if (slides[0].subtitulo.includes("Apresentação Executiva")) slides[0].subtitulo = "Registro fotográfico de obras e entregas municipais.";
+        }
+    }
 
     window.apresentacaoId = {{ apresentacao.id if apresentacao else 'null' }};
     window.projetoId = {{ apresentacao.projeto_id if apresentacao and apresentacao.projeto_id else 'null' }};
