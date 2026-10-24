@@ -10,8 +10,29 @@ apresentacao_bp = Blueprint('apresentacao', __name__)
 @apresentacao_bp.route('/apresentacao')
 @login_required
 def apresentacao():
-    """Rota principal de apresentacao"""
-    return render_template('apresentacao/apresentacao.html')
+    """
+    Rota principal de apresentações.
+    Busca os projetos (pastas) e apresentações salvas no banco de dados para o usuário autenticado.
+    """
+    if getattr(current_user, 'admin', False):
+        projetos_usuario = Projeto.query.order_by(Projeto.nome.asc()).all()
+    else:
+        projetos_usuario = Projeto.query.filter_by(usuario_id=current_user.id).order_by(Projeto.nome.asc()).all()
+
+    projeto_ids = [p.id for p in projetos_usuario]
+    if projeto_ids:
+        apresentacoes = Apresentacao.query.filter(
+            Apresentacao.projeto_id.in_(projeto_ids)
+        ).order_by(Apresentacao.data_criacao.desc()).all()
+    else:
+        apresentacoes = []
+
+    return render_template(
+        'apresentacao/apresentacao.html',
+        projetos=projetos_usuario,
+        apresentacoes=apresentacoes
+    )
+
 
 @apresentacao_bp.route('/apresentacao/criar', methods=['GET', 'POST'])
 @login_required
