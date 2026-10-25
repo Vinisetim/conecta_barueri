@@ -4,61 +4,120 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/equipes.css') }}">
 {% endblock %}
 
-{% block title %}Administrador | Conecta Barueri{% endblock %}
+{% block title %}Equipes | Conecta Barueri{% endblock %}
 
 {% block content %}
 
-
 <section class="equipes-page">
 
-    <div class="equipes-header">
-        <div>
-            <h1>Equipes</h1>
-            <p>Gerencie as equipes da plataforma</p>
+    <!-- =========================================================
+         VISÃO 1: LISTAGEM DE EQUIPES (GRID PRINCIPAL)
+    ========================================================== -->
+    <div id="equipesListView">
+        <div class="equipes-header">
+            <div>
+                <h1>Equipes</h1>
+                <p>Gerencie as equipes da plataforma e clique em uma equipe para visualizar seus membros</p>
+            </div>
+
+            <button id="btnNovaEquipe" class="equipes-new-btn" type="button">
+                <i class="bi bi-plus-lg"></i>
+                Nova equipe
+            </button>
         </div>
 
-        <button id="btnNovaEquipe" class="equipes-new-btn" type="button">
-            <i class="bi bi-plus-lg"></i>
-            Nova equipe
-        </button>
+        <section class="equipes-card">
+            <div class="projects-grid" id="projectsGrid">
+                <!-- Renderizado dinamicamente pelo admin_equipes.js -->
+            </div>
+        </section>
     </div>
 
-    <section class="equipes-card">
-        <div class="projects-grid" id="projectsGrid">
-            <!-- CARD 1 -->
-            <div class="project-card" data-title="Uber">
-                <div class="card-thumb saude">
-                    <div class="thumb-mock">
-                        <div style="display:flex;align-items:center;gap:12px;">
-                            <div class="thumb-circle"></div>
-                            <div class="thumb-chart">
-                                <div class="thumb-bar" style="height:40px;"></div>
-                                <div class="thumb-bar" style="height:55px;"></div>
-                                <div class="thumb-bar" style="height:30px;"></div>
-                                <div class="thumb-bar" style="height:48px;"></div>
-                            </div>
+    <!-- =========================================================
+         VISÃO 2: TELA DE DETALHES DA EQUIPE E SEUS MEMBROS
+    ========================================================== -->
+    <div id="equipeDetalheView" class="equipe-detalhe-view">
+
+        <div class="equipe-detalhe-topbar">
+            <button type="button" id="btnVoltarEquipes" class="btn-back-equipes">
+                <i class="bi bi-arrow-left"></i>
+                Voltar para Equipes
+            </button>
+        </div>
+
+        <!-- Banner / Cabeçalho da Equipe -->
+        <div class="equipe-hero-card">
+            <div id="detalheEquipeCover" class="equipe-hero-cover"></div>
+
+            <div class="equipe-hero-body">
+                <div class="equipe-hero-left">
+                    <div id="detalheEquipeAvatar" class="equipe-hero-avatar">UB</div>
+                    <div class="equipe-hero-info">
+                        <h2 id="detalheEquipeNome">Uber</h2>
+                        <div class="equipe-hero-meta">
+                            <span>
+                                <i class="bi bi-calendar3"></i>
+                                <span id="detalheEquipeData">Criado em 12 mai. 2026</span>
+                            </span>
+                            <span>•</span>
+                            <span>
+                                <i class="bi bi-people-fill text-primary"></i>
+                                <strong id="detalheEquipeQtdMembros">0 membro(s)</strong>
+                            </span>
                         </div>
                     </div>
                 </div>
-                <div class="card-body-proj">
-                    <div class="card-creator">
-                        <div class="creator-avatar" style="background:#0052ff;">UB</div>
-                        <div class="creator-info">
-                            <div class="creator-name">Uber</div>
-                            <div class="creator-date"><i class="bi bi-calendar3" style="font-size:10px;"></i> Criado em 12 mai. 2026</div>
-                        </div>
-                        <div class="creator-actions">
-                            <button class="btn-delete-equipe" title="Remover equipe"><i class="bi bi-trash text-danger"></i></button>
-                        </div>
-                    </div>
+
+                <div class="equipe-hero-actions">
+                    <button type="button" id="btnAbrirModalMembro" class="equipes-new-btn">
+                        <i class="bi bi-person-plus-fill"></i>
+                        Adicionar membro
+                    </button>
                 </div>
             </div>
-        </div><!-- /projects-grid -->
-    </section>
+        </div>
+
+        <!-- Tabela de Membros da Equipe -->
+        <section class="equipe-membros-card">
+            <div class="equipe-membros-toolbar">
+                <h3>
+                    <i class="bi bi-people text-primary"></i>
+                    Membros da Equipe
+                </h3>
+
+                <div class="equipe-membros-search">
+                    <i class="bi bi-search"></i>
+                    <input
+                        type="text"
+                        id="pesquisaMembroEquipe"
+                        placeholder="Pesquisar membro por nome ou e-mail..."
+                    >
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="equipe-membros-table">
+                    <thead>
+                        <tr>
+                            <th>Membro</th>
+                            <th>E-mail</th>
+                            <th>Função na Equipe</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaMembrosEquipeBody">
+                        <!-- Preenchido via JS ao clicar na equipe -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
 
 </section>
 
-<!-- MODAL NOVA EQUIPE -->
+<!-- MODAL 1: NOVA EQUIPE -->
 <div id="modalNovaEquipe" class="equipes-modal-overlay">
     <div class="equipes-modal">
         <div class="modal-header-eq">
@@ -69,6 +128,13 @@
             <div class="form-group-eq">
                 <label>Nome da Equipe</label>
                 <input type="text" id="inputNomeEquipe" placeholder="Ex: Secretaria de Saúde">
+            </div>
+            <div class="form-group-eq">
+                <label>Membros Iniciais da Equipe</label>
+                <div id="listaCheckMembrosNovaEquipe" class="membros-checkbox-list">
+                    <!-- Preenchido com os usuários do banco de dados -->
+                </div>
+                <small>Selecione os funcionários que farão parte desta equipe.</small>
             </div>
             <div class="form-group-eq">
                 <label>Imagem da Equipe</label>
@@ -83,6 +149,51 @@
     </div>
 </div>
 
+<!-- MODAL 2: ADICIONAR MEMBRO À EQUIPE ATUAL -->
+<div id="modalAdicionarMembro" class="equipes-modal-overlay">
+    <div class="equipes-modal">
+        <div class="modal-header-eq">
+            <h2>Adicionar Membro à Equipe</h2>
+            <button type="button" class="btn-close-modal" id="btnCloseModalMembro"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="modal-body-eq">
+            <div class="form-group-eq">
+                <label>Selecionar funcionário cadastrado no banco</label>
+                <select id="selectFuncionarioBanco">
+                    <option value="">-- Preencher manualmente abaixo --</option>
+                </select>
+                <small>Ao escolher um funcionário do banco, o nome e o e-mail são preenchidos automaticamente.</small>
+            </div>
+
+            <div class="form-group-eq">
+                <label>Nome do Membro *</label>
+                <input type="text" id="inputNomeMembro" placeholder="Ex: Mariana Lima">
+            </div>
+
+            <div class="form-group-eq">
+                <label>E-mail Institucional *</label>
+                <input type="email" id="inputEmailMembro" placeholder="Ex: mariana.lima@barueri.sp.gov.br">
+            </div>
+
+            <div class="form-group-eq">
+                <label>Função na Equipe</label>
+                <select id="selectFuncaoMembro">
+                    <option value="Editor">Editor</option>
+                    <option value="Líder da Equipe">Líder da Equipe</option>
+                    <option value="Administrador">Administrador</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer-eq">
+            <button type="button" class="btn-cancel-eq" id="btnCancelModalMembro">Cancelar</button>
+            <button type="button" class="btn-save-eq" id="btnSalvarNovoMembro">Adicionar à Equipe</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.USUARIOS_BANCO = {{ (usuarios_json or []) | tojson | safe }};
+</script>
 {% endblock %}
 
 {% block extra_js %}

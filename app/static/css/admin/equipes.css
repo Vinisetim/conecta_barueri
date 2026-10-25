@@ -1,5 +1,5 @@
 /* =========================================================
-   TELA: EQUIPES
+   TELA: EQUIPES E VISUALIZAÇÃO DE MEMBROS
    CSS isolado para a página de equipes
 ========================================================= */
 
@@ -105,15 +105,16 @@
     border: 1px solid #e8edf5;
     border-radius: 12px;
     overflow: hidden;
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
     cursor: pointer;
     display: flex;
     flex-direction: column;
 }
 
 .project-card:hover {
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
-    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(13, 110, 253, 0.1);
+    border-color: #bfd6ff;
+    transform: translateY(-3px);
 }
 
 .card-thumb {
@@ -126,6 +127,24 @@
 }
 
 .card-thumb.saude { background: linear-gradient(135deg, #0a1628 0%, #1a3a6e 60%, #0052ff 100%); }
+
+.card-members-pill {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(7, 25, 79, 0.72);
+    backdrop-filter: blur(6px);
+    color: #ffffff;
+    font-size: 0.74rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    z-index: 2;
+}
 
 .thumb-mock {
     width: 90%;
@@ -162,6 +181,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
+    gap: 10px;
 }
 
 .card-creator {
@@ -209,6 +229,9 @@
 
 .creator-actions {
     margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .btn-delete-equipe {
@@ -224,8 +247,369 @@
 .btn-delete-equipe:hover {
     background-color: #ffe4e6;
 }
+
+.card-footer-members {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2px 4px 0;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #0d6efd;
+}
+
+.card-avatars-stack {
+    display: flex;
+    align-items: center;
+}
+
+.stack-mini-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #eaf2ff;
+    color: #0d6efd;
+    border: 2px solid #ffffff;
+    font-size: 0.62rem;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: -6px;
+}
+
+.stack-mini-avatar:first-child {
+    margin-left: 0;
+}
+
+/* =========================================================
+   TELA DE DETALHES DA EQUIPE E SEUS MEMBROS
+========================================================= */
+
+.equipe-detalhe-view {
+    display: none;
+    animation: fadeInEquipe 0.25s ease;
+}
+
+.equipe-detalhe-view.active {
+    display: block;
+}
+
+@keyframes fadeInEquipe {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.equipe-detalhe-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.btn-back-equipes {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 42px;
+    padding: 0 16px;
+    border-radius: 8px;
+    border: 1px solid #dfe5ef;
+    background: #ffffff;
+    color: #07194f;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-back-equipes:hover {
+    border-color: #0d6efd;
+    color: #0d6efd;
+    background: #f8fbff;
+}
+
+/* Banner / Hero da Equipe Selecionada */
+.equipe-hero-card {
+    background: #ffffff;
+    border: 1px solid #e8edf5;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.04);
+    margin-bottom: 24px;
+}
+
+.equipe-hero-cover {
+    height: 130px;
+    background: linear-gradient(135deg, #0a1628 0%, #1a3a6e 60%, #0052ff 100%);
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.equipe-hero-body {
+    padding: 20px 28px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.equipe-hero-left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.equipe-hero-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    background: #0d6efd;
+    color: #ffffff;
+    font-size: 1.4rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 22px rgba(13, 110, 253, 0.25);
+    flex-shrink: 0;
+}
+
+.equipe-hero-info h2 {
+    margin: 0 0 6px;
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: #07194f;
+    letter-spacing: -0.03em;
+}
+
+.equipe-hero-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    font-size: 0.88rem;
+    color: #667085;
+    font-weight: 600;
+}
+
+.equipe-hero-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.equipe-hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Card da Tabela de Membros da Equipe */
+.equipe-membros-card {
+    background: #ffffff;
+    border: 1px solid #e8edf5;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.04);
+}
+
+.equipe-membros-toolbar {
+    padding: 20px 28px;
+    border-bottom: 1px solid #e8edf5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.equipe-membros-toolbar h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #07194f;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.equipe-membros-search {
+    position: relative;
+    min-width: 280px;
+}
+
+.equipe-membros-search i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #667085;
+}
+
+.equipe-membros-search input {
+    width: 100%;
+    height: 42px;
+    padding: 0 14px 0 40px;
+    border: 1px solid #dfe5ef;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #07194f;
+    outline: none;
+}
+
+.equipe-membros-search input:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+}
+
+.equipe-membros-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.equipe-membros-table thead th {
+    padding: 16px 28px;
+    background: #f8fbff;
+    color: #475467;
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    text-align: left;
+}
+
+.equipe-membros-table tbody tr {
+    border-top: 1px solid #e8edf5;
+    transition: background 0.15s ease;
+}
+
+.equipe-membros-table tbody tr:hover {
+    background: #f8fbff;
+}
+
+.equipe-membros-table tbody td {
+    padding: 18px 28px;
+    color: #26324f;
+    font-size: 0.92rem;
+    font-weight: 600;
+    vertical-align: middle;
+}
+
+.membro-user-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.membro-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #eaf2ff;
+    color: #0d6efd;
+    font-size: 0.8rem;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.membro-user-cell strong {
+    color: #07194f;
+    font-weight: 800;
+}
+
+.membro-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    font-weight: 800;
+}
+
+.membro-badge.lider {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.membro-badge.admin {
+    background: #f0eaff;
+    color: #7c3aed;
+}
+
+.membro-badge.editor {
+    background: #eaf2ff;
+    color: #0d6efd;
+}
+
+.membro-badge.ativo {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.membro-badge.inativo {
+    background: #ffe4e6;
+    color: #dc3545;
+}
+
+.btn-remove-membro {
+    border: none;
+    background: transparent;
+    color: #dc3545;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 6px;
+    transition: background 0.2s ease;
+}
+
+.btn-remove-membro:hover {
+    background: #ffe4e6;
+}
+
+/* Lista de seleção de membros no modal */
+.membros-checkbox-list {
+    max-height: 185px;
+    overflow-y: auto;
+    border: 1px solid #dfe5ef;
+    border-radius: 8px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: #f8fbff;
+}
+
+.membro-check-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    background: #ffffff;
+    border: 1px solid #e8edf5;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.membro-check-item:hover {
+    border-color: #0d6efd;
+}
+
+.membro-check-item input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #0d6efd;
+}
+
 /* ==============================
-   MODAL NOVA EQUIPE
+   MODAL NOVA EQUIPE E NOVO MEMBRO
 ================================= */
 .equipes-modal-overlay {
     position: fixed;
@@ -238,6 +622,7 @@
     z-index: 9999;
     opacity: 0;
     transition: opacity 0.3s ease;
+    padding: 16px;
 }
 
 .equipes-modal-overlay.show {
@@ -248,7 +633,7 @@
 .equipes-modal {
     background: #ffffff;
     width: 100%;
-    max-width: 460px;
+    max-width: 480px;
     border-radius: 14px;
     box-shadow: 0 14px 35px rgba(15, 23, 42, 0.1);
     transform: translateY(20px);
@@ -310,7 +695,9 @@
 }
 
 .form-group-eq input[type="text"],
-.form-group-eq input[type="file"] {
+.form-group-eq input[type="email"],
+.form-group-eq input[type="file"],
+.form-group-eq select {
     width: 100%;
     padding: 10px 14px;
     border: 1px solid #dfe5ef;
@@ -319,10 +706,11 @@
     outline: none;
     transition: border-color 0.2s;
     color: #344054;
+    background: #ffffff;
 }
 
-.form-group-eq input[type="text"]:focus,
-.form-group-eq input[type="file"]:focus {
+.form-group-eq input:focus,
+.form-group-eq select:focus {
     border-color: #0d6efd;
 }
 

@@ -317,8 +317,8 @@
     <section class="admin-table-card">
 
         <div class="table-title-row">
-            <h2>Apresentações e projetos recentes no banco ({{ total_apresentacoes }})</h2>
-            <a href="{{ url_for('projetos.projetos') }}">Ver todos</a>
+            <h2>Apresentações e projetos recentes no banco (5 mais recentes)</h2>
+            <a href="{{ url_for('projetos.projetos') }}">Ver todos ({{ total_apresentacoes }})</a>
         </div>
 
         <div class="table-responsive">
@@ -336,7 +336,7 @@
                 </thead>
 
                 <tbody>
-                    {% for ap in apresentacoes[:8] %}
+                    {% for ap in apresentacoes[:5] %}
                     {% set cor_pasta = ap.projeto.capa_uri if (ap.projeto and ap.projeto.capa_uri and ap.projeto.capa_uri.startswith('#')) else '#0d6efd' %}
                     <tr>
                         <td>
