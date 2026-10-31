@@ -284,3 +284,55 @@ document.getElementById('tipo-grafico').addEventListener('change', (e) => {
     const pinAtual = pins.find(p => p.bairro === bairroAtual)
     if (pinAtual) renderizarGrafico(pinAtual, e.target.value)
 })
+
+// ==========================================
+// FUNÇÕES DE FILTRO E VISUALIZAÇÃO DE APRESENTAÇÕES
+// ==========================================
+function filterCards() {
+    const searchInput = document.getElementById("searchInput");
+    const moduloFilter = document.getElementById("moduloFilter");
+    const statusFilter = document.getElementById("statusFilter");
+    if (!searchInput) return;
+
+    const searchVal = (searchInput.value || "").toLowerCase();
+    const moduloVal = moduloFilter ? moduloFilter.value : "";
+    const statusVal = statusFilter ? statusFilter.value : "";
+    const cards = document.querySelectorAll(".ap-card-item");
+
+    cards.forEach(card => {
+        const title = (card.getAttribute("data-title") || "").toLowerCase();
+        const modulo = card.getAttribute("data-modulo") || "";
+        const status = card.getAttribute("data-status") || "";
+
+        const matchesSearch = !searchVal || title.includes(searchVal);
+        const matchesModulo = !moduloVal || modulo === moduloVal;
+        const matchesStatus = !statusVal || status === statusVal;
+
+        if (matchesSearch && matchesModulo && matchesStatus) {
+            card.style.display = "";
+        } else {
+            card.style.display = "none";
+        }
+    });
+}
+
+function setView(viewType) {
+    const grid = document.getElementById("cardsGrid");
+    const gridBtn = document.getElementById("gridBtn");
+    const listBtn = document.getElementById("listBtn");
+
+    if (!grid || !gridBtn || !listBtn) return;
+
+    if (viewType === "list") {
+        grid.classList.add("list-view");
+        gridBtn.classList.remove("active");
+        listBtn.classList.add("active");
+    } else {
+        grid.classList.remove("list-view");
+        gridBtn.classList.add("active");
+        listBtn.classList.remove("active");
+    }
+}
+
+window.filterCards = filterCards;
+window.setView = setView;

@@ -278,45 +278,7 @@
 
 </div>
 
-<!-- SCRIPT DE FILTRO E VISUALIZAÇÃO -->
-<script>
-    function filterCards() {
-        const searchVal = (document.getElementById("searchInput").value || "").toLowerCase();
-        const moduloVal = document.getElementById("moduloFilter").value;
-        const statusVal = document.getElementById("statusFilter").value;
-        const cards = document.querySelectorAll(".ap-card-item");
-
-        cards.forEach(card => {
-            const title = (card.getAttribute("data-title") || "").toLowerCase();
-            const modulo = card.getAttribute("data-modulo") || "";
-            const status = card.getAttribute("data-status") || "";
-
-            const matchesSearch = !searchVal || title.includes(searchVal);
-            const matchesModulo = !moduloVal || modulo === moduloVal;
-            const matchesStatus = !statusVal || status === statusVal;
-
-            if (matchesSearch && matchesModulo && matchesStatus) {
-                card.style.display = "";
-            } else {
-                card.style.display = "none";
-            }
-        });
-    }
-
-    function setView(viewType) {
-        const grid = document.getElementById("cardsGrid");
-        const gridBtn = document.getElementById("gridBtn");
-        const listBtn = document.getElementById("listBtn");
-
-        if (viewType === "list") {
-            grid.classList.add("list-view");
-            gridBtn.classList.remove("active");
-            listBtn.classList.add("active");
-        } else {
-            grid.classList.remove("list-view");
-            gridBtn.classList.add("active");
-            listBtn.classList.remove("active");
-        }
-    }
-</script>
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/apresentacao.js') }}?v=1.0"></script>
+{% endblock %}
 {% endblock %}

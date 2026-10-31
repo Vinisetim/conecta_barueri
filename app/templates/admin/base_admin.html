@@ -221,14 +221,7 @@
 
     </div>
 
-    <script>
-        const sidebar = document.getElementById("sidebar");
-        const sidebarToggle = document.getElementById("sidebarToggle");
-
-        sidebarToggle.addEventListener("click", function () {
-            sidebar.classList.toggle("collapsed");
-        });
-    </script>
+    <script src="{{ url_for('static', filename='js/base_admin.js') }}?v=1.0"></script>
 
     {% block extra_js %}{% endblock %}
 
