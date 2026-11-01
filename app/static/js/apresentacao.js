@@ -126,7 +126,7 @@ L.Icon.Default.mergeOptions({
 })
 // Tile minimalista — sem poluição visual nas ruas
 // Trocar o tile atual por esse
-L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png', {
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap © CARTO'
 }).addTo(map)
 

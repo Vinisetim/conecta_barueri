@@ -190,7 +190,9 @@ def salvar_apresentacao():
                 'chartType': item.get('chartType', 'line'),
                 'chartIndicador': item.get('chartIndicador'),
                 'periodo': item.get('periodo', 'Últimos 12 meses'),
-                'indicadores': json.dumps(item.get('indicadores') or []) if item.get('indicadores') is not None else None
+                'indicadores': json.dumps(item.get('indicadores') or []) if item.get('indicadores') is not None else None,
+                'mapaTipo': item.get('mapaTipo', 'barueri'),
+                'mapaPins': json.dumps(item.get('mapaPins') or []) if item.get('mapaPins') is not None else None
             }
 
             origens_campos = item.get('origens_campos') or {}
@@ -288,6 +290,8 @@ def editar_apresentacao(id):
             'chartIndicador': 1,
             'periodo': 'Últimos 12 meses',
             'indicadores': [],
+            'mapaTipo': 'barueri',
+            'mapaPins': [],
             'origens_campos': {}
         }
 
@@ -306,7 +310,7 @@ def editar_apresentacao(id):
                     slide_dict[campo.chave_campo] = float(val) if val else (4.0 if campo.chave_campo == 'tamanhoTitulo' else 1.8)
                 except (ValueError, TypeError):
                     slide_dict[campo.chave_campo] = 4.0 if campo.chave_campo == 'tamanhoTitulo' else 1.8
-            elif campo.chave_campo in ('logos', 'odsNums', 'indicadores'):
+            elif campo.chave_campo in ('logos', 'odsNums', 'indicadores', 'mapaPins'):
                 try:
                     slide_dict[campo.chave_campo] = json.loads(val) if val else []
                 except Exception:
@@ -342,7 +346,9 @@ def editar_apresentacao(id):
             'chartType': 'line',
             'chartIndicador': 1,
             'periodo': 'Últimos 12 meses',
-            'indicadores': []
+            'indicadores': [],
+            'mapaTipo': 'barueri',
+            'mapaPins': []
         }]
 
     # Carrega as pastas para exibir no seletor de salvar

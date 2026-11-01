@@ -186,7 +186,9 @@ def acervo_projeto(id):
                 'chartType': 'line',
                 'chartIndicador': 1,
                 'periodo': 'Últimos 12 meses',
-                'indicadores': []
+                'indicadores': [],
+                'mapaTipo': 'barueri',
+                'mapaPins': []
             }
 
             for campo in s.campos:
@@ -202,7 +204,7 @@ def acervo_projeto(id):
                         slide_dict[k] = float(val) if val else 4.0
                     except (ValueError, TypeError):
                         slide_dict[k] = 4.0
-                elif k in ('logos', 'odsNums', 'indicadores'):
+                elif k in ('logos', 'odsNums', 'indicadores', 'mapaPins'):
                     try:
                         slide_dict[k] = json.loads(val) if val else []
                     except Exception:

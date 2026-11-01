@@ -19,6 +19,46 @@ document.addEventListener("DOMContentLoaded", function() {
         "17": { num: "17", label: "Parcerias e Meios de Implementação", color: "#19486A" }
     };
 
+    // --- CATÁLOGOS PRÉ-DEFINIDOS DE PINS DO MAPA ---
+    const MAPA_LOCAIS_CATALOGO = {
+        barueri: [
+            { id: "alphaville", nome: "Alphaville", lat: -23.4927, lng: -46.8508 },
+            { id: "centro", nome: "Centro", lat: -23.5044, lng: -46.8756 },
+            { id: "engenho_novo", nome: "Engenho Novo", lat: -23.5123, lng: -46.8934 },
+            { id: "parque_camargos", nome: "Parque dos Camargos", lat: -23.5189, lng: -46.8834 },
+            { id: "aldeia_serra", nome: "Aldeia da Serra", lat: -23.5389, lng: -46.8923 },
+            { id: "jardim_mutinga", nome: "Jardim Mutinga", lat: -23.5156, lng: -46.8612 },
+            { id: "tambore", nome: "Tamboré", lat: -23.4890, lng: -46.8370 },
+            { id: "jardim_belval", nome: "Jardim Belval", lat: -23.5080, lng: -46.8860 },
+            { id: "jardim_silveira", nome: "Jardim Silveira", lat: -23.5220, lng: -46.8670 },
+            { id: "cruz_preta", nome: "Cruz Preta", lat: -23.4980, lng: -46.8880 }
+        ],
+        brasil: [
+            { id: "sao_paulo", nome: "São Paulo - SP", lat: -23.5505, lng: -46.6333 },
+            { id: "rio_de_janeiro", nome: "Rio de Janeiro - RJ", lat: -22.9068, lng: -43.1729 },
+            { id: "brasilia", nome: "Brasília - DF", lat: -15.7975, lng: -47.8919 },
+            { id: "salvador", nome: "Salvador - BA", lat: -12.9777, lng: -38.5016 },
+            { id: "belo_horizonte", nome: "Belo Horizonte - MG", lat: -19.9167, lng: -43.9345 },
+            { id: "curitiba", nome: "Curitiba - PR", lat: -25.4284, lng: -49.2733 },
+            { id: "porto_alegre", nome: "Porto Alegre - RS", lat: -30.0346, lng: -51.2177 },
+            { id: "recife", nome: "Recife - PE", lat: -8.0476, lng: -34.8770 },
+            { id: "fortaleza", nome: "Fortaleza - CE", lat: -3.7319, lng: -38.5267 },
+            { id: "manaus", nome: "Manaus - AM", lat: -3.1190, lng: -60.0217 },
+            { id: "belem", nome: "Belém - PA", lat: -1.4558, lng: -48.4902 },
+            { id: "goiania", nome: "Goiânia - GO", lat: -16.6869, lng: -49.2648 }
+        ]
+    };
+
+    // Dados para gráficos dos popups de mapa
+    const POPUP_CHART_INDICADORES = {
+        saude: { label: "Atendimentos Médicos", color: "#ef4444", data: [6420, 6800, 7150, 7400, 7900, 8735] },
+        seguranca: { label: "Ocorrências Solucionadas", color: "#3b82f6", data: [890, 940, 980, 1050, 1140, 1243] },
+        educacao: { label: "Alunos Matriculados", color: "#8b5cf6", data: [3100, 3250, 3400, 3600, 3750, 3890] },
+        mobilidade: { label: "Passageiros Transportados (mil)", color: "#f59e0b", data: [9800, 10400, 11200, 11800, 12100, 12430] },
+        "meio-ambiente": { label: "Índice de Coleta Seletiva (%)", color: "#10b981", data: [82, 85, 88, 90, 92, 94.3] },
+        social: { label: "Famílias Assistidas", color: "#ec4899", data: [1750, 1860, 1980, 2100, 2240, 2341] }
+    };
+
     const urlParams = new URLSearchParams(window.location.search);
     const initialTemplate = urlParams.get('template') || "capa";
 
@@ -75,6 +115,30 @@ document.addEventListener("DOMContentLoaded", function() {
     const tplImgTexto = document.querySelectorAll(".tpl-imgtexto");
     const tplIndicadores = document.querySelectorAll(".tpl-indicadores");
     const tplGrafico = document.querySelectorAll(".tpl-grafico");
+    const layoutMapa = document.querySelector(".layout-mapa");
+    const tplMapa = document.querySelectorAll(".tpl-mapa");
+    const slideMapContainer = document.getElementById("slideMapContainer");
+    const mapaTipoRadios = document.querySelectorAll("input[name='mapaTipoRadio']");
+    const mapaPinsBadge = document.getElementById("mapaPinsBadge");
+    const selectPinLocal = document.getElementById("selectPinLocal");
+    const btnTipoPopups = document.querySelectorAll(".btn-tipo-popup");
+    const pinFieldsTexto = document.getElementById("pinFieldsTexto");
+    const pinFieldsGrafico = document.getElementById("pinFieldsGrafico");
+    const pinFieldsImagem = document.getElementById("pinFieldsImagem");
+    const inputPinTextoTitulo = document.getElementById("inputPinTextoTitulo");
+    const inputPinTextoDescricao = document.getElementById("inputPinTextoDescricao");
+    const inputPinGraficoTitulo = document.getElementById("inputPinGraficoTitulo");
+    const selectPinGraficoTipo = document.getElementById("selectPinGraficoTipo");
+    const selectPinGraficoIndicador = document.getElementById("selectPinGraficoIndicador");
+    const inputPinImgTitulo = document.getElementById("inputPinImgTitulo");
+    const inputPinImgUrl = document.getElementById("inputPinImgUrl");
+    const btnUploadPinImg = document.getElementById("btnUploadPinImg");
+    const inputUploadPinImgFile = document.getElementById("inputUploadPinImgFile");
+    const btnAddPin = document.getElementById("btnAddPin");
+    const listaPinsAdicionados = document.getElementById("listaPinsAdicionados");
+
+    let slideMapInstance = null;
+    let slideMapMarkers = [];
 
     const labelTitulo = document.getElementById("labelTitulo");
     const labelSubtitulo = document.getElementById("labelSubtitulo");
@@ -372,6 +436,30 @@ document.addEventListener("DOMContentLoaded", function() {
             `;
         }
 
+        if (tpl === 'mapa') {
+            const logoHtml = buildLogosHtml(slide, true);
+            const pinCount = (slide.mapaPins || []).length;
+            const regiaoNome = (slide.mapaTipo === 'brasil') ? 'Brasil' : 'Barueri';
+            return `
+                <div style="width:100%; height:100%; position:relative; padding:3px 4px; display:flex; flex-direction:column; justify-content:space-between; background:#f0f9ff; box-sizing:border-box; overflow:hidden;">
+                    <div style="position:absolute; inset:0; opacity:0.25; background-image: radial-gradient(#0284c7 1px, transparent 1px); background-size: 6px 6px;"></div>
+                    <div style="position:relative; z-index:1; display:flex; flex-direction:column;">
+                        ${logoHtml}
+                        <div style="font-size:${titleSize}; font-weight:800; color:${textColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; line-height:1;">${title || 'Mapa Interativo'}</div>
+                        <div style="font-size:${subtitleSize}; color:${subtextColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; line-height:1; margin-top:1px;">${subtitle || ('Região: ' + regiaoNome)}</div>
+                    </div>
+                    <div style="position:relative; z-index:1; display:flex; align-items:center; justify-content:space-between; margin-top:auto;">
+                        <span style="font-size:3px; background:rgba(255,255,255,0.9); padding:0.5px 2px; border-radius:1px; font-weight:700; color:#ef4444; border:0.5px solid #fca5a5; display:inline-flex; align-items:center; gap:1px;">
+                            <i class="bi bi-geo-alt-fill" style="font-size:3px;"></i> ${pinCount}/5 pins
+                        </span>
+                        <span style="font-size:3px; color:#0369a1; font-weight:700; text-transform:uppercase;">${regiaoNome}</span>
+                    </div>
+                    ${odsBadge}
+                    ${qrBadge}
+                </div>
+            `;
+        }
+
         return '';
     }
 
@@ -472,6 +560,12 @@ document.addEventListener("DOMContentLoaded", function() {
         updatePreviewMedia();
         if(slide.template === "grafico") renderChart(slide);
         if(slide.template === "indicadores") renderIndicadores(slide);
+        if(slide.template === "mapa") {
+            slide.mapaTipo = slide.mapaTipo || "barueri";
+            slide.mapaPins = slide.mapaPins || [];
+            syncMapaSidebar(slide);
+            renderSlideMap(slide);
+        }
     }
 
     // --- ODS SELECTS ---
@@ -834,15 +928,17 @@ document.addEventListener("DOMContentLoaded", function() {
     function switchTemplate() {
         const val = selectTemplate.value;
 
-        layoutCapa.style.display = "none";
-        layoutImgTexto.style.display = "none";
-        layoutIndicadores.style.display = "none";
-        layoutGrafico.style.display = "none";
+        if (layoutCapa) layoutCapa.style.display = "none";
+        if (layoutImgTexto) layoutImgTexto.style.display = "none";
+        if (layoutIndicadores) layoutIndicadores.style.display = "none";
+        if (layoutGrafico) layoutGrafico.style.display = "none";
+        if (layoutMapa) layoutMapa.style.display = "none";
 
         tplCapa.forEach(el => el.style.display = "none");
         tplImgTexto.forEach(el => el.style.display = "none");
         tplIndicadores.forEach(el => el.style.display = "none");
         tplGrafico.forEach(el => el.style.display = "none");
+        tplMapa.forEach(el => el.style.display = "none");
 
         document.getElementById("activeSlideSurface").className = "slide-surface template-" + val;
 
@@ -868,6 +964,12 @@ document.addEventListener("DOMContentLoaded", function() {
             layoutGrafico.style.display = "flex";
             tplGrafico.forEach(el => el.style.display = "block");
             labelTitulo.textContent = "Título";
+            labelSubtitulo.textContent = "Texto Introdutório";
+            fgSubtitulo.style.display = "flex";
+        } else if(val === "mapa") {
+            if (layoutMapa) layoutMapa.style.display = "flex";
+            tplMapa.forEach(el => el.style.display = "block");
+            labelTitulo.textContent = "Título do Slide";
             labelSubtitulo.textContent = "Texto Introdutório";
             fgSubtitulo.style.display = "flex";
         }
@@ -933,6 +1035,12 @@ document.addEventListener("DOMContentLoaded", function() {
             updatePreviewMedia();
             if(slide.template === "grafico") renderChart(slide);
             if(slide.template === "indicadores") renderIndicadores(slide);
+            if(slide.template === "mapa") {
+                slide.mapaTipo = slide.mapaTipo || "barueri";
+                slide.mapaPins = slide.mapaPins || [];
+                syncMapaSidebar(slide);
+                renderSlideMap(slide);
+            }
             renderThumbnails();
         }
     });
@@ -1175,6 +1283,8 @@ document.addEventListener("DOMContentLoaded", function() {
             chartType: "line",
             periodo: "Últimos 12 meses",
             indicadores: [],
+            mapaTipo: "barueri",
+            mapaPins: [],
             tamanhoTitulo: currentSlide.tamanhoTitulo || 4.0,
             tamanhoSubtitulo: currentSlide.tamanhoSubtitulo || 1.8,
             corTitulo: currentSlide.corTitulo || "#0f172a",
@@ -1339,6 +1449,13 @@ document.addEventListener("DOMContentLoaded", function() {
         previewModal.style.display = "flex";
         atualizarPreviewNavegacao();
 
+        const curSlide = slides.find(s => s.id === activeSlideId);
+        if (curSlide && curSlide.template === "mapa") {
+            setTimeout(() => {
+                if (slideMapInstance) slideMapInstance.invalidateSize();
+            }, 250);
+        }
+
         // 4. Solicita tela cheia nativa do navegador
         try {
             if (!document.fullscreenElement) {
@@ -1381,6 +1498,13 @@ document.addEventListener("DOMContentLoaded", function() {
             activeSlideSurface.style.height = "auto";
             activeSlideSurface.style.borderRadius = "var(--radius-lg)";
             activeSlideSurface.style.boxShadow = "0 6px 20px rgba(0, 0, 0, 0.06)";
+        }
+
+        const curSlideClosed = slides.find(s => s.id === activeSlideId);
+        if (curSlideClosed && curSlideClosed.template === "mapa") {
+            setTimeout(() => {
+                if (slideMapInstance) slideMapInstance.invalidateSize();
+            }, 250);
         }
     }
 
@@ -1742,6 +1866,8 @@ document.addEventListener("DOMContentLoaded", function() {
             chartIndicador: sOrigem.chartIndicador || 1,
             periodo: sOrigem.periodo || 'Últimos 12 meses',
             indicadores: Array.isArray(sOrigem.indicadores) ? JSON.parse(JSON.stringify(sOrigem.indicadores)) : [],
+            mapaTipo: sOrigem.mapaTipo || 'barueri',
+            mapaPins: Array.isArray(sOrigem.mapaPins) ? JSON.parse(JSON.stringify(sOrigem.mapaPins)) : [],
             origens_campos: {}
         };
 
@@ -1876,6 +2002,8 @@ document.addEventListener("DOMContentLoaded", function() {
             if (chkLogoCustom) chkLogoCustom.checked = true;
             if (fgLogoCustom) fgLogoCustom.style.display = 'block';
             updateSlotsVisibility();
+        } else if (tipo === 'pinImg') {
+            if (inputPinImgUrl) inputPinImgUrl.value = valor;
         }
 
         updateActiveThumbnail();
@@ -1976,6 +2104,523 @@ document.addEventListener("DOMContentLoaded", function() {
             renderGradeAcervoDados(acervoFiltroDadoAtual);
         });
     });
+
+
+    // ============================================================
+    // IMPLEMENTAÇÃO DO TEMPLATE DE MAPA E GERENCIAMENTO DE PINS
+    // ============================================================
+
+    let activeTipoPopup = "texto";
+
+    function populateSelectPinLocal(regiao) {
+        if (!selectPinLocal) return;
+        const catalog = MAPA_LOCAIS_CATALOGO[regiao] || MAPA_LOCAIS_CATALOGO.barueri;
+        selectPinLocal.innerHTML = catalog.map(item => `<option value="${item.id}">${escapeHtml(item.nome)}</option>`).join("");
+    }
+
+    function syncMapaSidebar(slide) {
+        if (!slide) return;
+        const regiao = slide.mapaTipo || "barueri";
+
+        mapaTipoRadios.forEach(r => {
+            r.checked = (r.value === regiao);
+        });
+
+        populateSelectPinLocal(regiao);
+
+        const pins = slide.mapaPins || [];
+        if (mapaPinsBadge) {
+            mapaPinsBadge.textContent = `${pins.length} / 5`;
+            mapaPinsBadge.style.background = pins.length >= 5 ? "#fee2e2" : "#eff6ff";
+            mapaPinsBadge.style.color = pins.length >= 5 ? "#ef4444" : "#0052ff";
+            mapaPinsBadge.style.borderColor = pins.length >= 5 ? "#fca5a5" : "#bfdbfe";
+        }
+
+        if (btnAddPin) {
+            btnAddPin.disabled = (pins.length >= 5);
+            btnAddPin.style.opacity = pins.length >= 5 ? "0.5" : "1";
+            btnAddPin.style.cursor = pins.length >= 5 ? "not-allowed" : "pointer";
+            btnAddPin.title = pins.length >= 5 ? "Máximo de 5 pins atingido." : "Adicionar pin";
+        }
+
+        renderListaPinsAdicionados(slide);
+    }
+
+    function renderListaPinsAdicionados(slide) {
+        if (!listaPinsAdicionados) return;
+        const pins = slide.mapaPins || [];
+
+        if (pins.length === 0) {
+            listaPinsAdicionados.innerHTML = `
+                <div style="text-align:center; padding:16px 8px; color:#94a3b8; font-size:0.78rem; background:#f8fafc; border-radius:6px; border:1px dashed #cbd5e1;">
+                    <i class="bi bi-geo-alt" style="font-size:1.2rem; display:block; margin-bottom:4px; color:#cbd5e1;"></i>
+                    Nenhum pin adicionado ao mapa ainda.<br>Selecione um local acima e adicione até 5 pins.
+                </div>
+            `;
+            return;
+        }
+
+        listaPinsAdicionados.innerHTML = pins.map((pin, idx) => {
+            let badgeTipo = '';
+            if (pin.tipoPopup === 'grafico') {
+                badgeTipo = '<span style="font-size:0.7rem; background:#eff6ff; color:#2563eb; padding:2px 6px; border-radius:4px; font-weight:600;"><i class="bi bi-bar-chart"></i> Gráfico</span>';
+            } else if (pin.tipoPopup === 'imagem') {
+                badgeTipo = '<span style="font-size:0.7rem; background:#ecfdf5; color:#059669; padding:2px 6px; border-radius:4px; font-weight:600;"><i class="bi bi-image"></i> Imagem</span>';
+            } else {
+                badgeTipo = '<span style="font-size:0.7rem; background:#f1f5f9; color:#475569; padding:2px 6px; border-radius:4px; font-weight:600;"><i class="bi bi-fonts"></i> Texto</span>';
+            }
+
+            return `
+                <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 10px; background:#fff; border:1px solid #e2e8f0; border-radius:6px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
+                    <div style="display:flex; align-items:center; gap:8px; overflow:hidden;">
+                        <span style="width:20px; height:20px; border-radius:50%; background:#fee2e2; color:#ef4444; font-size:0.72rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;">${idx + 1}</span>
+                        <div style="display:flex; flex-direction:column; min-width:0;">
+                            <span style="font-size:0.8rem; font-weight:700; color:#1e293b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(pin.localNome)}</span>
+                            <div style="margin-top:2px;">${badgeTipo}</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <button type="button" class="btn-pan-pin" data-pin-id="${pin.id}" style="background:none; border:none; color:#0052ff; cursor:pointer; font-size:0.85rem; padding:4px;" title="Centralizar e abrir popup"><i class="bi bi-crosshair"></i></button>
+                        <button type="button" class="btn-remover-pin" data-pin-id="${pin.id}" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:0.85rem; padding:4px;" title="Remover este pin"><i class="bi bi-trash"></i></button>
+                    </div>
+                </div>
+            `;
+        }).join("");
+
+        // Vincular eventos de remover e centralizar
+        listaPinsAdicionados.querySelectorAll(".btn-remover-pin").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const pinId = btn.getAttribute("data-pin-id");
+                removerPinDoMapa(pinId);
+            });
+        });
+
+        listaPinsAdicionados.querySelectorAll(".btn-pan-pin").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const pinId = btn.getAttribute("data-pin-id");
+                focarPinNoMapa(pinId);
+            });
+        });
+    }
+
+    function removerPinDoMapa(pinId) {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (!slide || !slide.mapaPins) return;
+        slide.mapaPins = slide.mapaPins.filter(p => String(p.id) !== String(pinId));
+        syncMapaSidebar(slide);
+        renderSlideMap(slide);
+        renderThumbnails();
+        updateActiveThumbnail();
+    }
+
+    function focarPinNoMapa(pinId) {
+        const slide = slides.find(s => s.id === activeSlideId);
+        if (!slide || !slide.mapaPins || !slideMapInstance) return;
+        const pin = slide.mapaPins.find(p => String(p.id) === String(pinId));
+        if (!pin) return;
+
+        slideMapInstance.panTo([pin.lat, pin.lng], { animate: true, duration: 0.5 });
+        const markerObj = slideMapMarkers.find(m => String(m._pinId) === String(pinId));
+        if (markerObj) {
+            setTimeout(() => {
+                markerObj.openPopup();
+            }, 400);
+        }
+    }
+
+    function renderSlideMap(slide) {
+        const container = document.getElementById("slideMapContainer");
+        if (!container) return;
+
+        if (typeof L === "undefined") {
+            console.warn("Leaflet não carregado ainda.");
+            return;
+        }
+
+        // Destroi mapa anterior se existir para reinicializar limpo
+        if (slideMapInstance) {
+            try {
+                slideMapInstance.remove();
+            } catch (e) {
+                console.warn("Erro ao remover mapa anterior:", e);
+            }
+            slideMapInstance = null;
+            slideMapMarkers = [];
+        }
+
+        const isBrasil = (slide.mapaTipo === "brasil");
+
+        // Atualiza tags de cabeçalho
+        const tagHeader = document.getElementById("mapaRegiaoTag");
+        if (tagHeader) {
+            tagHeader.textContent = isBrasil ? "República Federativa do Brasil" : "Município de Barueri";
+        }
+        const badgeInferior = document.getElementById("mapaRegiaoBadgeInferior");
+        if (badgeInferior) {
+            badgeInferior.textContent = isBrasil ? "Brasil • Nacional" : "Barueri • SP";
+        }
+
+        // Bounding box e limites rígidos de travamento
+        // Barueri BBox: lat [-23.554, -23.470], lng [-46.966, -46.799]
+        const barueriBounds = [[-23.565, -46.985], [-23.455, -46.775]];
+        const barueriCenter = [-23.5080, -46.8760];
+
+        // Brasil BBox: lat [-33.77, 5.24], lng [-73.99, -34.73]
+        const brasilBounds = [[-34.5, -74.5], [5.5, -34.0]];
+        const brasilCenter = [-14.235, -51.925];
+
+        const currentBounds = isBrasil ? brasilBounds : barueriBounds;
+        const centerCoord = isBrasil ? brasilCenter : barueriCenter;
+        const zoomLevel = isBrasil ? 4 : 13;
+        const minZ = isBrasil ? 4 : 12;
+        const maxZ = isBrasil ? 8 : 16;
+
+        // O mapa é travado no território com maxBounds e maxBoundsViscosity = 1.0 (não sai dele)
+        slideMapInstance = L.map('slideMapContainer', {
+            center: centerCoord,
+            zoom: zoomLevel,
+            minZoom: minZ,
+            maxZoom: maxZ,
+            maxBounds: currentBounds,
+            maxBoundsViscosity: 1.0,
+            zoomControl: false,
+            attributionControl: false
+        });
+
+        // Camada base OpenStreetMap (100% gratuita, sem marca d'água)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(slideMapInstance);
+
+        L.control.zoom({ position: 'bottomright' }).addTo(slideMapInstance);
+
+        // ============================================================
+        // GEOJSON: Limites marcados de azul + máscara externa translúcida
+        // ============================================================
+        const geojsonUrl = isBrasil ? '/static/data/brasil.geojson' : '/static/data/barueri.geojson';
+
+        fetch(geojsonUrl)
+            .then(res => res.json())
+            .then(geoData => {
+                if (!slideMapInstance) return;
+
+                // 1. Máscara branca no exterior para isolar o território com destaque (como no exemplo)
+                const mundo = [[-90, -180], [-90, 180], [90, 180], [90, -180], [-90, -180]];
+                let polyHoles = [];
+                if (geoData.features && geoData.features.length > 0) {
+                    geoData.features.forEach(feat => {
+                        const geom = feat.geometry;
+                        if (geom.type === 'Polygon') {
+                            polyHoles.push(geom.coordinates[0].map(pt => [pt[1], pt[0]]));
+                        } else if (geom.type === 'MultiPolygon') {
+                            geom.coordinates.forEach(poly => {
+                                polyHoles.push(poly[0].map(pt => [pt[1], pt[0]]));
+                            });
+                        }
+                    });
+                }
+
+                if (polyHoles.length > 0) {
+                    polyHoles.forEach(hole => {
+                        L.polygon([mundo, hole], {
+                            color: 'none',
+                            fillColor: '#ffffff',
+                            fillOpacity: 0.82,
+                            interactive: false
+                        }).addTo(slideMapInstance);
+                    });
+                }
+
+                // 2. Limites marcados de azul vibrante e preenchimento suave
+                L.geoJSON(geoData, {
+                    style: {
+                        color: '#0052ff', // Linha azul nítida
+                        weight: 3,
+                        opacity: 1,
+                        fillColor: '#38bdf8', // Azul claro destacado
+                        fillOpacity: 0.16
+                    },
+                    interactive: false
+                }).addTo(slideMapInstance);
+            })
+            .catch(err => console.warn('Erro ao carregar GeoJSON de limites:', err));
+
+        // ============================================================
+        // PINS NO MAPA COM BADGES ESTILO GOOGLE MAPS / MOCKUP
+        // ============================================================
+        const pins = slide.mapaPins || [];
+        slideMapMarkers = [];
+
+        const pinColors = {
+            grafico: { bg: '#0052ff', icon: 'bi-bar-chart-fill' },
+            imagem: { bg: '#059669', icon: 'bi-image-fill' },
+            texto: { bg: '#7c3aed', icon: 'bi-geo-alt-fill' }
+        };
+
+        pins.forEach((pin, idx) => {
+            const col = pinColors[pin.tipoPopup] || pinColors.texto;
+
+            const pinIcon = L.divIcon({
+                className: 'map-pin-div-wrapper',
+                html: `
+                    <div class="map-pin-badge" style="border-color: ${col.bg};" title="${escapeHtml(pin.localNome)}">
+                        <div class="map-pin-icon-circle" style="background: ${col.bg};">
+                            <i class="bi ${col.icon}"></i>
+                        </div>
+                        <span class="map-pin-text">${escapeHtml(pin.localNome)}</span>
+                    </div>
+                `,
+                iconSize: [120, 32],
+                iconAnchor: [20, 16],
+                popupAnchor: [0, -18]
+            });
+
+            const marker = L.marker([pin.lat, pin.lng], { icon: pinIcon }).addTo(slideMapInstance);
+            marker._pinId = pin.id;
+
+            let popupContent = '';
+            if (pin.tipoPopup === 'grafico') {
+                const chartCanvasId = 'popupChart_' + pin.id + '_' + Date.now();
+                popupContent = `
+                    <div class="popup-box-inner">
+                        <div class="popup-box-header">
+                            <i class="bi bi-bar-chart-fill text-primary" style="font-size:1.05rem;"></i>
+                            <h5>${escapeHtml(pin.popupTitulo || pin.localNome)}</h5>
+                        </div>
+                        <div class="popup-box-body">
+                            <div class="popup-chart-container">
+                                <canvas id="${chartCanvasId}"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                marker.bindPopup(popupContent);
+
+                marker.on('popupopen', () => {
+                    setTimeout(() => {
+                        const canvas = document.getElementById(chartCanvasId);
+                        if (!canvas) return;
+                        const indKey = pin.chartIndicador || 'saude';
+                        const indData = POPUP_CHART_INDICADORES[indKey] || POPUP_CHART_INDICADORES.saude;
+                        const ctype = pin.chartType || 'bar';
+                        new Chart(canvas.getContext('2d'), {
+                            type: ctype,
+                            data: {
+                                labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                                datasets: [{
+                                    label: indData.label,
+                                    data: indData.data,
+                                    backgroundColor: ctype === 'pie' ? ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899'] : indData.color + 'bb',
+                                    borderColor: indData.color,
+                                    borderWidth: 1.5,
+                                    borderRadius: ctype === 'bar' ? 4 : 0,
+                                    fill: (ctype === 'line')
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { display: (ctype === 'pie'), position: 'bottom', labels: { boxWidth: 8, font: { size: 9 } } }
+                                },
+                                scales: ctype === 'pie' ? {} : {
+                                    x: { grid: { display: false }, ticks: { font: { size: 8 } } },
+                                    y: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 8 } } }
+                                }
+                            }
+                        });
+                    }, 80);
+                });
+
+            } else if (pin.tipoPopup === 'imagem') {
+                const imgUrl = pin.popupImagem || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb';
+                popupContent = `
+                    <div class="popup-box-inner" style="padding: 10px;">
+                        <div class="popup-box-header" style="margin-bottom: 6px;">
+                            <i class="bi bi-image text-success" style="font-size:1.05rem;"></i>
+                            <h5>${escapeHtml(pin.popupTitulo || pin.localNome)}</h5>
+                        </div>
+                        <div class="popup-box-body">
+                            <img src="${escapeHtml(imgUrl)}" style="width: 100%; height: 130px; object-fit: cover; border-radius: 8px; display: block; border: 1px solid #e2e8f0;">
+                        </div>
+                    </div>
+                `;
+                marker.bindPopup(popupContent);
+
+            } else {
+                // Texto
+                popupContent = `
+                    <div class="popup-box-inner">
+                        <div class="popup-box-header">
+                            <i class="bi bi-geo-alt-fill text-danger" style="font-size:1.05rem;"></i>
+                            <h5>${escapeHtml(pin.popupTitulo || pin.localNome)}</h5>
+                        </div>
+                        <div class="popup-box-body">
+                            <p>${escapeHtml(pin.popupTexto || 'Nenhuma descrição detalhada informada para esta região.')}</p>
+                        </div>
+                    </div>
+                `;
+                marker.bindPopup(popupContent);
+            }
+
+            slideMapMarkers.push(marker);
+        });
+
+        // ============================================================
+        // LEGENDA FLUTUANTE DE PONTOS DE INTERESSE (DIREITA)
+        // ============================================================
+        const cardPontos = document.getElementById("mapaPontosInteresseCard");
+        const listaPontos = document.getElementById("mapaPontosInteresseLista");
+        if (cardPontos && listaPontos) {
+            if (pins.length > 0) {
+                cardPontos.style.display = "block";
+                listaPontos.innerHTML = pins.map(p => {
+                    const col = pinColors[p.tipoPopup] || pinColors.texto;
+                    return `
+                        <div class="ponto-legenda-item" data-pin-id="${p.id}" style="display:flex; align-items:center; gap:0.6cqw; cursor:pointer; padding:0.25cqw 0.4cqw; border-radius:0.4cqw; transition:background 0.15s ease;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'" title="Centralizar no mapa">
+                            <div style="width:1.6cqw; height:1.6cqw; min-width:1.6cqw; border-radius:50%; background:${col.bg}; color:#fff; display:flex; align-items:center; justify-content:center; font-size:0.85cqw;">
+                                <i class="bi ${col.icon}"></i>
+                            </div>
+                            <span style="font-size:1.05cqw; font-weight:700; color:#334155; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(p.localNome)}</span>
+                        </div>
+                    `;
+                }).join("");
+
+                listaPontos.querySelectorAll(".ponto-legenda-item").forEach(item => {
+                    item.addEventListener("click", () => {
+                        const pid = item.getAttribute("data-pin-id");
+                        focarPinNoMapa(pid);
+                    });
+                });
+            } else {
+                cardPontos.style.display = "none";
+                listaPontos.innerHTML = "";
+            }
+        }
+
+        // Invalidate size para garantir renderização perfeita
+        setTimeout(() => {
+            if (slideMapInstance) {
+                slideMapInstance.invalidateSize();
+            }
+        }, 180);
+    }
+
+    // Ouvintes de eventos do Mapa
+    mapaTipoRadios.forEach(radio => {
+        radio.addEventListener("change", (e) => {
+            const slide = slides.find(s => s.id === activeSlideId);
+            if (!slide) return;
+            slide.mapaTipo = e.target.value;
+            syncMapaSidebar(slide);
+            renderSlideMap(slide);
+            renderThumbnails();
+            updateActiveThumbnail();
+        });
+    });
+
+    btnTipoPopups.forEach(btn => {
+        btn.addEventListener("click", () => {
+            btnTipoPopups.forEach(b => {
+                b.classList.remove("active");
+                b.style.background = "#f8fafc";
+                b.style.color = "#475569";
+                b.style.borderColor = "#cbd5e1";
+            });
+            btn.classList.add("active");
+            btn.style.background = "#0052ff";
+            btn.style.color = "#ffffff";
+            btn.style.borderColor = "#0052ff";
+
+            activeTipoPopup = btn.getAttribute("data-popup") || "texto";
+
+            if (pinFieldsTexto) pinFieldsTexto.style.display = (activeTipoPopup === "texto") ? "block" : "none";
+            if (pinFieldsGrafico) pinFieldsGrafico.style.display = (activeTipoPopup === "grafico") ? "block" : "none";
+            if (pinFieldsImagem) pinFieldsImagem.style.display = (activeTipoPopup === "imagem") ? "block" : "none";
+        });
+    });
+
+    if (btnUploadPinImg && inputUploadPinImgFile) {
+        btnUploadPinImg.addEventListener("click", () => inputUploadPinImgFile.click());
+        inputUploadPinImgFile.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (re) => {
+                if (inputPinImgUrl) inputPinImgUrl.value = re.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    if (btnAddPin) {
+        btnAddPin.addEventListener("click", () => {
+            const slide = slides.find(s => s.id === activeSlideId);
+            if (!slide) return;
+            if (!slide.mapaPins) slide.mapaPins = [];
+
+            if (slide.mapaPins.length >= 5) {
+                alert("Você só pode adicionar no máximo 5 pins no mapa.");
+                return;
+            }
+
+            const regiao = slide.mapaTipo || "barueri";
+            const catalog = MAPA_LOCAIS_CATALOGO[regiao] || MAPA_LOCAIS_CATALOGO.barueri;
+            const localId = selectPinLocal ? selectPinLocal.value : "";
+            const localObj = catalog.find(item => item.id === localId) || catalog[0];
+
+            if (!localObj) {
+                alert("Selecione um local válido.");
+                return;
+            }
+
+            const novoPin = {
+                id: 'pin_' + Date.now(),
+                localKey: localObj.id,
+                localNome: localObj.nome,
+                lat: localObj.lat,
+                lng: localObj.lng,
+                tipoPopup: activeTipoPopup
+            };
+
+            if (activeTipoPopup === "grafico") {
+                novoPin.popupTitulo = inputPinGraficoTitulo ? inputPinGraficoTitulo.value.trim() : "";
+                if (!novoPin.popupTitulo) novoPin.popupTitulo = localObj.nome;
+                novoPin.chartType = selectPinGraficoTipo ? selectPinGraficoTipo.value : "bar";
+                novoPin.chartIndicador = selectPinGraficoIndicador ? selectPinGraficoIndicador.value : "saude";
+            } else if (activeTipoPopup === "imagem") {
+                novoPin.popupTitulo = inputPinImgTitulo ? inputPinImgTitulo.value.trim() : "";
+                if (!novoPin.popupTitulo) novoPin.popupTitulo = localObj.nome;
+                novoPin.popupImagem = inputPinImgUrl ? inputPinImgUrl.value.trim() : "";
+                if (!novoPin.popupImagem) novoPin.popupImagem = "https://images.unsplash.com/photo-1506744038136-46273834b3fb";
+            } else {
+                novoPin.popupTitulo = inputPinTextoTitulo ? inputPinTextoTitulo.value.trim() : "";
+                if (!novoPin.popupTitulo) novoPin.popupTitulo = localObj.nome;
+                novoPin.popupTexto = inputPinTextoDescricao ? inputPinTextoDescricao.value.trim() : "";
+                if (!novoPin.popupTexto) novoPin.popupTexto = `Indicadores e métricas institucionais registrados para a região de ${localObj.nome}.`;
+            }
+
+            slide.mapaPins.push(novoPin);
+
+            // Limpa campos
+            if (inputPinTextoTitulo) inputPinTextoTitulo.value = "";
+            if (inputPinTextoDescricao) inputPinTextoDescricao.value = "";
+            if (inputPinGraficoTitulo) inputPinGraficoTitulo.value = "";
+            if (inputPinImgTitulo) inputPinImgTitulo.value = "";
+            if (inputPinImgUrl) inputPinImgUrl.value = "";
+
+            syncMapaSidebar(slide);
+            renderSlideMap(slide);
+            renderThumbnails();
+            updateActiveThumbnail();
+
+            // Abre o popup do novo pin para confirmação visual imediata
+            setTimeout(() => {
+                focarPinNoMapa(novoPin.id);
+            }, 300);
+        });
+    }
 
     renderThumbnails();
     renderActiveSlide();

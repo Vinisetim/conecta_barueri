@@ -4,6 +4,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/apresentacao/criar-apresentacao.css') }}">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
 {% endblock %}
 
 {% block content %}
@@ -179,6 +180,47 @@
                         </div>
                     </div>
 
+                    <!-- MAPA LAYOUT (Ocupa o slide inteiro com limites destacados e sobreposição de informações) -->
+                    <div class="layout-mapa" style="display: none; position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; overflow: hidden; border-radius: inherit; pointer-events: none;">
+                        <!-- O mapa ocupa 100% da área do slide -->
+                        <div id="slideMapContainer" style="width: 100%; height: 100%; position: absolute; inset: 0; z-index: 1; pointer-events: auto;"></div>
+
+                        <!-- TOPO: TÍTULO E LOGO INSTITUCIONAL SOBREPOSTOS AO MAPA -->
+                        <div class="mapa-top-overlay" style="position: absolute; top: 2cqw; left: 2.2cqw; right: 2.2cqw; z-index: 10; pointer-events: none; display: flex; justify-content: space-between; align-items: flex-start;">
+                            <!-- Bloco do Título e Subtítulo com efeito translúcido -->
+                            <div style="pointer-events: auto; background: rgba(255, 255, 255, 0.94); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-radius: 1.2cqw; padding: 1cqw 1.8cqw; box-shadow: 0 4px 18px rgba(15, 23, 42, 0.12); border: 1px solid rgba(255, 255, 255, 0.9); max-width: 62%;">
+                                <span class="mapa-regiao-tag" id="mapaRegiaoTag" style="font-size: 1.05cqw; font-weight: 700; color: #0052ff; text-transform: uppercase; letter-spacing: 0.04em; display: block; margin-bottom: 0.3cqw;">Município de Barueri</span>
+                                <h1 class="slide-title-preview preview-titulo" style="margin: 0; line-height: 1.15; font-size: 3.2cqw; font-weight: 800; color: #0f172a;">Mapa de Indicadores</h1>
+                                <p class="slide-subtitle-preview preview-subtitulo" style="margin-top: 0.2cqw; margin-bottom: 0; font-size: 1.4cqw; color: #64748b;">Distribuição territorial e dados de atendimentos por região.</p>
+                            </div>
+
+                            <!-- Logo da Prefeitura sobreposta no topo direito -->
+                            <div class="slide-top-brand" style="pointer-events: auto; background: rgba(255, 255, 255, 0.94); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-radius: 1.2cqw; padding: 0.8cqw 1.4cqw; box-shadow: 0 4px 18px rgba(15, 23, 42, 0.12); border: 1px solid rgba(255, 255, 255, 0.9); display: flex; align-items: center; gap: 0.8cqw; margin: 0;">
+                                <img src="{{ url_for('static', filename='img/logo-barueri.jpeg') }}" alt="Logo Barueri" class="slide-logo">
+                                <div class="slide-brand-text">
+                                    <span>Prefeitura de</span>
+                                    <strong>Barueri</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CARD LATERAL DIREITO: PONTOS DE INTERESSE (LEGENDA DOS PINS) -->
+                        <div id="mapaPontosInteresseCard" style="display: none; position: absolute; top: 9.5cqw; right: 2.2cqw; z-index: 10; pointer-events: auto; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-radius: 1.2cqw; padding: 1cqw 1.4cqw; box-shadow: 0 6px 20px rgba(15, 23, 42, 0.14); border: 1px solid rgba(255, 255, 255, 0.9); min-width: 140px; max-width: 210px;">
+                            <div style="font-size: 1.15cqw; font-weight: 700; color: #0f172a; margin-bottom: 0.6cqw; display: flex; align-items: center; gap: 0.4cqw; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.4cqw;">
+                                <i class="bi bi-geo-alt-fill text-primary" style="font-size: 1.1cqw;"></i> Pontos de interesse
+                            </div>
+                            <div id="mapaPontosInteresseLista" style="display: flex; flex-direction: column; gap: 0.5cqw;">
+                                <!-- Gerado dinamicamente via JS -->
+                            </div>
+                        </div>
+
+                        <!-- CANTO INFERIOR ESQUERDO: ORIENTAÇÃO / ESCALA -->
+                        <div style="position: absolute; bottom: 2cqw; left: 2.2cqw; z-index: 10; pointer-events: none; display: flex; align-items: center; gap: 0.6cqw; background: rgba(255, 255, 255, 0.88); backdrop-filter: blur(6px); padding: 0.4cqw 0.8cqw; border-radius: 0.6cqw; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid rgba(255,255,255,0.7);">
+                            <i class="bi bi-compass" style="font-size: 1.2cqw; color: #0052ff;"></i>
+                            <span id="mapaRegiaoBadgeInferior" style="font-size: 0.9cqw; color: #334155; font-weight: 700;">Barueri • SP</span>
+                        </div>
+                    </div>
+
                     <!-- SLOTS (Global posicionado absoluto ou no rodapé) -->
                     <div class="global-slots-container" style="z-index: 1000; position: absolute; bottom: 12px; right: 12px; display: flex; gap: 10px; align-items: flex-end;">
                         <div class="slide-slot-item" id="slotODS" style="display: none; flex-direction: row; gap: 3px; flex-wrap: nowrap; flex-shrink: 0;">
@@ -211,6 +253,7 @@
                             <option value="imagem_texto">Imagem + Texto</option>
                             <option value="indicadores">Indicadores</option>
                             <option value="grafico">Gráfico</option>
+                            <option value="mapa">Mapa Interativo</option>
                         </select>
                         <i class="bi bi-chevron-down select-chevron"></i>
                     </div>
@@ -321,6 +364,114 @@
                         <option value="Ano atual">Ano atual</option>
                         <option value="Ano anterior">Ano anterior</option>
                     </select>
+                </div>
+
+                <!-- Mapa específicos -->
+                <div class="form-group-ap tpl-mapa" style="display: none;">
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+                        <label style="font-size: 0.85rem; font-weight: 700; color: #1e293b; margin-bottom: 8px; display: block;">
+                            <i class="bi bi-map me-1 text-primary"></i> Região do Mapa
+                        </label>
+                        <div style="display: flex; gap: 14px; margin-bottom: 4px;">
+                            <label style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 600; color: #334155; cursor: pointer;">
+                                <input type="radio" name="mapaTipoRadio" value="barueri" checked>
+                                Barueri
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 600; color: #334155; cursor: pointer;">
+                                <input type="radio" name="mapaTipoRadio" value="brasil">
+                                Brasil
+                            </label>
+                        </div>
+                        <small style="color: #64748b; font-size: 0.72rem; display: block; margin-top: 4px;">
+                            Selecione entre o mapa de Barueri e o mapa do Brasil.
+                        </small>
+                    </div>
+
+                    <!-- Gerenciamento de Pins (Máx. 5) -->
+                    <div style="border-top: 1px solid #e2e8f0; padding-top: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <label style="font-size: 0.85rem; font-weight: 700; color: #1e293b; margin: 0;">
+                                <i class="bi bi-geo-alt-fill text-danger me-1"></i> Pins no Mapa (Máx. 5)
+                            </label>
+                            <span id="mapaPinsBadge" style="font-size: 0.75rem; background: #eff6ff; color: #0052ff; font-weight: 700; padding: 2px 8px; border-radius: 999px; border: 1px solid #bfdbfe;">0 / 5</span>
+                        </div>
+
+                        <!-- Card de Criação de Pin -->
+                        <div id="boxAddPin" style="background: #ffffff; border: 1.5px dashed #cbd5e1; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+                            <div style="margin-bottom: 10px;">
+                                <label style="font-size: 0.75rem; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Localização Pré-definida</label>
+                                <select id="selectPinLocal" class="form-control-ap" style="font-size: 0.82rem; padding: 6px 10px;">
+                                    <!-- Popula dinamicamente -->
+                                </select>
+                            </div>
+
+                            <div style="margin-bottom: 10px;">
+                                <label style="font-size: 0.75rem; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Conteúdo do Popup</label>
+                                <div style="display: flex; gap: 4px;" id="groupTipoPopup">
+                                    <button type="button" class="btn-tipo-popup active" data-popup="texto" style="flex:1; font-size:0.75rem; font-weight:600; padding:6px 4px; border-radius:6px; border:1px solid #0052ff; background:#0052ff; color:#fff; cursor:pointer;"><i class="bi bi-fonts"></i> Texto</button>
+                                    <button type="button" class="btn-tipo-popup" data-popup="grafico" style="flex:1; font-size:0.75rem; font-weight:600; padding:6px 4px; border-radius:6px; border:1px solid #cbd5e1; background:#f8fafc; color:#475569; cursor:pointer;"><i class="bi bi-bar-chart"></i> Gráfico</button>
+                                    <button type="button" class="btn-tipo-popup" data-popup="imagem" style="flex:1; font-size:0.75rem; font-weight:600; padding:6px 4px; border-radius:6px; border:1px solid #cbd5e1; background:#f8fafc; color:#475569; cursor:pointer;"><i class="bi bi-image"></i> Imagem</button>
+                                </div>
+                            </div>
+
+                            <!-- Campos: Texto -->
+                            <div id="pinFieldsTexto">
+                                <label style="font-size: 0.72rem; color: #64748b; margin-bottom: 2px; display: block;">Título do Popup</label>
+                                <input type="text" id="inputPinTextoTitulo" class="form-control-ap mb-2" placeholder="Ex: Unidade Básica Centro" style="font-size:0.8rem; padding:6px 10px;">
+                                <label style="font-size: 0.72rem; color: #64748b; margin-bottom: 2px; display: block;">Descrição</label>
+                                <textarea id="inputPinTextoDescricao" class="form-control-ap" rows="2" placeholder="Informações detalhadas sobre o local..." style="font-size:0.8rem; padding:6px 10px;"></textarea>
+                            </div>
+
+                            <!-- Campos: Gráfico -->
+                            <div id="pinFieldsGrafico" style="display: none;">
+                                <label style="font-size: 0.72rem; color: #64748b; margin-bottom: 2px; display: block;">Título do Gráfico</label>
+                                <input type="text" id="inputPinGraficoTitulo" class="form-control-ap mb-2" placeholder="Ex: Atendimentos Realizados" style="font-size:0.8rem; padding:6px 10px;">
+                                <div style="display: flex; gap: 8px;">
+                                    <div style="flex: 1;">
+                                        <label style="font-size: 0.72rem; color: #64748b; margin-bottom: 2px; display: block;">Tipo</label>
+                                        <select id="selectPinGraficoTipo" class="form-control-ap" style="font-size:0.8rem; padding:6px 8px;">
+                                            <option value="bar">Barras</option>
+                                            <option value="line">Linha</option>
+                                            <option value="pie">Pizza</option>
+                                        </select>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <label style="font-size: 0.72rem; color: #64748b; margin-bottom: 2px; display: block;">Indicador</label>
+                                        <select id="selectPinGraficoIndicador" class="form-control-ap" style="font-size:0.8rem; padding:6px 8px;">
+                                            <option value="saude">Saúde</option>
+                                            <option value="seguranca">Segurança</option>
+                                            <option value="educacao">Educação</option>
+                                            <option value="mobilidade">Mobilidade</option>
+                                            <option value="meio-ambiente">Meio Ambiente</option>
+                                            <option value="social">Assistência</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Campos: Imagem -->
+                            <div id="pinFieldsImagem" style="display: none;">
+                                <label style="font-size: 0.72rem; color: #64748b; margin-bottom: 2px; display: block;">Título / Legenda</label>
+                                <input type="text" id="inputPinImgTitulo" class="form-control-ap mb-2" placeholder="Ex: Vista Panorâmica" style="font-size:0.8rem; padding:6px 10px;">
+                                <label style="font-size: 0.72rem; color: #64748b; margin-bottom: 2px; display: block;">URL da Imagem</label>
+                                <input type="url" id="inputPinImgUrl" class="form-control-ap mb-2" placeholder="https://..." style="font-size:0.8rem; padding:6px 10px;">
+                                <div style="display: flex; gap: 6px;">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="btnUploadPinImg" style="flex: 1; font-size: 0.75rem;"><i class="bi bi-upload"></i> Upload</button>
+                                    <button type="button" class="btn btn-sm btn-outline-primary btn-abrir-acervo-midia" data-target="pinImg" style="flex: 1; font-size: 0.75rem;"><i class="bi bi-folder-symlink"></i> Acervo</button>
+                                    <input type="file" id="inputUploadPinImgFile" accept="image/*" style="display:none;">
+                                </div>
+                            </div>
+
+                            <button type="button" id="btnAddPin" class="btn btn-primary w-100 mt-3" style="font-size:0.82rem; font-weight:600; padding:7px 12px; display:flex; align-items:center; justify-content:center; gap:6px;">
+                                <i class="bi bi-plus-circle"></i> Adicionar Pin ao Mapa
+                            </button>
+                        </div>
+
+                        <!-- Lista de Pins Adicionados -->
+                        <div id="listaPinsAdicionados" style="display: flex; flex-direction: column; gap: 8px;">
+                            <!-- Renderizado via JS -->
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Estilos de Texto -->
@@ -614,6 +765,10 @@
         transition: transform 0.3s ease;
     }
 
+    .slide-surface.template-mapa {
+        padding: 0 !important;
+        position: relative !important;
+    }
     .slide-surface .preview-titulo { font-size: 4cqw !important; margin-bottom: 1cqw !important; }
     .slide-surface .preview-subtitulo { font-size: 1.8cqw !important; line-height: 1.4; }
 
@@ -820,6 +975,118 @@
         margin: auto !important;
         display: flex !important;
     }
+
+    /* Estilos do Mapa, Pins e Popups */
+    .slide-surface .map-pin-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: rgba(255, 255, 255, 0.96);
+        border: 2px solid #0052ff;
+        border-radius: 9999px;
+        padding: 3px 9px 3px 4px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+        cursor: pointer;
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+        white-space: nowrap;
+        pointer-events: auto;
+    }
+    .slide-surface .map-pin-badge:hover {
+        transform: scale(1.14);
+        box-shadow: 0 6px 20px rgba(0, 82, 255, 0.4);
+    }
+    .slide-surface .map-pin-icon-circle {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+    }
+    .slide-surface .map-pin-text {
+        font-size: 11px;
+        font-weight: 700;
+        color: #0f172a;
+    }
+    .slide-surface .map-pin-pulse {
+        width: 30px;
+        height: 30px;
+        position: relative;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .slide-surface .map-pin-pulse::after {
+        content: '';
+        position: absolute;
+        width: 14px;
+        height: 14px;
+        background: #ef4444;
+        border: 2.5px solid #ffffff;
+        border-radius: 50%;
+        box-shadow: 0 0 10px rgba(239, 68, 68, 0.9), 0 3px 6px rgba(0,0,0,0.35);
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease;
+    }
+    .slide-surface .map-pin-pulse:hover::after {
+        transform: scale(1.4);
+        background: #dc2626;
+    }
+    .slide-surface .map-pin-pulse .map-pin-label {
+        position: absolute;
+        top: -24px;
+        background: rgba(15, 23, 42, 0.88);
+        color: #fff;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 2px 7px;
+        border-radius: 4px;
+        white-space: nowrap;
+        pointer-events: none;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+    .leaflet-popup-content-wrapper {
+        border-radius: 12px !important;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22) !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+    }
+    .leaflet-popup-content {
+        margin: 0 !important;
+        line-height: 1.4 !important;
+        min-width: 240px !important;
+        max-width: 290px !important;
+    }
+    .popup-box-inner {
+        padding: 12px 14px;
+    }
+    .popup-box-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        border-bottom: 1px solid #f1f5f9;
+        padding-bottom: 6px;
+    }
+    .popup-box-header h5 {
+        margin: 0;
+        font-size: 0.92rem;
+        font-weight: 700;
+        color: #0f172a;
+    }
+    .popup-box-body p {
+        margin: 0;
+        font-size: 0.82rem;
+        color: #475569;
+    }
+    .popup-chart-container {
+        width: 100%;
+        height: 130px;
+        position: relative;
+    }
+
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -843,6 +1110,8 @@
         "chartIndicador": 1,
         "periodo": "Últimos 12 meses",
         "indicadores": [],
+        "mapaTipo": "barueri",
+        "mapaPins": [],
         "tamanhoTitulo": 4.0,
         "tamanhoSubtitulo": 1.8,
         "corTitulo": "#0f172a",
@@ -853,5 +1122,6 @@
     "salvarUrl": {{ url_for('apresentacao.salvar_apresentacao') | tojson }}
 }
 </script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script src="{{ url_for('static', filename='js/criar-apresentacao.js') }}?v=1.0"></script>
 {% endblock %}
