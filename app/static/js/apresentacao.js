@@ -99,195 +99,169 @@ const pins = [
             { label: 'Atend./mês', valor: '247',   var: '▲ 4,1%' }
         ]
     }
-]
+];
 
-// Eixo X compartilhado por todos os gráficos de linha e barra
-const meses = ['Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai']
-
-// ============================================================
-// MAPA
-const map = L.map('map', {
-    center: [-23.5030, -46.8750],
-    zoom: 14,           // ← aumentar
-    minZoom: 13,        // ← impede afastar do zoom inicial
-    maxZoom: 17,
-    zoomControl: false,
-    maxBounds: [
-        [-23.58, -46.95],  // ← bounds mais apertados
-        [-23.43, -46.78]   // ← força o mapa a ficar em Barueri
-    ],
-    maxBoundsViscosity: 1.0
-})
-
-delete L.Icon.Default.prototype._getIconUrl
-L.Icon.Default.mergeOptions({
-    iconUrl: '',
-    shadowUrl: ''
-})
-// Tile minimalista — sem poluição visual nas ruas
-// Trocar o tile atual por esse
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap © CARTO'
-}).addTo(map)
-
-// Botões de zoom no canto inferior esquerdo
-L.control.zoom({ position: 'bottomleft' }).addTo(map)
+const meses = ['Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai'];
 
 // ============================================================
-// GEOJSON — máscara escura fora de Barueri + contorno azul
-// Só o desenho do município fica dentro do fetch
+// MAPA (executado apenas se o elemento #map existir na tela)
 // ============================================================
-fetch('/static/data/barueri.geojson')
-    .then(response => response.json())
-    .then(data => {
-        const mundo = [[-90, -180], [-90, 180], [90, 180], [90, -180], [-90, -180]]
-        const barueri = data.features[0].geometry.coordinates[0]
+if (document.getElementById('map') && typeof L !== 'undefined') {
+    const map = L.map('map', {
+        center: [-23.5030, -46.8750],
+        zoom: 14,
+        minZoom: 13,
+        maxZoom: 17,
+        zoomControl: false,
+        maxBounds: [
+            [-23.58, -46.95],
+            [-23.43, -46.78]
+        ],
+        maxBoundsViscosity: 1.0
+    });
 
-        // 1º — máscara escura do entorno
-        L.polygon([mundo, barueri], {
-            color: 'none',
-            fillColor: '#0f172a',
-            fillOpacity: 0.55
-        }).addTo(map)
+    delete L.Icon.Default.prototype._getIconUrl;
+    L.Icon.Default.mergeOptions({
+        iconUrl: '',
+        shadowUrl: ''
+    });
 
-        // 2º — preenchimento azul claro de Barueri POR CIMA da máscara
-        L.geoJSON(data, {
-            style: {
-                color: '#0052ff',
-                weight: 2.5,
-                fillColor: '#4d82ff',  // azul mais visível
-                fillOpacity: 0.25      // mais opaco que antes
-            }
-        }).addTo(map)
-    })
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap © CARTO'
+    }).addTo(map);
 
-// ============================================================
-// PINS — criados fora do fetch, não dependem do GeoJSON
-// ============================================================
-let graficoAtual = null
+    L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
-pins.forEach(pin => {
-    // divIcon permite usar HTML/CSS como ícone do marker
-    const iconeHTML = L.divIcon({
-        className: '', // remove estilos padrão do Leaflet
-        html: `<div class="pin-wrapper"><i class="bi ${pin.icone}"></i></div>`,
-        iconSize: [48, 48],
-        iconAnchor: [24, 24] // ancora o centro do ícone na coordenada
-    })
+    fetch('/static/data/barueri.geojson')
+        .then(response => response.json())
+        .then(data => {
+            const mundo = [[-90, -180], [-90, 180], [90, 180], [90, -180], [-90, -180]];
+            const barueri = data.features[0].geometry.coordinates[0];
 
-    const marker = L.marker([pin.lat, pin.lng], { icon: iconeHTML }).addTo(map)
+            L.polygon([mundo, barueri], {
+                color: 'none',
+                fillColor: '#0f172a',
+                fillOpacity: 0.55
+            }).addTo(map);
 
-    // Ao clicar no pin, abre o popup com os dados desse pin
-    marker.on('click', (e) => {
-        L.DomEvent.stopPropagation(e) // impede o click de fechar o popup imediatamente
-        abrirPopup(pin)
-    })
-})
+            L.geoJSON(data, {
+                style: {
+                    color: '#0052ff',
+                    weight: 2.5,
+                    fillColor: '#4d82ff',
+                    fillOpacity: 0.25
+                }
+            }).addTo(map);
+        });
 
-// ============================================================
-// FUNÇÕES DE POPUP
-// ============================================================
-function abrirPopup(pin) {
-    const popup = document.getElementById('popup')
+    let graficoAtual = null;
 
-    // Preenche os campos do HTML com os dados do pin clicado
-    document.getElementById('popup-modulo').textContent = pin.modulo
-    document.getElementById('popup-bairro').textContent = pin.bairro
-    document.getElementById('popup-data').textContent = pin.data
-    document.getElementById('popup-total').textContent = pin.total
-    document.getElementById('popup-variacao').textContent = pin.variacao
-    document.getElementById('popup-icone').innerHTML = `<i class="bi ${pin.icone}"></i>`
+    pins.forEach(pin => {
+        const iconeHTML = L.divIcon({
+            className: '',
+            html: `<div class="pin-wrapper"><i class="bi ${pin.icone}"></i></div>`,
+            iconSize: [48, 48],
+            iconAnchor: [24, 24]
+        });
 
-    // Preenche os três cards de métricas dinamicamente
-    pin.cards.forEach((card, i) => {
-        const n = i + 1
-        document.getElementById(`card${n}-label`).textContent = card.label
-        document.getElementById(`card${n}-valor`).textContent = card.valor
-        document.getElementById(`card${n}-var`).textContent = card.var
-    })
+        const marker = L.marker([pin.lat, pin.lng], { icon: iconeHTML }).addTo(map);
 
-    // Reseta o select para "linha" sempre que abre um novo pin
-    document.getElementById('tipo-grafico').value = 'line'
+        marker.on('click', (e) => {
+            L.DomEvent.stopPropagation(e);
+            abrirPopup(pin);
+        });
+    });
 
-    popup.classList.remove('d-none')
-    renderizarGrafico(pin, 'line')
-}
+    function abrirPopup(pin) {
+        const popup = document.getElementById('popup');
 
-function fecharPopup() {
-    document.getElementById('popup').classList.add('d-none')
-    if (graficoAtual) {
-        graficoAtual.destroy()
-        graficoAtual = null
-    }
-}
+        document.getElementById('popup-modulo').textContent = pin.modulo;
+        document.getElementById('popup-bairro').textContent = pin.bairro;
+        document.getElementById('popup-data').textContent = pin.data;
+        document.getElementById('popup-total').textContent = pin.total;
+        document.getElementById('popup-variacao').textContent = pin.variacao;
+        document.getElementById('popup-icone').innerHTML = `<i class="bi ${pin.icone}"></i>`;
 
-function renderizarGrafico(pin, tipo) {
-    // Destrói o gráfico anterior para evitar sobreposição
-    if (graficoAtual) {
-        graficoAtual.destroy()
-        graficoAtual = null
+        pin.cards.forEach((card, i) => {
+            const n = i + 1;
+            document.getElementById(`card${n}-label`).textContent = card.label;
+            document.getElementById(`card${n}-valor`).textContent = card.valor;
+            document.getElementById(`card${n}-var`).textContent = card.var;
+        });
+
+        document.getElementById('tipo-grafico').value = 'line';
+
+        popup.classList.remove('d-none');
+        renderizarGrafico(pin, 'line');
     }
 
-    const ctx = document.getElementById('grafico-popup').getContext('2d')
-
-    // Labels e dados mudam conforme o tipo de gráfico
-    const labels = tipo === 'pie' ? pin.cards.map(c => c.label) : meses
-    const dados  = tipo === 'pie'
-        ? pin.cards.map(c => parseFloat(c.valor.replace('.', '').replace(',', '.')))
-        : pin.historico
-
-    const config = {
-        type: tipo,
-        data: {
-            labels,
-            datasets: [{
-                label: pin.modulo,
-                data: dados,
-                borderColor: '#0052ff',
-                backgroundColor: tipo === 'line'
-                    ? 'rgba(0, 82, 255, 0.08)'
-                    : tipo === 'bar'
-                    ? 'rgba(0, 82, 255, 0.7)'
-                    : ['#0052ff', '#3b82f6', '#93c5fd'],
-                fill: tipo === 'line',
-                tension: 0.4,
-                pointRadius: 3
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: tipo === 'pie' ? {} : {
-                x: { grid: { display: false } },
-                y: { grid: { color: '#f1f5f9' } }
-            }
+    function fecharPopup() {
+        document.getElementById('popup').classList.add('d-none');
+        if (graficoAtual) {
+            graficoAtual.destroy();
+            graficoAtual = null;
         }
     }
 
-    graficoAtual = new Chart(ctx, config)
+    function renderizarGrafico(pin, tipo) {
+        if (graficoAtual) {
+            graficoAtual.destroy();
+            graficoAtual = null;
+        }
+
+        const ctx = document.getElementById('grafico-popup').getContext('2d');
+        const labels = tipo === 'pie' ? pin.cards.map(c => c.label) : meses;
+        const dados  = tipo === 'pie'
+            ? pin.cards.map(c => parseFloat(c.valor.replace('.', '').replace(',', '.')))
+            : pin.historico;
+
+        const config = {
+            type: tipo,
+            data: {
+                labels,
+                datasets: [{
+                    label: pin.modulo,
+                    data: dados,
+                    borderColor: '#0052ff',
+                    backgroundColor: tipo === 'line'
+                        ? 'rgba(0, 82, 255, 0.08)'
+                        : tipo === 'bar'
+                        ? 'rgba(0, 82, 255, 0.7)'
+                        : ['#0052ff', '#3b82f6', '#93c5fd'],
+                    fill: tipo === 'line',
+                    tension: 0.4,
+                    pointRadius: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: tipo === 'pie' ? {} : {
+                    x: { grid: { display: false } },
+                    y: { grid: { color: '#f1f5f9' } }
+                }
+            }
+        };
+
+        graficoAtual = new Chart(ctx, config);
+    }
+
+    document.getElementById('popup-fechar')?.addEventListener('click', fecharPopup);
+    map.on('click', fecharPopup);
+
+    document.getElementById('tipo-grafico')?.addEventListener('change', (e) => {
+        const bairroAtual = document.getElementById('popup-bairro').textContent;
+        const pinAtual = pins.find(p => p.bairro === bairroAtual);
+        if (pinAtual) renderizarGrafico(pinAtual, e.target.value);
+    });
 }
 
-// ============================================================
-// EVENT LISTENERS
-// ============================================================
-
-// Fechar pelo botão X
-document.getElementById('popup-fechar').addEventListener('click', fecharPopup)
-
-// Fechar ao clicar no mapa fora do popup
-map.on('click', fecharPopup)
-
-// Trocar tipo de gráfico pelo select
-document.getElementById('tipo-grafico').addEventListener('change', (e) => {
-    const bairroAtual = document.getElementById('popup-bairro').textContent
-    const pinAtual = pins.find(p => p.bairro === bairroAtual)
-    if (pinAtual) renderizarGrafico(pinAtual, e.target.value)
-})
-
 // ==========================================
-// FUNÇÕES DE FILTRO E VISUALIZAÇÃO DE APRESENTAÇÕES
+// FUNÇÕES DE FILTRO E VISUALIZAÇÃO DE APRESENTAÇÕES (MÁX. 5 VISÍVEIS)
 // ==========================================
+const LIMITE_PROJETOS_TELA = 5;
+
 function filterCards() {
     const searchInput = document.getElementById("searchInput");
     const moduloFilter = document.getElementById("moduloFilter");
@@ -299,6 +273,8 @@ function filterCards() {
     const statusVal = statusFilter ? statusFilter.value : "";
     const cards = document.querySelectorAll(".ap-card-item");
 
+    let exibidos = 0;
+
     cards.forEach(card => {
         const title = (card.getAttribute("data-title") || "").toLowerCase();
         const modulo = card.getAttribute("data-modulo") || "";
@@ -308,8 +284,9 @@ function filterCards() {
         const matchesModulo = !moduloVal || modulo === moduloVal;
         const matchesStatus = !statusVal || status === statusVal;
 
-        if (matchesSearch && matchesModulo && matchesStatus) {
+        if (matchesSearch && matchesModulo && matchesStatus && exibidos < LIMITE_PROJETOS_TELA) {
             card.style.display = "";
+            exibidos++;
         } else {
             card.style.display = "none";
         }
