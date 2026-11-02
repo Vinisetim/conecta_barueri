@@ -1828,7 +1828,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         <div style="font-size: 0.8rem; font-weight: 600; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(s.titulo || 'Sem título')}">
                             ${escapeHtml(s.titulo || 'Slide sem título')}
                         </div>
-                        <button type="button" class="btn btn-sm btn-primary w-100 d-inline-flex align-items-center justify-content-center gap-1" onclick="window.importarSlideDoAcervo(${s.slide_id})" style="background: #0052ff; border: none; font-size: 0.8rem; padding: 6px 10px; border-radius: 6px; font-weight: 600;">
+                        <button type="button" class="btn btn-sm btn-primary w-100 d-inline-flex align-items-center justify-content-center gap-1 btn-importar-slide-acervo" data-slide-id="${s.slide_id}" onclick="window.importarSlideDoAcervo(${s.slide_id})" style="background: #0052ff; border: none; font-size: 0.8rem; padding: 6px 10px; border-radius: 6px; font-weight: 600;">
                             <i class="bi bi-plus-circle"></i> Inserir este Slide
                         </button>
                     </div>
@@ -1889,9 +1889,10 @@ document.addEventListener("DOMContentLoaded", function() {
         let totalExibidos = 0;
 
         // Renderização de Mídias (Fundos, Imagens, Logos)
+        let midiasFiltradas = [];
         if (filtro === 'todos' || filtro === 'bgCapa' || filtro === 'imgTexto' || filtro === 'customLogoImg') {
-            const midiasFiltradas = midias.filter(m => filtro === 'todos' || m.tipo === filtro);
-            midiasFiltradas.forEach(m => {
+            midiasFiltradas = midias.filter(m => filtro === 'todos' || m.tipo === filtro);
+            midiasFiltradas.forEach((m, idx) => {
                 totalExibidos++;
                 const tipoBadge = m.tipo === 'bgCapa' ? 'Fundo' : (m.tipo === 'imgTexto' ? 'Imagem' : 'Logotipo');
                 htmlCards += `
@@ -1906,7 +1907,7 @@ document.addEventListener("DOMContentLoaded", function() {
                             <span style="font-size: 0.72rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(m.apresentacao_nome)}">
                                 De: ${escapeHtml(m.apresentacao_nome)}
                             </span>
-                            <button type="button" class="btn btn-sm btn-outline-primary w-100" onclick="window.aplicarMidiaAcervo('${m.tipo}', ${JSON.stringify(m.valor)}, ${m.campo_id})" style="font-size: 0.78rem; font-weight: 600; padding: 5px;">
+                            <button type="button" class="btn btn-sm btn-outline-primary w-100 btn-aplicar-midia-acervo" data-idx="${idx}" style="font-size: 0.78rem; font-weight: 600; padding: 5px;">
                                 <i class="bi bi-box-arrow-in-down me-1"></i> Usar Mídia
                             </button>
                         </div>
@@ -1916,8 +1917,10 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         // Renderização de Textos (Títulos e Subtítulos)
+        let textosFiltrados = [];
         if (filtro === 'todos' || filtro === 'textos') {
-            textos.forEach(t => {
+            textosFiltrados = textos;
+            textosFiltrados.forEach((t, idx) => {
                 totalExibidos++;
                 const chaveRotulo = t.chave === 'titulo' ? 'Título' : 'Subtítulo';
                 htmlCards += `
@@ -1932,10 +1935,10 @@ document.addEventListener("DOMContentLoaded", function() {
                             </p>
                         </div>
                         <div style="display: flex; gap: 6px; margin-top: 4px;">
-                            <button type="button" class="btn btn-sm btn-outline-primary flex-fill" onclick="window.aplicarTextoAcervo('titulo', ${JSON.stringify(t.valor)}, ${t.campo_id})" style="font-size: 0.72rem; padding: 4px;">
+                            <button type="button" class="btn btn-sm btn-outline-primary flex-fill btn-aplicar-texto-acervo" data-alvo="titulo" data-idx="${idx}" style="font-size: 0.72rem; padding: 4px;">
                                 Como Título
                             </button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary flex-fill" onclick="window.aplicarTextoAcervo('subtitulo', ${JSON.stringify(t.valor)}, ${t.campo_id})" style="font-size: 0.72rem; padding: 4px;">
+                            <button type="button" class="btn btn-sm btn-outline-secondary flex-fill btn-aplicar-texto-acervo" data-alvo="subtitulo" data-idx="${idx}" style="font-size: 0.72rem; padding: 4px;">
                                 Como Subtítulo
                             </button>
                         </div>
@@ -1945,8 +1948,10 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         // Renderização de Indicadores
+        let indicadoresFiltrados = [];
         if (filtro === 'todos' || filtro === 'indicadores') {
-            indicadores.forEach(ind => {
+            indicadoresFiltrados = indicadores;
+            indicadoresFiltrados.forEach((ind, idx) => {
                 totalExibidos++;
                 htmlCards += `
                     <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; gap: 8px;">
@@ -1962,7 +1967,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 2px;">
                             De: ${escapeHtml(ind.apresentacao_nome)}
                         </div>
-                        <button type="button" class="btn btn-sm btn-primary w-100" onclick="window.aplicarIndicadorAcervo(${JSON.stringify(ind).replace(/"/g, '&quot;')}, ${ind.campo_id})" style="font-size: 0.75rem; font-weight: 600; padding: 5px; background: #0052ff; border: none;">
+                        <button type="button" class="btn btn-sm btn-primary w-100 btn-aplicar-indicador-acervo" data-idx="${idx}" style="font-size: 0.75rem; font-weight: 600; padding: 5px; background: #0052ff; border: none;">
                             <i class="bi bi-plus-circle me-1"></i> Inserir no Slide
                         </button>
                     </div>
@@ -1978,6 +1983,35 @@ document.addEventListener("DOMContentLoaded", function() {
 
         if (emptyAcervoDados) emptyAcervoDados.style.display = "none";
         gridAcervoDados.innerHTML = htmlCards;
+
+        // Atribuir event listeners dinâmicos com isolamento de dados
+        gridAcervoDados.querySelectorAll('.btn-aplicar-midia-acervo').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const idx = parseInt(btn.dataset.idx, 10);
+                const m = midiasFiltradas[idx];
+                if (m) window.aplicarMidiaAcervo(m.tipo, m.valor, m.campo_id);
+            });
+        });
+
+        gridAcervoDados.querySelectorAll('.btn-aplicar-texto-acervo').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const idx = parseInt(btn.dataset.idx, 10);
+                const alvo = btn.dataset.alvo;
+                const t = textosFiltrados[idx];
+                if (t) window.aplicarTextoAcervo(alvo, t.valor, t.campo_id);
+            });
+        });
+
+        gridAcervoDados.querySelectorAll('.btn-aplicar-indicador-acervo').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const idx = parseInt(btn.dataset.idx, 10);
+                const ind = indicadoresFiltrados[idx];
+                if (ind) window.aplicarIndicadorAcervo(ind, ind.campo_id);
+            });
+        });
     }
 
     window.aplicarMidiaAcervo = function(tipo, valor, campoId) {
@@ -2028,7 +2062,7 @@ document.addEventListener("DOMContentLoaded", function() {
         updatePreviewTexts();
         updateActiveThumbnail();
         fecharAcervoModal();
-        mostrarToastNotificacao(`Texto inserido como ${campoAlvo}!`);
+        mostrarToastNotificacao(`Texto inserido como ${campoAlvo === 'titulo' ? 'Título' : 'Subtítulo'}!`);
     };
 
     window.aplicarIndicadorAcervo = function(item, campoId) {
