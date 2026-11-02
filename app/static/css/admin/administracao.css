@@ -1,5 +1,18 @@
 
 
+:root {
+    --blue: #0d6efd;
+    --blue-soft: #eaf2ff;
+    --purple: #7c3aed;
+    --purple-soft: #f0eaff;
+    --yellow: #f59e0b;
+    --yellow-soft: #fff4d8;
+    --green: #16a46f;
+    --green-soft: #e7f8ef;
+    --red: #dc3545;
+    --shadow-card: 0 12px 30px rgba(15, 23, 42, 0.04);
+}
+
 /* ==============================
    LAYOUT IGUAL À HOME
 ================================= */
@@ -617,6 +630,27 @@
     color: var(--purple);
 }
 
+.role-badge.inactive {
+    background: #ffecec;
+    color: var(--red);
+}
+
+.folder-badge-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.folder-badge-dot span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
 .action-button {
     width: 32px;
     height: 32px;
@@ -632,6 +666,7 @@
     justify-content: center;
 
     cursor: pointer;
+    text-decoration: none;
 }
 
 .action-button:hover {

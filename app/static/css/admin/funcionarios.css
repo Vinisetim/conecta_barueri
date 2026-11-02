@@ -409,3 +409,158 @@
 .func-btn-delete:hover {
     transform: scale(1.1);
 }
+
+/* ==============================
+   CÉLULA DO USUÁRIO E MODAL
+================================= */
+
+.func-user-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.func-user-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #eaf2ff;
+    color: #0d6efd;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.76rem;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+.func-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(7, 25, 79, 0.45);
+    backdrop-filter: blur(3px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 20px;
+}
+
+.func-modal-overlay.open {
+    display: flex;
+}
+
+.func-modal-box {
+    width: 100%;
+    max-width: 500px;
+    background: #ffffff;
+    border: 1px solid #e6ebf5;
+    border-radius: 16px;
+    box-shadow: 0 24px 60px rgba(7, 25, 79, 0.18);
+    overflow: hidden;
+}
+
+.func-modal-header {
+    padding: 20px 26px;
+    border-bottom: 1px solid #e6ebf5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.func-modal-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #07194f;
+}
+
+.func-modal-close {
+    border: none;
+    background: transparent;
+    color: #667085;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.func-modal-body {
+    padding: 22px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.func-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.func-form-group label {
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #07194f;
+}
+
+.func-form-group input,
+.func-form-group select {
+    height: 46px;
+    padding: 0 14px;
+    border: 1px solid #dfe5ef;
+    border-radius: 8px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #07194f;
+    outline: none;
+}
+
+.func-form-group input:focus,
+.func-form-group select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+}
+
+.func-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.func-modal-footer {
+    padding: 16px 26px;
+    background: #f8fbff;
+    border-top: 1px solid #e6ebf5;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.func-btn-cancel {
+    height: 42px;
+    padding: 0 18px;
+    border-radius: 8px;
+    border: 1px solid #dfe5ef;
+    background: #ffffff;
+    color: #344054;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.func-btn-save {
+    height: 42px;
+    padding: 0 22px;
+    border-radius: 8px;
+    border: none;
+    background: #0d6efd;
+    color: #ffffff;
+    font-size: 0.88rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(13, 110, 253, 0.22);
+}
+
+.func-btn-save:hover {
+    background: #075bd8;
+}
