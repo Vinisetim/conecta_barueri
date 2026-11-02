@@ -1040,3 +1040,178 @@ input:checked + .slider-ap:before {
 .global-slots-container { position: absolute; bottom: 12px; right: 12px; display: flex; gap: 10px; align-items: flex-end; }
 
 
+
+
+/* ==============================================================
+   MODO APRESENTAÇÃO FULLSCREEN PROPORCIONAL (16:9 TOTAL)
+   ============================================================== */
+.presentation-mode-modal,
+#previewModal {
+    position: fixed !important;
+    inset: 0 !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: #000000 !important;
+    z-index: 999999 !important;
+    display: none;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    user-select: none !important;
+}
+
+#previewModal:fullscreen,
+#previewModal:-webkit-full-screen,
+#previewModal:-ms-fullscreen {
+    width: 100vw !important;
+    height: 100vh !important;
+    background: #000000 !important;
+}
+
+/* BARRA SUPERIOR (HEADER) FIXA NO TOPO - SEM SOBREPOR O SLIDE */
+.presentation-header {
+    width: 100% !important;
+    height: 56px !important;
+    min-height: 56px !important;
+    max-height: 56px !important;
+    background: #0b0f19 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0 28px !important;
+    box-sizing: border-box !important;
+    z-index: 100 !important;
+    flex-shrink: 0 !important;
+}
+
+.presentation-header-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+}
+
+.presentation-badge-live {
+    color: #ffffff !important;
+    font-size: 1.15rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.01em !important;
+}
+
+.presentation-slide-counter {
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    color: #94a3b8 !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    padding: 3px 12px !important;
+    border-radius: 9999px !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+}
+
+.presentation-header-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+}
+
+/* BOTÕES DE NAVEGAÇÃO */
+.btn-ap-nav {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    padding: 8px 18px !important;
+    font-size: 0.88rem !important;
+    font-weight: 700 !important;
+    border-radius: 8px !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: all 0.18s ease !important;
+}
+
+.btn-ap-prev,
+.btn-ap-next {
+    background: #0052ff !important;
+    color: #ffffff !important;
+}
+
+.btn-ap-prev:hover,
+.btn-ap-next:hover {
+    background: #0043d0 !important;
+    transform: translateY(-1px) !important;
+}
+
+.btn-ap-prev:disabled,
+.btn-ap-next:disabled {
+    background: #334155 !important;
+    color: #64748b !important;
+    opacity: 0.45 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+}
+
+.btn-ap-close {
+    background: #ef4444 !important;
+    color: #ffffff !important;
+    margin-left: 4px !important;
+}
+
+.btn-ap-close:hover {
+    background: #dc2626 !important;
+    transform: translateY(-1px) !important;
+}
+
+/* PALCO DO SLIDE (ÁREA TOTAL RESTANTE DA TELA) */
+.presentation-stage {
+    flex: 1 !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 16px 28px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    position: relative !important;
+    background: #000000 !important;
+}
+
+/* CAIXA DO SLIDE QUE OCUPA O MÁXIMO DA TELA DENTRO DA PROPORÇÃO 16:9 */
+.presentation-slide-box,
+#previewContainer {
+    width: min(calc((100vh - 56px - 32px) * (16 / 9)), calc(100vw - 56px)) !important;
+    height: min(calc(100vh - 56px - 32px), calc((100vw - 56px) * (9 / 16))) !important;
+    aspect-ratio: 16 / 9 !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    background: #ffffff !important;
+    border-radius: 12px !important;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8) !important;
+    overflow: hidden !important;
+    display: flex !important;
+    position: relative !important;
+    box-sizing: border-box !important;
+}
+
+/* SLIDE DENTRO DA APRESENTAÇÃO */
+.presentation-slide-box .slide-surface,
+#previewContainer .slide-surface {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    aspect-ratio: 16 / 9 !important;
+    margin: 0 !important;
+    border: none !important;
+    border-radius: inherit !important;
+    box-shadow: none !important;
+    container-type: inline-size !important;
+    display: flex !important;
+    flex-direction: column !important;
+}

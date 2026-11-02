@@ -105,136 +105,184 @@ const pins = [
 const meses = ['Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai']
 
 // ============================================================
-// MAPA
-const map = L.map('map', {
-    center: [-23.5030, -46.8750],
-    zoom: 14,           // ← aumentar
-    minZoom: 13,        // ← impede afastar do zoom inicial
-    maxZoom: 17,
-    zoomControl: false,
-    maxBounds: [
-        [-23.58, -46.95],  // ← bounds mais apertados
-        [-23.43, -46.78]   // ← força o mapa a ficar em Barueri
-    ],
-    maxBoundsViscosity: 1.0
-})
-
-delete L.Icon.Default.prototype._getIconUrl
-L.Icon.Default.mergeOptions({
-    iconUrl: '',
-    shadowUrl: ''
-})
-// Tile minimalista — sem poluição visual nas ruas
-// Trocar o tile atual por esse
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap © CARTO'
-}).addTo(map)
-
-// Botões de zoom no canto inferior esquerdo
-L.control.zoom({ position: 'bottomleft' }).addTo(map)
-
+// MAPA (LEAFLET - CONFIGURAÇÃO COM TRAVAMENTO E LIMITES DESTACADOS)
 // ============================================================
-// GEOJSON — máscara escura fora de Barueri + contorno azul
-// Só o desenho do município fica dentro do fetch
-// ============================================================
-fetch('/static/data/barueri.geojson')
-    .then(response => response.json())
-    .then(data => {
-        const mundo = [[-90, -180], [-90, 180], [90, 180], [90, -180], [-90, -180]]
-        const barueri = data.features[0].geometry.coordinates[0]
+let map = null;
+let graficoAtual = null;
 
-        // 1º — máscara escura do entorno
-        L.polygon([mundo, barueri], {
-            color: 'none',
-            fillColor: '#0f172a',
-            fillOpacity: 0.55
-        }).addTo(map)
+const mapContainer = document.getElementById('map');
+if (mapContainer && typeof L !== 'undefined') {
+    // Barueri BBox e centro calibrado
+    const barueriBounds = [[-23.565, -46.985], [-23.455, -46.775]];
+    const barueriCenter = [-23.5080, -46.8760];
 
-        // 2º — preenchimento azul claro de Barueri POR CIMA da máscara
-        L.geoJSON(data, {
-            style: {
-                color: '#0052ff',
-                weight: 2.5,
-                fillColor: '#4d82ff',  // azul mais visível
-                fillOpacity: 0.25      // mais opaco que antes
+    // Mapa travado estritamente no território de Barueri (não permite sair dele)
+    map = L.map('map', {
+        center: barueriCenter,
+        zoom: 13,
+        minZoom: 12,
+        maxZoom: 16,
+        zoomControl: false,
+        maxBounds: barueriBounds,
+        maxBoundsViscosity: 1.0,
+        attributionControl: false
+    });
+
+    delete L.Icon.Default.prototype._getIconUrl;
+    L.Icon.Default.mergeOptions({
+        iconUrl: '',
+        shadowUrl: ''
+    });
+
+    // Camada base OpenStreetMap (100% gratuita, sem marca d'água de API KEY)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxZoom: 19
+    }).addTo(map);
+
+    // Botões de zoom no canto inferior esquerdo
+    L.control.zoom({ position: 'bottomleft' }).addTo(map);
+
+    // ============================================================
+    // GEOJSON: Limites marcados de azul + máscara externa translúcida
+    // ============================================================
+    fetch('/static/data/barueri.geojson')
+        .then(response => response.json())
+        .then(geoData => {
+            const mundo = [[-90, -180], [-90, 180], [90, 180], [90, -180], [-90, -180]];
+            let polyHoles = [];
+            if (geoData.features && geoData.features.length > 0) {
+                geoData.features.forEach(feat => {
+                    const geom = feat.geometry;
+                    if (geom.type === 'Polygon') {
+                        polyHoles.push(geom.coordinates[0].map(pt => [pt[1], pt[0]]));
+                    } else if (geom.type === 'MultiPolygon') {
+                        geom.coordinates.forEach(poly => {
+                            polyHoles.push(poly[0].map(pt => [pt[1], pt[0]]));
+                        });
+                    }
+                });
             }
-        }).addTo(map)
-    })
 
-// ============================================================
-// PINS — criados fora do fetch, não dependem do GeoJSON
-// ============================================================
-let graficoAtual = null
+            // 1º Máscara branca no exterior para isolar o território com destaque (como no mockup)
+            if (polyHoles.length > 0) {
+                polyHoles.forEach(hole => {
+                    L.polygon([mundo, hole], {
+                        color: 'none',
+                        fillColor: '#ffffff',
+                        fillOpacity: 0.82,
+                        interactive: false
+                    }).addTo(map);
+                });
+            }
 
-pins.forEach(pin => {
-    // divIcon permite usar HTML/CSS como ícone do marker
-    const iconeHTML = L.divIcon({
-        className: '', // remove estilos padrão do Leaflet
-        html: `<div class="pin-wrapper"><i class="bi ${pin.icone}"></i></div>`,
-        iconSize: [48, 48],
-        iconAnchor: [24, 24] // ancora o centro do ícone na coordenada
-    })
+            // 2º Limites marcados de azul vibrante e preenchimento suave
+            L.geoJSON(geoData, {
+                style: {
+                    color: '#0052ff', // Linha azul nítida
+                    weight: 3,
+                    opacity: 1,
+                    fillColor: '#38bdf8', // Azul claro destacado
+                    fillOpacity: 0.16
+                },
+                interactive: false
+            }).addTo(map);
+        })
+        .catch(err => console.error("Erro ao carregar o GeoJSON do mapa:", err));
 
-    const marker = L.marker([pin.lat, pin.lng], { icon: iconeHTML }).addTo(map)
+    // ============================================================
+    // PINS NO MAPA COM BADGES ESTILO GOOGLE MAPS / MOCKUP
+    // ============================================================
+    pins.forEach(pin => {
+        const iconeHTML = L.divIcon({
+            className: 'map-pin-div-wrapper',
+            html: `
+                <div class="map-pin-badge" style="display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.96); border:2px solid #0052ff; border-radius:9999px; padding:3px 10px 3px 4px; box-shadow:0 4px 14px rgba(0,0,0,0.22); cursor:pointer; white-space:nowrap; transition:transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                    <div style="width:22px; height:22px; border-radius:50%; background:#0052ff; color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px;">
+                        <i class="bi ${pin.icone}"></i>
+                    </div>
+                    <span style="font-size:12px; font-weight:700; color:#0f172a;">${pin.bairro}</span>
+                </div>
+            `,
+            iconSize: [130, 32],
+            iconAnchor: [65, 16]
+        });
 
-    // Ao clicar no pin, abre o popup com os dados desse pin
-    marker.on('click', (e) => {
-        L.DomEvent.stopPropagation(e) // impede o click de fechar o popup imediatamente
-        abrirPopup(pin)
-    })
-})
+        const marker = L.marker([pin.lat, pin.lng], { icon: iconeHTML }).addTo(map);
+
+        marker.on('click', (e) => {
+            if (e && e.originalEvent) L.DomEvent.stopPropagation(e);
+            abrirPopup(pin);
+        });
+    });
+
+    // Fechar ao clicar no mapa fora do popup
+    map.on('click', fecharPopup);
+}
 
 // ============================================================
 // FUNÇÕES DE POPUP
 // ============================================================
 function abrirPopup(pin) {
-    const popup = document.getElementById('popup')
+    const popup = document.getElementById('popup');
+    if (!popup) return;
 
-    // Preenche os campos do HTML com os dados do pin clicado
-    document.getElementById('popup-modulo').textContent = pin.modulo
-    document.getElementById('popup-bairro').textContent = pin.bairro
-    document.getElementById('popup-data').textContent = pin.data
-    document.getElementById('popup-total').textContent = pin.total
-    document.getElementById('popup-variacao').textContent = pin.variacao
-    document.getElementById('popup-icone').innerHTML = `<i class="bi ${pin.icone}"></i>`
+    const elModulo = document.getElementById('popup-modulo');
+    const elBairro = document.getElementById('popup-bairro');
+    const elData = document.getElementById('popup-data');
+    const elTotal = document.getElementById('popup-total');
+    const elVariacao = document.getElementById('popup-variacao');
+    const elIcone = document.getElementById('popup-icone');
 
-    // Preenche os três cards de métricas dinamicamente
-    pin.cards.forEach((card, i) => {
-        const n = i + 1
-        document.getElementById(`card${n}-label`).textContent = card.label
-        document.getElementById(`card${n}-valor`).textContent = card.valor
-        document.getElementById(`card${n}-var`).textContent = card.var
-    })
+    if (elModulo) elModulo.textContent = pin.modulo;
+    if (elBairro) elBairro.textContent = pin.bairro;
+    if (elData) elData.textContent = pin.data;
+    if (elTotal) elTotal.textContent = pin.total;
+    if (elVariacao) elVariacao.textContent = pin.variacao;
+    if (elIcone) elIcone.innerHTML = `<i class="bi ${pin.icone}"></i>`;
 
-    // Reseta o select para "linha" sempre que abre um novo pin
-    document.getElementById('tipo-grafico').value = 'line'
+    if (pin.cards) {
+        pin.cards.forEach((card, i) => {
+            const n = i + 1;
+            const l = document.getElementById(`card${n}-label`);
+            const v = document.getElementById(`card${n}-valor`);
+            const r = document.getElementById(`card${n}-var`);
+            if (l) l.textContent = card.label;
+            if (v) v.textContent = card.valor;
+            if (r) r.textContent = card.var;
+        });
+    }
 
-    popup.classList.remove('d-none')
-    renderizarGrafico(pin, 'line')
+    const tipoSelect = document.getElementById('tipo-grafico');
+    if (tipoSelect) tipoSelect.value = 'line';
+
+    popup.classList.remove('d-none');
+    renderizarGrafico(pin, 'line');
 }
 
 function fecharPopup() {
-    document.getElementById('popup').classList.add('d-none')
+    const popup = document.getElementById('popup');
+    if (popup) popup.classList.add('d-none');
     if (graficoAtual) {
-        graficoAtual.destroy()
-        graficoAtual = null
+        graficoAtual.destroy();
+        graficoAtual = null;
     }
 }
 
 function renderizarGrafico(pin, tipo) {
-    // Destrói o gráfico anterior para evitar sobreposição
     if (graficoAtual) {
-        graficoAtual.destroy()
-        graficoAtual = null
+        graficoAtual.destroy();
+        graficoAtual = null;
     }
 
-    const ctx = document.getElementById('grafico-popup').getContext('2d')
+    const canvas = document.getElementById('grafico-popup');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
 
-    // Labels e dados mudam conforme o tipo de gráfico
-    const labels = tipo === 'pie' ? pin.cards.map(c => c.label) : meses
-    const dados  = tipo === 'pie'
-        ? pin.cards.map(c => parseFloat(c.valor.replace('.', '').replace(',', '.')))
-        : pin.historico
+    const labels = tipo === 'pie' ? (pin.cards ? pin.cards.map(c => c.label) : []) : meses;
+    const dados = tipo === 'pie'
+        ? (pin.cards ? pin.cards.map(c => parseFloat(c.valor.replace('.', '').replace(',', '.'))) : [])
+        : pin.historico;
 
     const config = {
         type: tipo,
@@ -263,27 +311,26 @@ function renderizarGrafico(pin, tipo) {
                 y: { grid: { color: '#f1f5f9' } }
             }
         }
-    }
+    };
 
-    graficoAtual = new Chart(ctx, config)
+    graficoAtual = new Chart(ctx, config);
 }
 
-// ============================================================
-// EVENT LISTENERS
-// ============================================================
+// Event Listeners seguros
+const btnPopupFechar = document.getElementById('popup-fechar');
+if (btnPopupFechar) {
+    btnPopupFechar.addEventListener('click', fecharPopup);
+}
 
-// Fechar pelo botão X
-document.getElementById('popup-fechar').addEventListener('click', fecharPopup)
-
-// Fechar ao clicar no mapa fora do popup
-map.on('click', fecharPopup)
-
-// Trocar tipo de gráfico pelo select
-document.getElementById('tipo-grafico').addEventListener('change', (e) => {
-    const bairroAtual = document.getElementById('popup-bairro').textContent
-    const pinAtual = pins.find(p => p.bairro === bairroAtual)
-    if (pinAtual) renderizarGrafico(pinAtual, e.target.value)
-})
+const selectTipoGrafico = document.getElementById('tipo-grafico');
+if (selectTipoGrafico) {
+    selectTipoGrafico.addEventListener('change', (e) => {
+        const elBairro = document.getElementById('popup-bairro');
+        const bairroAtual = elBairro ? elBairro.textContent : '';
+        const pinAtual = pins.find(p => p.bairro === bairroAtual);
+        if (pinAtual) renderizarGrafico(pinAtual, e.target.value);
+    });
+}
 
 // ==========================================
 // FUNÇÕES DE FILTRO E VISUALIZAÇÃO DE APRESENTAÇÕES

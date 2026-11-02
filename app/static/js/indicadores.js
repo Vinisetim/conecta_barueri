@@ -274,64 +274,115 @@ if (modalOverlay) {
 }
 
 /* ══════════════════════════════════════
-   CONFIGURAÇÃO DO MAPA (LEAFLET)
+   CONFIGURAÇÃO DO MAPA (LEAFLET - TRAVAMENTO E LIMITES DESTACADOS)
    ══════════════════════════════════════ */
+const mapContainer = document.getElementById('map');
+if (mapContainer && typeof L !== 'undefined') {
+    // Barueri BBox e centro calibrado
+    const barueriBounds = [[-23.565, -46.985], [-23.455, -46.775]];
+    const barueriCenter = [-23.5080, -46.8760];
 
+    // Mapa travado estritamente no território de Barueri (não permite sair dele)
+    const map = L.map('map', {
+        center: barueriCenter,
+        zoom: 13,
+        minZoom: 12,
+        maxZoom: 16,
+        zoomControl: false,
+        maxBounds: barueriBounds,
+        maxBoundsViscosity: 1.0,
+        attributionControl: false
+    });
 
+    // Camada base OpenStreetMap (100% gratuita, sem marca d'água de API KEY)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxZoom: 19
+    }).addTo(map);
 
-const map = L.map('map', {
-    center: [-23.5030, -46.8750],
-    zoom: 14,
-    minZoom: 13,
-    maxZoom: 17,
-    zoomControl: false,
-    maxBounds: [
-        [-23.58, -46.95],
-        [-23.43, -46.78]
-    ],
-    maxBoundsViscosity: 1.0
-});
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-
-const layer=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-   maxZoom: 20
-})
-
-
-layer.addTo(map);
-/* ══════════════════════════════════════
-   CORREÇÃO DO MAPA APAGADO/CINZA
-   ══════════════════════════════════════ */
-// Executa imediatamente e repete após o carregamento total da janela
-// function forcarRenderizacaoMapa() {
-//     map.invalidateSize();
-// }
-
-
-
-
-
-
-// GEOJSON Barueri
-fetch('/static/data/barueri.geojson')
-    .then(response => response.json())
-    .then(data => {
-        const mundo = [[-90, -180], [-90, 180], [90, 180], [90, -180], [-90, -180]];
-        const barueri = data.features[0].geometry.coordinates[0];
-
-        L.polygon([mundo, barueri], {
-            color: 'none',
-            fillColor: '#0f172a',
-            fillOpacity: 0.55
-        }).addTo(map);
-
-        L.geoJSON(data, {
-            style: {
-                color: '#0052ff',
-                weight: 2.5,
-                fillColor: '#4d82ff',
-                fillOpacity: 0.25
+    // ============================================================
+    // GEOJSON: Limites marcados de azul + máscara externa translúcida
+    // ============================================================
+    fetch('/static/data/barueri.geojson')
+        .then(response => response.json())
+        .then(geoData => {
+            const mundo = [[-90, -180], [-90, 180], [90, 180], [90, -180], [-90, -180]];
+            let polyHoles = [];
+            if (geoData.features && geoData.features.length > 0) {
+                geoData.features.forEach(feat => {
+                    const geom = feat.geometry;
+                    if (geom.type === 'Polygon') {
+                        polyHoles.push(geom.coordinates[0].map(pt => [pt[1], pt[0]]));
+                    } else if (geom.type === 'MultiPolygon') {
+                        geom.coordinates.forEach(poly => {
+                            polyHoles.push(poly[0].map(pt => [pt[1], pt[0]]));
+                        });
+                    }
+                });
             }
-        }).addTo(map);
-    })
-    .catch(err => console.error("Erro ao carregar o GeoJSON do mapa:", err));
+
+            // 1º Máscara branca no exterior para isolar o território com destaque (como no mockup)
+            if (polyHoles.length > 0) {
+                polyHoles.forEach(hole => {
+                    L.polygon([mundo, hole], {
+                        color: 'none',
+                        fillColor: '#ffffff',
+                        fillOpacity: 0.82,
+                        interactive: false
+                    }).addTo(map);
+                });
+            }
+
+            // 2º Limites marcados de azul vibrante e preenchimento suave
+            L.geoJSON(geoData, {
+                style: {
+                    color: '#0052ff', // Linha azul nítida
+                    weight: 3,
+                    opacity: 1,
+                    fillColor: '#38bdf8', // Azul claro destacado
+                    fillOpacity: 0.16
+                },
+                interactive: false
+            }).addTo(map);
+        })
+        .catch(err => console.error("Erro ao carregar o GeoJSON do mapa:", err));
+
+    // ============================================================
+    // PINS NO MAPA COM BADGES ESTILO GOOGLE MAPS / MOCKUP
+    // ============================================================
+    const pinsBairros = [
+        { bairro: 'Parque dos Camargos', modulo: 'Saúde',         bg: '#eff6ff', color: '#2563eb', icone: 'bi-heart-pulse-fill',   lat: -23.5234, lng: -46.8789 },
+        { bairro: 'Alphaville',          modulo: 'Segurança',     bg: '#f0fdf4', color: '#16a34a', icone: 'bi-shield-fill-check',  lat: -23.4927, lng: -46.8508 },
+        { bairro: 'Engenho Novo',        modulo: 'Educação',      bg: '#faf5ff', color: '#7c3aed', icone: 'bi-mortarboard-fill',   lat: -23.5123, lng: -46.8934 },
+        { bairro: 'Centro',              modulo: 'Mobilidade',    bg: '#fef3c7', color: '#d97706', icone: 'bi-car-front-fill',     lat: -23.5044, lng: -46.8756 },
+        { bairro: 'Aldeia da Serra',     modulo: 'Meio Ambiente', bg: '#f0fdf4', color: '#15803d', icone: 'bi-tree-fill',          lat: -23.5389, lng: -46.8923 },
+        { bairro: 'Jardim Mutinga',      modulo: 'Assist. Social', bg: '#fff1f2', color: '#e11d48', icone: 'bi-people-fill',       lat: -23.5156, lng: -46.8612 }
+    ];
+
+    pinsBairros.forEach(pin => {
+        const iconeHTML = L.divIcon({
+            className: 'map-pin-div-wrapper',
+            html: `
+                <div class="map-pin-badge" style="display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.96); border:2px solid ${pin.color}; border-radius:9999px; padding:3px 10px 3px 4px; box-shadow:0 4px 14px rgba(0,0,0,0.22); cursor:pointer; white-space:nowrap; transition:transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                    <div style="width:22px; height:22px; border-radius:50%; background:${pin.color}; color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px;">
+                        <i class="bi ${pin.icone}"></i>
+                    </div>
+                    <span style="font-size:12px; font-weight:700; color:#0f172a;">${pin.bairro}</span>
+                </div>
+            `,
+            iconSize: [130, 32],
+            iconAnchor: [65, 16]
+        });
+
+        const marker = L.marker([pin.lat, pin.lng], { icon: iconeHTML }).addTo(map);
+
+        marker.on('click', (e) => {
+            if (e && e.originalEvent) L.DomEvent.stopPropagation(e);
+            if (typeof openModal === 'function') {
+                openModal(pin.bairro, pin.modulo, pin.bg, pin.color);
+            }
+        });
+    });
+}

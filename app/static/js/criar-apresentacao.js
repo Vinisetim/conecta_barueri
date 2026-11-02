@@ -440,6 +440,12 @@ document.addEventListener("DOMContentLoaded", function() {
             const logoHtml = buildLogosHtml(slide, true);
             const pinCount = (slide.mapaPins || []).length;
             const regiaoNome = (slide.mapaTipo === 'brasil') ? 'Brasil' : 'Barueri';
+            const defaultTextColor = '#0f172a';
+            const defaultSubColor = '#64748b';
+            const textColor = slide.corTitulo || defaultTextColor;
+            const subtextColor = slide.corSubtitulo || defaultSubColor;
+            const titleSize = slide.tamanhoTitulo ? (slide.tamanhoTitulo * 1.5) + 'px' : '5.5px';
+            const subtitleSize = slide.tamanhoSubtitulo ? (slide.tamanhoSubtitulo * 1.5) + 'px' : '3.8px';
             return `
                 <div style="width:100%; height:100%; position:relative; padding:3px 4px; display:flex; flex-direction:column; justify-content:space-between; background:#f0f9ff; box-sizing:border-box; overflow:hidden;">
                     <div style="position:absolute; inset:0; opacity:0.25; background-image: radial-gradient(#0284c7 1px, transparent 1px); background-size: 6px 6px;"></div>
@@ -1409,9 +1415,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const btnPrevSlide = document.getElementById("btnPrevSlide");
     const btnNextSlide = document.getElementById("btnNextSlide");
     const btnClosePreview = document.getElementById("btnClosePreview");
-    const btnToggleFullscreen = document.getElementById("btnToggleFullscreen");
     const previewSlideCounter = document.getElementById("previewSlideCounter");
-
     const canvasStage = document.querySelector(".canvas-stage");
 
     function atualizarPreviewNavegacao() {
@@ -1423,14 +1427,30 @@ document.addEventListener("DOMContentLoaded", function() {
 
         if (btnPrevSlide) {
             btnPrevSlide.disabled = (currentIndex === 0);
-            btnPrevSlide.style.opacity = (currentIndex === 0) ? "0.4" : "1";
-            btnPrevSlide.style.cursor = (currentIndex === 0) ? "not-allowed" : "pointer";
         }
 
         if (btnNextSlide) {
             btnNextSlide.disabled = (currentIndex === total - 1);
-            btnNextSlide.style.opacity = (currentIndex === total - 1) ? "0.4" : "1";
-            btnNextSlide.style.cursor = (currentIndex === total - 1) ? "not-allowed" : "pointer";
+        }
+    }
+
+    function navegarSlidePreview(delta) {
+        const currentIndex = slides.findIndex(s => s.id === activeSlideId);
+        const nextIndex = currentIndex + delta;
+        if (nextIndex >= 0 && nextIndex < slides.length) {
+            activeSlideId = slides[nextIndex].id;
+            renderThumbnails();
+            renderActiveSlide();
+            atualizarPreviewNavegacao();
+
+            setTimeout(() => {
+                const curSlide = slides.find(s => s.id === activeSlideId);
+                if (curSlide && curSlide.template === "mapa" && slideMapInstance) {
+                    slideMapInstance.invalidateSize();
+                } else if (curSlide && curSlide.template === "grafico" && slideChartInstance) {
+                    slideChartInstance.resize();
+                }
+            }, 180);
         }
     }
 
@@ -1444,32 +1464,47 @@ document.addEventListener("DOMContentLoaded", function() {
         // 2. Limpa estilos inline fixos para permitir a responsividade 16:9 máxima
         activeSlideSurface.style.maxWidth = "none";
         activeSlideSurface.style.maxHeight = "none";
+        activeSlideSurface.style.width = "100%";
+        activeSlideSurface.style.height = "100%";
 
-        // 3. Exibe o modal
+        // 3. Exibe o modal ocupando a tela toda (tela preta total com barra no topo)
         previewModal.style.display = "flex";
         atualizarPreviewNavegacao();
 
-        const curSlide = slides.find(s => s.id === activeSlideId);
-        if (curSlide && curSlide.template === "mapa") {
-            setTimeout(() => {
-                if (slideMapInstance) slideMapInstance.invalidateSize();
-            }, 250);
-        }
-
         // 4. Solicita tela cheia nativa do navegador
         try {
-            if (!document.fullscreenElement) {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
                 if (previewModal.requestFullscreen) {
                     await previewModal.requestFullscreen();
                 } else if (previewModal.webkitRequestFullscreen) {
                     await previewModal.webkitRequestFullscreen();
                 } else if (previewModal.msRequestFullscreen) {
                     await previewModal.msRequestFullscreen();
+                } else if (document.documentElement.requestFullscreen) {
+                    await document.documentElement.requestFullscreen();
                 }
             }
         } catch (err) {
             console.warn("Fullscreen request blocked or not permitted:", err);
         }
+
+        // 5. Redimensiona mapas e gráficos após a transição
+        setTimeout(() => {
+            const curSlide = slides.find(s => s.id === activeSlideId);
+            if (curSlide && curSlide.template === "mapa" && slideMapInstance) {
+                slideMapInstance.invalidateSize();
+            } else if (curSlide && curSlide.template === "grafico" && slideChartInstance) {
+                slideChartInstance.resize();
+            }
+        }, 220);
+        setTimeout(() => {
+            const curSlide = slides.find(s => s.id === activeSlideId);
+            if (curSlide && curSlide.template === "mapa" && slideMapInstance) {
+                slideMapInstance.invalidateSize();
+            } else if (curSlide && curSlide.template === "grafico" && slideChartInstance) {
+                slideChartInstance.resize();
+            }
+        }, 550);
     }
 
     async function fecharModoApresentacao() {
@@ -1495,16 +1530,17 @@ document.addEventListener("DOMContentLoaded", function() {
             canvasStage.appendChild(activeSlideSurface);
             activeSlideSurface.style.maxWidth = "660px";
             activeSlideSurface.style.maxHeight = "100%";
+            activeSlideSurface.style.width = "100%";
             activeSlideSurface.style.height = "auto";
             activeSlideSurface.style.borderRadius = "var(--radius-lg)";
             activeSlideSurface.style.boxShadow = "0 6px 20px rgba(0, 0, 0, 0.06)";
         }
 
         const curSlideClosed = slides.find(s => s.id === activeSlideId);
-        if (curSlideClosed && curSlideClosed.template === "mapa") {
-            setTimeout(() => {
-                if (slideMapInstance) slideMapInstance.invalidateSize();
-            }, 250);
+        if (curSlideClosed && curSlideClosed.template === "mapa" && slideMapInstance) {
+            setTimeout(() => { slideMapInstance.invalidateSize(); }, 250);
+        } else if (curSlideClosed && curSlideClosed.template === "grafico" && slideChartInstance) {
+            setTimeout(() => { slideChartInstance.resize(); }, 250);
         }
     }
 
@@ -1517,60 +1553,39 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     if (btnPrevSlide) {
-        btnPrevSlide.addEventListener("click", () => {
-            const currentIndex = slides.findIndex(s => s.id === activeSlideId);
-            if (currentIndex > 0) {
-                activeSlideId = slides[currentIndex - 1].id;
-                renderThumbnails();
-                renderActiveSlide();
-                atualizarPreviewNavegacao();
-            }
-        });
+        btnPrevSlide.addEventListener("click", () => navegarSlidePreview(-1));
     }
 
     if (btnNextSlide) {
-        btnNextSlide.addEventListener("click", () => {
-            const currentIndex = slides.findIndex(s => s.id === activeSlideId);
-            if (currentIndex < slides.length - 1) {
-                activeSlideId = slides[currentIndex + 1].id;
-                renderThumbnails();
-                renderActiveSlide();
-                atualizarPreviewNavegacao();
-            }
-        });
+        btnNextSlide.addEventListener("click", () => navegarSlidePreview(1));
     }
 
-    if (btnToggleFullscreen) {
-        btnToggleFullscreen.addEventListener("click", async () => {
-            if (!document.fullscreenElement) {
-                try {
-                    if (previewModal.requestFullscreen) await previewModal.requestFullscreen();
-                } catch (e) {
-                    console.warn(e);
-                }
-            } else {
-                try {
-                    if (document.exitFullscreen) await document.exitFullscreen();
-                } catch (e) {
-                    console.warn(e);
-                }
-            }
-        });
-    }
-
-    // Monitora evento de saída de tela cheia (ex: usuário pressionou ESC no teclado)
-    document.addEventListener("fullscreenchange", () => {
-        const icon = btnToggleFullscreen ? btnToggleFullscreen.querySelector("i") : null;
-        if (icon) {
-            if (document.fullscreenElement) {
-                icon.className = "bi bi-fullscreen-exit";
-            } else {
-                icon.className = "bi bi-arrows-fullscreen";
-            }
-        }
-        // Se saiu de tela cheia mas o modal ainda está aberto, o usuário fechou pelo ESC nativo
-        if (!document.fullscreenElement && previewModal && previewModal.style.display === "flex") {
+    // Monitora evento de saída de tela cheia (ex: tecla ESC nativa do navegador)
+    const onFullscreenChangeHandler = () => {
+        if (!document.fullscreenElement && !document.webkitFullscreenElement && previewModal && previewModal.style.display === "flex") {
             fecharModoApresentacao();
+        } else if ((document.fullscreenElement || document.webkitFullscreenElement) && previewModal && previewModal.style.display === "flex") {
+            setTimeout(() => {
+                const curSlide = slides.find(s => s.id === activeSlideId);
+                if (curSlide && curSlide.template === "mapa" && slideMapInstance) {
+                    slideMapInstance.invalidateSize();
+                } else if (curSlide && curSlide.template === "grafico" && slideChartInstance) {
+                    slideChartInstance.resize();
+                }
+            }, 200);
+        }
+    };
+    document.addEventListener("fullscreenchange", onFullscreenChangeHandler);
+    document.addEventListener("webkitfullscreenchange", onFullscreenChangeHandler);
+
+    window.addEventListener("resize", () => {
+        if (previewModal && previewModal.style.display === "flex") {
+            const curSlide = slides.find(s => s.id === activeSlideId);
+            if (curSlide && curSlide.template === "mapa" && slideMapInstance) {
+                slideMapInstance.invalidateSize();
+            } else if (curSlide && curSlide.template === "grafico" && slideChartInstance) {
+                slideChartInstance.resize();
+            }
         }
     });
 
@@ -1579,22 +1594,10 @@ document.addEventListener("DOMContentLoaded", function() {
         if (previewModal && previewModal.style.display === "flex") {
             if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") {
                 e.preventDefault();
-                const currentIndex = slides.findIndex(s => s.id === activeSlideId);
-                if (currentIndex < slides.length - 1) {
-                    activeSlideId = slides[currentIndex + 1].id;
-                    renderThumbnails();
-                    renderActiveSlide();
-                    atualizarPreviewNavegacao();
-                }
+                navegarSlidePreview(1);
             } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
                 e.preventDefault();
-                const currentIndex = slides.findIndex(s => s.id === activeSlideId);
-                if (currentIndex > 0) {
-                    activeSlideId = slides[currentIndex - 1].id;
-                    renderThumbnails();
-                    renderActiveSlide();
-                    atualizarPreviewNavegacao();
-                }
+                navegarSlidePreview(-1);
             } else if (e.key === "Escape") {
                 e.preventDefault();
                 fecharModoApresentacao();
@@ -2045,17 +2048,23 @@ document.addEventListener("DOMContentLoaded", function() {
         mostrarToastNotificacao("Mídia aplicada ao slide com sucesso!");
     };
 
-    window.aplicarTextoAcervo = function(campoAlvo, valor, campoId) {
+        window.aplicarTextoAcervo = function(campoAlvo, valor, campoId) {
         const slide = slides.find(s => s.id === activeSlideId);
         if (!slide) return;
         if (!slide.origens_campos) slide.origens_campos = {};
 
         if (campoAlvo === 'titulo') {
             slide.titulo = valor;
-            if (inputTitulo) inputTitulo.value = valor;
+            if (inputTitulo) {
+                inputTitulo.value = valor;
+                try { inputTitulo.dispatchEvent(new Event('input', { bubbles: true })); } catch(e){}
+            }
         } else {
             slide.subtitulo = valor;
-            if (inputSubtitulo) inputSubtitulo.value = valor;
+            if (inputSubtitulo) {
+                inputSubtitulo.value = valor;
+                try { inputSubtitulo.dispatchEvent(new Event('input', { bubbles: true })); } catch(e){}
+            }
         }
         slide.origens_campos[campoAlvo] = campoId;
 
