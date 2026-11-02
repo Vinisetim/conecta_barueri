@@ -76,14 +76,14 @@ def criar_apresentacao():
             except (ValueError, TypeError):
                 pass
         tpl_arg = (request.args.get('template') or '').strip()
-        if tpl_arg in ('capa', 'indicadores', 'grafico', 'imagem_texto'):
+        if tpl_arg in ('capa', 'indicadores', 'grafico', 'imagem_texto', 'mapa'):
             form.template_inicial.data = tpl_arg
 
     if form.validate_on_submit():
         nome_ap = form.nome.data.strip()
         proj_id = form.projeto_id.data
         tpl_escolhido = (form.template_inicial.data or request.args.get('template') or 'capa').strip()
-        if tpl_escolhido not in ('capa', 'indicadores', 'grafico', 'imagem_texto'):
+        if tpl_escolhido not in ('capa', 'indicadores', 'grafico', 'imagem_texto', 'mapa'):
             tpl_escolhido = 'capa'
 
         # Criação da entidade Apresentacao apontando para a pasta (projeto_id) escolhida
@@ -113,7 +113,7 @@ def criar_apresentacao():
                 'capa': 'Apresentação Executiva - Indicadores Municipais',
                 'indicadores': 'Plataforma integrada de dados da cidade.',
                 'grafico': 'Evolução no número de atendimentos e métricas setoriais.',
-                'imagem_texto': 'Resumo comparativo dos principais dados socioeconômicos.'
+                'imagem_texto': 'Resumo comparativo dos principais dados socioeconômicos.', 'mapa': 'Mapeamento territorial e indicadores por região.'
             }
 
             campos_iniciais = [
@@ -394,6 +394,10 @@ def editar_apresentacao(id):
                 slide_dict[campo.chave_campo] = val
 
         slides_iniciais.append(slide_dict)
+
+    tpl_query = (request.args.get('template') or '').strip()
+    if tpl_query in ('capa', 'indicadores', 'grafico', 'imagem_texto', 'mapa') and len(slides_iniciais) == 1:
+        slides_iniciais[0]['template'] = tpl_query
 
     if not slides_iniciais:
         slides_iniciais = [{

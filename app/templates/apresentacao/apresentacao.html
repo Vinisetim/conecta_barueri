@@ -80,7 +80,7 @@
             </div>
         </a>
 
-        <!-- CARDS DINÂMICOS DO BANCO DE DADOS -->
+        <!-- CARDS DINÂMICOS DO BANCO DE DADOS (MÁXIMO 5 VISÍVEIS POR VEZ) -->
         {% for ap in apresentacoes %}
             {% set cor_tema = ap.projeto.capa_uri if (ap.projeto and ap.projeto.capa_uri and ap.projeto.capa_uri.startswith('#')) else '#0d6efd' %}
             {% set qtd_slides = ap.slides|length %}
@@ -102,7 +102,8 @@
                 class="ap-card-item"
                 data-status="{{ status_ap }}"
                 data-modulo="proj-{{ ap.projeto_id }}"
-                data-title="{{ ap.nome }} {{ nome_pasta }} {{ ns.subtitulo_capa }}" {% if loop.index > 5 %}style="display: none;"{% endif %}
+                data-title="{{ ap.nome }} {{ nome_pasta }} {{ ns.subtitulo_capa }}"
+                {% if loop.index > 5 %}style="display: none;"{% endif %}
             >
                 <!-- TOPO COLORIDO COM A COR DO PROJETO / PASTA DO BANCO -->
                 <div class="card-thumb" style="background: linear-gradient(135deg, {{ cor_tema }} 0%, #07194f 135%);">
@@ -224,6 +225,15 @@
                 <div class="quick-card-text">
                     <strong>Imagem + Texto</strong>
                     <span>Registro fotográfico de obras e entregas</span>
+                </div>
+                <i class="bi bi-chevron-right quick-card-arrow"></i>
+            </a>
+
+            <a href="{{ url_for('apresentacao.criar_apresentacao') }}?template=mapa" class="template-quick-card">
+                <div class="quick-card-icon teal"><i class="bi bi-geo-alt-fill"></i></div>
+                <div class="quick-card-text">
+                    <strong>Mapa Interativo</strong>
+                    <span>Mapeamento territorial e pins por bairro</span>
                 </div>
                 <i class="bi bi-chevron-right quick-card-arrow"></i>
             </a>

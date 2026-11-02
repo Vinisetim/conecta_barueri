@@ -95,6 +95,7 @@ document.addEventListener("DOMContentLoaded", function() {
         "corSubtitulo": "#64748b"
     }];
 
+    if (urlParams.get('template') && slides.length === 1) { slides[0].template = initialTemplate; }
     window.apresentacaoId = initData.apresentacaoId !== undefined ? initData.apresentacaoId : null;
     window.projetoId = initData.projetoId !== undefined ? initData.projetoId : null;
     const salvarUrl = initData.salvarUrl || "/apresentacao/salvar";
