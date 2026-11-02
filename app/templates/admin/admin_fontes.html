@@ -80,46 +80,77 @@ Fontes de dados | Conecta Barueri
 
         </div>
 
-        <!-- PAGINAÇÃO -->
+        <!-- PAGINAÇÃO (MÁXIMO 5 POR ABA) -->
+        <div class="fontes-pagination">
 
-<div class="fontes-pagination">
+            <span id="contadorFontes" class="fontes-pagination-info">
+                0 fonte(s) cadastrada(s)
+            </span>
 
-    <span class="fontes-pagination-info">
-        1-6 de 24
-    </span>
+            <div class="fontes-pages" id="paginacaoFontes">
+                <a href="#" class="active" onclick="return false;">1</a>
+            </div>
 
-    <div class="fontes-pages">
+        </div>
 
-        <a href="#">
-            <i class="bi bi-chevron-left"></i>
-        </a>
-
-        <a href="#" class="active">
-            1
-        </a>
-
-        <a href="#">
-            2
-        </a>
-
-        <a href="#">
-            3
-        </a>
-
-        <a href="#">
-            4
-        </a>
-
-        <a href="#">
-            <i class="bi bi-chevron-right"></i>
-        </a>
-
-    </div>
-
-</div>
     </section>
 
 </section>
+
+<!-- MODAL DE CRIAÇÃO / EDIÇÃO DE FONTE DE DADOS -->
+<div id="modalFonte" class="fonte-modal-overlay" aria-hidden="true">
+    <div class="fonte-modal-box">
+        <div class="fonte-modal-header">
+            <h2 id="modalFonteTitulo">Nova Fonte de Dados</h2>
+            <button type="button" class="fonte-modal-close" id="btnFecharModalFonte" aria-label="Fechar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <form id="formFonte">
+            <input type="hidden" id="fonteIndex" value="">
+
+            <div class="fonte-modal-body">
+                <div class="fonte-form-group">
+                    <label for="fonteNome">Nome da fonte *</label>
+                    <input
+                        type="text"
+                        id="fonteNome"
+                        placeholder="Ex.: Portal da Transparência"
+                        required
+                    >
+                </div>
+
+                <div class="fonte-form-group">
+                    <label for="fonteDescricao">Descrição *</label>
+                    <input
+                        type="text"
+                        id="fonteDescricao"
+                        placeholder="Ex.: Dados orçamentários e administrativos"
+                        required
+                    >
+                </div>
+
+                <div class="fonte-form-group">
+                    <label for="fonteStatus">Status da conexão</label>
+                    <select id="fonteStatus">
+                        <option value="Conectado">Conectado</option>
+                        <option value="Erro">Erro</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="fonte-modal-footer">
+                <button type="button" class="fonte-btn-cancel" id="btnCancelarModalFonte">
+                    Cancelar
+                </button>
+                <button type="submit" class="fonte-btn-save">
+                    Salvar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
 <script
     src="{{ url_for('static', filename='js/fontes.js') }}"

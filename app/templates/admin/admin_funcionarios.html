@@ -20,7 +20,7 @@ Funcionários | Conecta Barueri
 
         <div>
             <h1>Funcionários</h1>
-            <p>Gerencie os funcionários cadastrados no banco de dados da plataforma</p>
+            <p>Gerencie os funcionários da plataforma</p>
         </div>
 
     </header>
@@ -62,7 +62,7 @@ Funcionários | Conecta Barueri
             id="btnAdicionar"
             class="funcionarios-add"
             type="button"
-            title="Adicionar novo funcionário no banco de dados"
+            title="Adicionar novo funcionário"
             aria-label="Adicionar funcionário"
         >
             <i class="bi bi-plus-lg"></i>
@@ -91,7 +91,7 @@ Funcionários | Conecta Barueri
                 </thead>
 
                 <tbody id="funcionariosBody">
-                    {% for u in usuarios %}
+                    {% for u in usuarios[:5] %}
                     <tr>
                         <td>
                             <div class="func-user-cell">
@@ -144,7 +144,7 @@ Funcionários | Conecta Barueri
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="6">Nenhum funcionário encontrado no banco de dados.</td>
+                        <td colspan="6">Nenhum funcionário encontrado.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -153,14 +153,14 @@ Funcionários | Conecta Barueri
 
         </div>
 
-        <!-- PAGINAÇÃO / RODAPÉ DE CONTAGEM REAL -->
+        <!-- PAGINAÇÃO (MÁXIMO 5 POR ABA) -->
         <div class="funcionarios-pagination">
 
             <span id="contadorFuncionarios">
-                {{ usuarios|length }} funcionário(s) cadastrado(s) no banco de dados
+                {{ usuarios|length }} funcionário(s) cadastrado(s)
             </span>
 
-            <div class="fontes-pages">
+            <div class="fontes-pages" id="paginacaoFuncionarios">
                 <a href="#" class="active" onclick="return false;">1</a>
             </div>
 
@@ -170,7 +170,7 @@ Funcionários | Conecta Barueri
 
 </section>
 
-<!-- MODAL DE CRIAÇÃO / EDIÇÃO DE FUNCIONÁRIO NO BANCO DE DADOS -->
+<!-- MODAL DE CRIAÇÃO / EDIÇÃO DE FUNCIONÁRIO -->
 <div id="modalFuncionario" class="func-modal-overlay" aria-hidden="true">
     <div class="func-modal-box">
         <div class="func-modal-header">
@@ -237,7 +237,7 @@ Funcionários | Conecta Barueri
                     Cancelar
                 </button>
                 <button type="submit" class="func-btn-save" id="btnSalvarModalFunc">
-                    Salvar no Banco
+                    Salvar
                 </button>
             </div>
         </form>

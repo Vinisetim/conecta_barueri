@@ -1,10 +1,13 @@
 // ========================================
-// DADOS REAIS DO BANCO DE DADOS POSTGRESQL
+// DADOS DOS FUNCIONÁRIOS E PAGINAÇÃO (MÁX. 5 POR ABA)
 // ========================================
 
 let funcionarios = Array.isArray(window.FUNCIONARIOS_DB)
     ? window.FUNCIONARIOS_DB
     : [];
+
+const ITENS_POR_PAGINA = 5;
+let paginaAtual = 1;
 
 // ========================================
 // CLASSES DOS BADGES
@@ -41,7 +44,54 @@ function obterIniciais(nome) {
 }
 
 // ========================================
-// RENDERIZAR TABELA COM FILTROS
+// NAVEGAÇÃO ENTRE ABAS (PAGINAÇÃO)
+// ========================================
+
+function irParaPagina(novaPagina) {
+    paginaAtual = novaPagina;
+    renderizarTabela();
+}
+
+function renderizarPaginacao(totalItens) {
+    const paginacaoContainer = document.getElementById("paginacaoFuncionarios");
+    if (!paginacaoContainer) return;
+
+    const totalPaginas = Math.max(1, Math.ceil(totalItens / ITENS_POR_PAGINA));
+    if (paginaAtual > totalPaginas) paginaAtual = totalPaginas;
+    if (paginaAtual < 1) paginaAtual = 1;
+
+    let htmlPaginas = "";
+
+    if (totalPaginas > 1 && paginaAtual > 1) {
+        htmlPaginas += `
+            <a href="#" onclick="irParaPagina(${paginaAtual - 1}); return false;" title="Aba anterior">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+        `;
+    }
+
+    for (let p = 1; p <= totalPaginas; p++) {
+        const classeAtiva = p === paginaAtual ? "active" : "";
+        htmlPaginas += `
+            <a href="#" class="${classeAtiva}" onclick="irParaPagina(${p}); return false;">
+                ${p}
+            </a>
+        `;
+    }
+
+    if (totalPaginas > 1 && paginaAtual < totalPaginas) {
+        htmlPaginas += `
+            <a href="#" onclick="irParaPagina(${paginaAtual + 1}); return false;" title="Próxima aba">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+        `;
+    }
+
+    paginacaoContainer.innerHTML = htmlPaginas;
+}
+
+// ========================================
+// RENDERIZAR TABELA COM FILTROS E ABAS
 // ========================================
 
 function renderizarTabela() {
@@ -70,11 +120,21 @@ function renderizarTabela() {
         return pesquisaOk && perfilOk && statusOk;
     });
 
+    const totalPaginas = Math.max(1, Math.ceil(funcionariosFiltrados.length / ITENS_POR_PAGINA));
+    if (paginaAtual > totalPaginas) paginaAtual = totalPaginas;
+    if (paginaAtual < 1) paginaAtual = 1;
+
+    const inicio = (paginaAtual - 1) * ITENS_POR_PAGINA;
+    const fim = inicio + ITENS_POR_PAGINA;
+    const funcionariosPagina = funcionariosFiltrados.slice(inicio, fim);
+
     if (contadorEl) {
-        contadorEl.textContent = `${funcionariosFiltrados.length} funcionário(s) exibido(s) de ${funcionarios.length} no banco de dados`;
+        contadorEl.textContent = `${funcionariosFiltrados.length} funcionário(s) cadastrado(s)`;
     }
 
-    if (funcionariosFiltrados.length === 0) {
+    renderizarPaginacao(funcionariosFiltrados.length);
+
+    if (funcionariosPagina.length === 0) {
         tbody.innerHTML = `
             <tr>
                 <td colspan="6">Nenhum funcionário encontrado para os filtros selecionados.</td>
@@ -83,7 +143,7 @@ function renderizarTabela() {
         return;
     }
 
-    funcionariosFiltrados.forEach(funcionario => {
+    funcionariosPagina.forEach(funcionario => {
         const iniciais = funcionario.iniciais || obterIniciais(funcionario.nome);
         const equipeTexto = funcionario.equipe || "Sem pastas";
 
@@ -137,7 +197,7 @@ function renderizarTabela() {
 }
 
 // ========================================
-// MODAL DE ADICIONAR / EDITAR NO BANCO
+// MODAL DE ADICIONAR / EDITAR
 // ========================================
 
 const modalOverlay = document.getElementById("modalFuncionario");
@@ -228,7 +288,7 @@ async function salvarFuncionarioNoBanco(event) {
         const dados = await resposta.json();
 
         if (!resposta.ok || dados.status !== "sucesso") {
-            alert(dados.mensagem || "Não foi possível salvar o funcionário no banco de dados.");
+            alert(dados.mensagem || "Não foi possível salvar o funcionário.");
             return;
         }
 
@@ -239,30 +299,32 @@ async function salvarFuncionarioNoBanco(event) {
             }
         } else if (dados.usuario) {
             funcionarios.push(dados.usuario);
+            // Ao adicionar um novo usuário (ex.: 6º usuário), navega para a última aba criada
+            paginaAtual = Math.ceil(funcionarios.length / ITENS_POR_PAGINA);
         }
 
         fecharModalFuncionario();
         renderizarTabela();
     } catch (erro) {
         console.error("Erro ao salvar funcionário:", erro);
-        alert("Erro de comunicação ao tentar salvar no banco de dados.");
+        alert("Erro de comunicação ao tentar salvar.");
     } finally {
         if (btnSalvarModal) {
             btnSalvarModal.disabled = false;
-            btnSalvarModal.textContent = "Salvar no Banco";
+            btnSalvarModal.textContent = "Salvar";
         }
     }
 }
 
 // ========================================
-// EXCLUIR DO BANCO DE DADOS
+// EXCLUIR FUNCIONÁRIO
 // ========================================
 
 async function excluirFuncionario(id) {
     const funcionario = funcionarios.find(f => Number(f.id) === Number(id));
     const nomeExibicao = funcionario ? funcionario.nome : `#${id}`;
 
-    const confirmar = confirm(`Deseja realmente excluir o funcionário "${nomeExibicao}" do banco de dados?`);
+    const confirmar = confirm(`Deseja realmente excluir o funcionário "${nomeExibicao}"?`);
     if (!confirmar) return;
 
     try {
@@ -284,7 +346,7 @@ async function excluirFuncionario(id) {
         renderizarTabela();
     } catch (erro) {
         console.error("Erro ao excluir funcionário:", erro);
-        alert("Erro de comunicação ao tentar excluir do banco de dados.");
+        alert("Erro de comunicação ao tentar excluir.");
     }
 }
 
@@ -302,9 +364,18 @@ modalOverlay?.addEventListener("click", e => {
 
 formFuncionario?.addEventListener("submit", salvarFuncionarioNoBanco);
 
-document.getElementById("pesquisaFuncionario")?.addEventListener("keyup", renderizarTabela);
-document.getElementById("filtroPerfil")?.addEventListener("change", renderizarTabela);
-document.getElementById("filtroStatus")?.addEventListener("change", renderizarTabela);
+document.getElementById("pesquisaFuncionario")?.addEventListener("keyup", () => {
+    paginaAtual = 1;
+    renderizarTabela();
+});
+document.getElementById("filtroPerfil")?.addEventListener("change", () => {
+    paginaAtual = 1;
+    renderizarTabela();
+});
+document.getElementById("filtroStatus")?.addEventListener("change", () => {
+    paginaAtual = 1;
+    renderizarTabela();
+});
 
 // ========================================
 // INICIALIZAÇÃO
