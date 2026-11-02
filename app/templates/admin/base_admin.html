@@ -170,20 +170,28 @@
                     <i class="bi bi-list"></i>
                 </button>
 
-                <div class="topbar-actions admin-user-area">
+                <a href="{{ url_for('app.perfil') }}" class="topbar-actions admin-user-area" style="text-decoration: none; cursor: pointer;" title="Ver meu perfil">
 
-                    <div class="admin-avatar">AD</div>
-
-                    <div class="admin-user-info">
-                        <strong>Administrador</strong>
-                        <span>Super Administrador</span>
+                    <div class="admin-avatar">
+                        {{ current_user.iniciais if current_user.is_authenticated else 'AD' }}
                     </div>
 
-                    <button class="profile-dropdown" type="button">
-                        <i class="bi bi-chevron-down"></i>
-                    </button>
+                    <div class="admin-user-info">
+                        <strong>{{ current_user.nome if current_user.is_authenticated and current_user.nome else 'Usuário' }}</strong>
+                        <span>
+                            {% if current_user.is_authenticated %}
+                                {{ 'Super Administrador' if current_user.admin else 'Editor Institucional' }}
+                            {% else %}
+                                Visitante
+                            {% endif %}
+                        </span>
+                    </div>
 
-                </div>
+                    <div class="profile-dropdown">
+                        <i class="bi bi-chevron-down"></i>
+                    </div>
+
+                </a>
 
             </header>
 

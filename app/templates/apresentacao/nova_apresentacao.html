@@ -73,6 +73,15 @@
                     {% endif %}
                 </div>
 
+                <!-- CAMPO: TEMPLATE DO PRIMEIRO SLIDE -->
+                <div class="mb-4">
+                    <label for="{{ form.template_inicial.id }}" class="form-label">
+                        {{ form.template_inicial.label.text }}
+                    </label>
+                    {{ form.template_inicial(class="form-select") }}
+                    <small class="text-muted d-block mt-1">Escolha com qual modelo homologado sua apresentação deve começar.</small>
+                </div>
+
                 <!-- AÇÕES DO FORMULÁRIO -->
                 <div class="d-flex justify-content-end align-items-center gap-3 mt-4 pt-3 border-top">
                     <a href="{{ url_for('apresentacao.apresentacao') }}" class="btn btn-outline-secondary btn-cancelar">

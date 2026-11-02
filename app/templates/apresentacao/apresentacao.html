@@ -28,24 +28,23 @@
         </div>
     </div>
 
-    <!-- BARRA DE FILTROS E PESQUISA (PADRÃO ADMIN_PROJETOS) -->
+    <!-- BARRA DE FILTROS E PESQUISA -->
     <div class="filters-bar">
         <div class="search-box">
             <i class="bi bi-search"></i>
             <input
                 type="text"
                 id="searchInput"
-                placeholder="Buscar por título, projeto ou secretaria..."
+                placeholder="Buscar por título, projeto ou pasta..."
                 oninput="filterCards()"
             >
         </div>
 
         <select class="filter-select" id="moduloFilter" onchange="filterCards()">
-            <option value="">Todas as Secretarias</option>
-            <option value="saude">Saúde</option>
-            <option value="educacao">Educação</option>
-            <option value="seguranca">Segurança</option>
-            <option value="mobilidade">Mobilidade</option>
+            <option value="">Todos os Projetos (Pastas)</option>
+            {% for proj in projetos %}
+                <option value="proj-{{ proj.id }}">{{ proj.nome }}</option>
+            {% endfor %}
         </select>
 
         <select class="filter-select" id="statusFilter" onchange="filterCards()">
@@ -55,19 +54,19 @@
         </select>
 
         <div class="view-toggle">
-            <button class="view-btn active" id="gridBtn" type="button" onclick="setView('grid')">
+            <button class="view-btn active" id="gridBtn" type="button" onclick="setView('grid')" title="Grade">
                 <i class="bi bi-grid"></i>
             </button>
-            <button class="view-btn" id="listBtn" type="button" onclick="setView('list')">
+            <button class="view-btn" id="listBtn" type="button" onclick="setView('list')" title="Lista">
                 <i class="bi bi-list-ul"></i>
             </button>
         </div>
     </div>
 
-    <!-- GRID DE APRESENTAÇÕES -->
+    <!-- GRID DE APRESENTAÇÕES CONECTADO AO BANCO DE DADOS -->
     <div class="apresentacoes-grid" id="cardsGrid">
 
-        <!-- CARD 1: CARD DE AÇÃO PARA CRIAR NOVA APRESENTAÇÃO (REDIRECIONAMENTO) -->
+        <!-- CARD 1: CARD DE AÇÃO PARA CRIAR NOVA APRESENTAÇÃO -->
         <a href="{{ url_for('apresentacao.criar_apresentacao') }}" class="card-criar-novo" id="cardCriarNovo">
             <div class="card-criar-inner">
                 <div class="criar-icon-circle">
@@ -81,146 +80,101 @@
             </div>
         </a>
 
-        <!-- CARD 2: APRESENTAÇÃO DE SAÚDE -->
-        <article class="ap-card-item" data-status="published" data-modulo="saude" data-title="Painel Executivo — Atendimentos de Saúde">
-            <div class="card-thumb thumb-saude">
-                <div class="thumb-mockup">
-                    <div class="thumb-badge-tag"><i class="bi bi-heart-pulse-fill"></i> Saúde</div>
-                    <div class="mockup-elements">
-                        <div class="mock-metric">
-                            <span class="mock-val">8.735</span>
-                            <span class="mock-lbl">Atendimentos</span>
+        <!-- CARDS DINÂMICOS DO BANCO DE DADOS -->
+        {% for ap in apresentacoes %}
+            {% set cor_tema = ap.projeto.capa_uri if (ap.projeto and ap.projeto.capa_uri and ap.projeto.capa_uri.startswith('#')) else '#0d6efd' %}
+            {% set qtd_slides = ap.slides|length %}
+            {% set status_ap = 'published' if qtd_slides > 0 else 'draft' %}
+            {% set dono_ap = ap.projeto.dono if (ap.projeto and ap.projeto.dono) else current_user %}
+            {% set nome_pasta = ap.projeto.nome if ap.projeto else 'Projeto Geral' %}
+
+            {# Busca eventual subtítulo preenchido no primeiro slide da apresentação #}
+            {% set ns = namespace(subtitulo_capa='') %}
+            {% if ap.slides %}
+                {% for campo in ap.slides[0].campos %}
+                    {% if campo.chave_campo == 'subtitulo' and campo.valor_manual %}
+                        {% set ns.subtitulo_capa = campo.valor_manual %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+
+            <article
+                class="ap-card-item"
+                data-status="{{ status_ap }}"
+                data-modulo="proj-{{ ap.projeto_id }}"
+                data-title="{{ ap.nome }} {{ nome_pasta }} {{ ns.subtitulo_capa }}"
+            >
+                <!-- TOPO COLORIDO COM A COR DO PROJETO / PASTA DO BANCO -->
+                <div class="card-thumb" style="background: linear-gradient(135deg, {{ cor_tema }} 0%, #07194f 135%);">
+                    <div class="thumb-mockup">
+                        <div class="thumb-badge-tag">
+                            <i class="bi bi-folder2-open"></i> {{ nome_pasta }}
                         </div>
-                        <div class="mock-bars">
-                            <span style="height: 35%;"></span>
-                            <span style="height: 65%;"></span>
-                            <span style="height: 90%;"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card-body-ap">
-                <div class="card-meta-top">
-                    <span class="badge-modulo saude">Saúde</span>
-                    <span class="badge-status published"><i class="bi bi-check-circle-fill"></i> Publicada</span>
-                </div>
-
-                <h5 class="card-title">Painel Executivo — Atendimentos de Saúde</h5>
-                <p class="card-desc">Balanço quadrienal com dados integrados da rede de UBS e hospitais municipais.</p>
-
-                <div class="card-creator">
-                    <div class="creator-avatar saude">RG</div>
-                    <div class="creator-info">
-                        <div class="creator-name">Dr. Roberto Guimarães</div>
-                        <div class="creator-date"><i class="bi bi-clock"></i> Atualizado há 2 dias</div>
-                    </div>
-                </div>
-
-                <div class="card-footer-ap">
-                    <a href="{{ url_for('apresentacao.criar_apresentacao') }}" class="btn-card-action" title="Editar no Criador">
-                        <i class="bi bi-pencil-square"></i> Editar
-                    </a>
-                    <a href="{{ url_for('iniciar_apresentacao.iniciar_apresentacao') }}" class="btn-card-action secondary" title="Apresentar">
-                        <i class="bi bi-play-fill"></i> Iniciar
-                    </a>
-                </div>
-            </div>
-        </article>
-
-        <!-- CARD 3: APRESENTAÇÃO DE EDUCAÇÃO -->
-        <article class="ap-card-item" data-status="published" data-modulo="educacao" data-title="Indicadores de Educação & Escolas">
-            <div class="card-thumb thumb-educacao">
-                <div class="thumb-mockup">
-                    <div class="thumb-badge-tag"><i class="bi bi-mortarboard-fill"></i> Educação</div>
-                    <div class="mockup-elements">
-                        <div class="mock-metric">
-                            <span class="mock-val">98.2%</span>
-                            <span class="mock-lbl">Adesão Escolar</span>
-                        </div>
-                        <div class="mock-bars">
-                            <span style="height: 50%;"></span>
-                            <span style="height: 80%;"></span>
-                            <span style="height: 60%;"></span>
+                        <div class="mockup-elements">
+                            <div class="mock-metric">
+                                <span class="mock-val">{{ qtd_slides }}</span>
+                                <span class="mock-lbl">{{ 'Slide configurado' if qtd_slides == 1 else 'Slides configurados' }}</span>
+                            </div>
+                            <div class="mock-bars">
+                                <span style="height: 45%;"></span>
+                                <span style="height: 75%;"></span>
+                                <span style="height: 95%;"></span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="card-body-ap">
-                <div class="card-meta-top">
-                    <span class="badge-modulo educacao">Educação</span>
-                    <span class="badge-status published"><i class="bi bi-check-circle-fill"></i> Publicada</span>
-                </div>
+                <!-- CORPO DO CARD -->
+                <div class="card-body-ap">
+                    <div class="card-meta-top">
+                        <span class="badge-modulo" style="background: {{ cor_tema }}18; color: {{ cor_tema }}; border: 1px solid {{ cor_tema }}30;">
+                            {{ nome_pasta }}
+                        </span>
 
-                <h5 class="card-title">Indicadores de Educação & Escolas</h5>
-                <p class="card-desc">Acompanhamento das metas do IDEB e distribuição de uniformes e tablets.</p>
-
-                <div class="card-creator">
-                    <div class="creator-avatar educacao">MA</div>
-                    <div class="creator-info">
-                        <div class="creator-name">Maria Aparecida</div>
-                        <div class="creator-date"><i class="bi bi-clock"></i> Atualizado há 4 dias</div>
+                        {% if status_ap == 'published' %}
+                            <span class="badge-status published">
+                                <i class="bi bi-check-circle-fill"></i> Publicada
+                            </span>
+                        {% else %}
+                            <span class="badge-status draft">
+                                <i class="bi bi-pencil"></i> Rascunho
+                            </span>
+                        {% endif %}
                     </div>
-                </div>
 
-                <div class="card-footer-ap">
-                    <a href="{{ url_for('apresentacao.criar_apresentacao') }}" class="btn-card-action" title="Editar no Criador">
-                        <i class="bi bi-pencil-square"></i> Editar
-                    </a>
-                    <a href="{{ url_for('iniciar_apresentacao.iniciar_apresentacao') }}" class="btn-card-action secondary" title="Apresentar">
-                        <i class="bi bi-play-fill"></i> Iniciar
-                    </a>
-                </div>
-            </div>
-        </article>
+                    <h5 class="card-title">{{ ap.nome }}</h5>
+                    <p class="card-desc">
+                        {{ ns.subtitulo_capa or ap.projeto.descricao or 'Apresentação institucional vinculada ao projeto ' ~ nome_pasta ~ '.' }}
+                    </p>
 
-        <!-- CARD 4: APRESENTAÇÃO DE SEGURANÇA -->
-        <article class="ap-card-item" data-status="draft" data-modulo="seguranca" data-title="Monitoramento CCO & Guarda Municipal">
-            <div class="card-thumb thumb-seguranca">
-                <div class="thumb-mockup">
-                    <div class="thumb-badge-tag"><i class="bi bi-shield-check"></i> Segurança</div>
-                    <div class="mockup-elements">
-                        <div class="mock-metric">
-                            <span class="mock-val">520+</span>
-                            <span class="mock-lbl">Câmeras CCO</span>
+                    <div class="card-creator">
+                        <div class="creator-avatar" style="background: {{ cor_tema }};">
+                            {{ dono_ap.iniciais if dono_ap and dono_ap.iniciais else 'CB' }}
                         </div>
-                        <div class="mock-bars">
-                            <span style="height: 70%;"></span>
-                            <span style="height: 40%;"></span>
-                            <span style="height: 85%;"></span>
+                        <div class="creator-info">
+                            <div class="creator-name">{{ dono_ap.nome if dono_ap and dono_ap.nome else 'Servidor Barueri' }}</div>
+                            <div class="creator-date">
+                                <i class="bi bi-clock"></i>
+                                {% if ap.data_criacao %}
+                                    Criado em {{ ap.data_criacao.strftime('%d/%m/%Y') }}
+                                {% else %}
+                                    Salvo recentemente
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <div class="card-body-ap">
-                <div class="card-meta-top">
-                    <span class="badge-modulo seguranca">Segurança</span>
-                    <span class="badge-status draft"><i class="bi bi-pencil"></i> Rascunho</span>
-                </div>
-
-                <h5 class="card-title">Monitoramento CCO & Guarda Municipal</h5>
-                <p class="card-desc">Métricas operacionais de patrulhamento preventivo e tempo de resposta municipal.</p>
-
-                <div class="card-creator">
-                    <div class="creator-avatar seguranca">CM</div>
-                    <div class="creator-info">
-                        <div class="creator-name">Carlos Mendes</div>
-                        <div class="creator-date"><i class="bi bi-clock"></i> Atualizado há 1 semana</div>
+                    <div class="card-footer-ap">
+                        <a href="{{ url_for('apresentacao.editar_apresentacao', id=ap.id) }}" class="btn-card-action" title="Editar no Criador">
+                            <i class="bi bi-pencil-square"></i> Editar
+                        </a>
+                        <a href="{{ url_for('iniciar_apresentacao.iniciar_apresentacao') }}" class="btn-card-action secondary" title="Apresentar">
+                            <i class="bi bi-play-fill"></i> Iniciar
+                        </a>
                     </div>
                 </div>
-
-                <div class="card-footer-ap">
-                    <a href="{{ url_for('apresentacao.criar_apresentacao') }}" class="btn-card-action" title="Editar no Criador">
-                        <i class="bi bi-pencil-square"></i> Editar
-                    </a>
-                    <a href="{{ url_for('iniciar_apresentacao.iniciar_apresentacao') }}" class="btn-card-action secondary" title="Apresentar">
-                        <i class="bi bi-play-fill"></i> Iniciar
-                    </a>
-                </div>
-            </div>
-        </article>
+            </article>
+        {% endfor %}
 
     </div>
 

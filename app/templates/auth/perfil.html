@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+
+{% block title %}Meu Perfil | Conecta Barueri{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth/perfil.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<section class="perfil-wrapper">
+
+    <!-- MENSAGENS FLASH -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show rounded-3 mb-3" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- HERO / CABEÇALHO DO USUÁRIO -->
+    <div class="perfil-hero-card">
+        <div class="perfil-banner"></div>
+
+        <div class="perfil-hero-body">
+            <div class="perfil-identity">
+                <div class="perfil-avatar-lg">
+                    {{ usuario.iniciais }}
+                </div>
+
+                <div class="perfil-title-box">
+                    <div class="perfil-title-row">
+                        <h1>{{ usuario.nome or 'Usuário sem nome' }}</h1>
+                    </div>
+                    <p class="perfil-email">
+                        <i class="bi bi-envelope"></i>
+                        {{ usuario.email }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="perfil-badges">
+                {% if usuario.admin %}
+                    <span class="badge-pill badge-role-admin">
+                        <i class="bi bi-shield-lock-fill"></i>
+                        Administrador
+                    </span>
+                {% else %}
+                    <span class="badge-pill badge-role-user">
+                        <i class="bi bi-person-badge-fill"></i>
+                        Editor Institucional
+                    </span>
+                {% endif %}
+
+                {% if usuario.status %}
+                    <span class="badge-pill badge-status-ativo">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Conta Ativa
+                    </span>
+                {% else %}
+                    <span class="badge-pill badge-status-inativo">
+                        <i class="bi bi-x-circle-fill"></i>
+                        Conta Inativa
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- CARDS DE INDICADORES INDIVIDUAIS DO USUÁRIO -->
+    <div class="perfil-stats-grid">
+        <article class="perfil-stat-card">
+            <div class="stat-icon-circle blue">
+                <i class="bi bi-person-vcard"></i>
+            </div>
+            <div class="stat-details">
+                <span>ID no Sistema</span>
+                <strong>#{{ usuario.id }}</strong>
+                <small>Registro único no banco</small>
+            </div>
+        </article>
+
+        <article class="perfil-stat-card">
+            <div class="stat-icon-circle amber">
+                <i class="bi bi-folder2-open"></i>
+            </div>
+            <div class="stat-details">
+                <span>Minhas Pastas</span>
+                <strong>{{ total_projetos }}</strong>
+                <small>Projetos criados por você</small>
+            </div>
+        </article>
+
+        <article class="perfil-stat-card">
+            <div class="stat-icon-circle purple">
+                <i class="bi bi-easel2"></i>
+            </div>
+            <div class="stat-details">
+                <span>Apresentações</span>
+                <strong>{{ total_apresentacoes }}</strong>
+                <small>Vinculadas ao seu usuário</small>
+            </div>
+        </article>
+
+        <article class="perfil-stat-card">
+            <div class="stat-icon-circle green">
+                <i class="bi bi-layers"></i>
+            </div>
+            <div class="stat-details">
+                <span>Total de Slides</span>
+                <strong>{{ total_slides }}</strong>
+                <small>Em suas apresentações</small>
+            </div>
+        </article>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL: DADOS DO BANCO + ATIVIDADE INDIVIDUAL -->
+    <div class="perfil-content-grid">
+
+        <!-- COLUNA ESQUERDA: DADOS CADASTRAIS E EDIÇÃO -->
+        <div class="perfil-panel">
+            <div class="panel-header">
+                <div class="panel-header-title">
+                    <i class="bi bi-person-gear"></i>
+                    <h2>Informações da Conta</h2>
+                </div>
+            </div>
+
+            <div class="db-info-list">
+                <div class="db-info-item">
+                    <span class="db-info-label">
+                        <i class="bi bi-hash"></i> ID do Usuário
+                    </span>
+                    <span class="db-info-value">#{{ usuario.id }}</span>
+                </div>
+
+                <div class="db-info-item">
+                    <span class="db-info-label">
+                        <i class="bi bi-shield-check"></i> Nível de Permissão
+                    </span>
+                    <span class="db-info-value">
+                        {{ 'Super Administrador (Acesso Total)' if usuario.admin else 'Usuário / Editor Padrão' }}
+                    </span>
+                </div>
+
+                <div class="db-info-item">
+                    <span class="db-info-label">
+                        <i class="bi bi-activity"></i> Status no Banco
+                    </span>
+                    <span class="db-info-value" style="color: {{ '#16a46f' if usuario.status else '#dc3545' }};">
+                        {{ 'Ativo' if usuario.status else 'Inativo' }}
+                    </span>
+                </div>
+            </div>
+
+            <form action="{{ url_for('app.atualizar_perfil') }}" method="POST" class="perfil-form">
+                <div class="form-group">
+                    <label for="nome">Nome de Exibição</label>
+                    <input
+                        type="text"
+                        id="nome"
+                        name="nome"
+                        class="perfil-input"
+                        value="{{ usuario.nome or '' }}"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="email">E-mail Institucional</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        class="perfil-input"
+                        value="{{ usuario.email or '' }}"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="nova_senha">Alterar Senha <span style="font-weight: 500; color: #667085;">(opcional)</span></label>
+                    <input
+                        type="password"
+                        id="nova_senha"
+                        name="nova_senha"
+                        class="perfil-input"
+                        placeholder="Deixe em branco para manter a senha atual"
+                    >
+                </div>
+
+                <button type="submit" class="btn-salvar-perfil">
+                    <i class="bi bi-check2-circle"></i>
+                    Salvar Alterações
+                </button>
+            </form>
+        </div>
+
+        <!-- COLUNA DIREITA: PASTAS E APRESENTAÇÕES EXCLUSIVAS DESTE USUÁRIO -->
+        <div class="perfil-panel">
+            <div class="panel-header">
+                <div class="panel-header-title">
+                    <i class="bi bi-folder-check"></i>
+                    <h2>Minhas Pastas ({{ total_projetos }})</h2>
+                </div>
+                <a href="{{ url_for('projetos.projetos') }}" style="font-size: 0.84rem; font-weight: 700; color: var(--primary); text-decoration: none;">
+                    Gerenciar todas <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+
+            {% if projetos %}
+                <div class="user-folders-grid">
+                    {% for proj in projetos[:4] %}
+                        {% set cor_pasta = proj.capa_uri if (proj.capa_uri and proj.capa_uri.startswith('#')) else '#0d6efd' %}
+                        <a href="{{ url_for('projetos.projetos') }}" class="user-folder-item">
+                            <div class="folder-color-dot" style="background: {{ cor_pasta }};">
+                                <i class="bi bi-folder-fill"></i>
+                            </div>
+                            <div class="folder-meta">
+                                <strong>{{ proj.nome }}</strong>
+                                <span>{{ proj.apresentacoes|length }} apresentação(ões)</span>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state-box mb-4">
+                    <i class="bi bi-folder-x"></i>
+                    <p>Você ainda não possui pastas criadas em sua conta.</p>
+                </div>
+            {% endif %}
+
+            <div class="panel-header" style="margin-top: 8px;">
+                <div class="panel-header-title">
+                    <i class="bi bi-collection-play"></i>
+                    <h2>Suas Apresentações Recentes</h2>
+                </div>
+                <a href="{{ url_for('apresentacao.criar_apresentacao') }}" style="font-size: 0.84rem; font-weight: 700; color: var(--primary); text-decoration: none;">
+                    + Nova apresentação
+                </a>
+            </div>
+
+            {% if apresentacoes %}
+                <div class="user-ap-list">
+                    {% for ap in apresentacoes[:5] %}
+                        <div class="user-ap-item">
+                            <div class="user-ap-info">
+                                <div class="user-ap-icon">
+                                    <i class="bi bi-easel"></i>
+                                </div>
+                                <div class="user-ap-text">
+                                    <strong>{{ ap.nome }}</strong>
+                                    <span>
+                                        Pasta: {{ ap.projeto.nome if ap.projeto else 'Geral' }}
+                                        • {{ ap.slides|length }} slide(s)
+                                        {% if ap.data_criacao %}
+                                            • {{ ap.data_criacao.strftime('%d/%m/%Y') }}
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <a href="{{ url_for('apresentacao.editar_apresentacao', id=ap.id) }}" class="btn-abrir-ap">
+                                <i class="bi bi-pencil-square"></i>
+                                Abrir
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state-box">
+                    <i class="bi bi-easel"></i>
+                    <p>Nenhuma apresentação encontrada para o seu usuário.</p>
+                    <a href="{{ url_for('apresentacao.criar_apresentacao') }}" class="btn-abrir-ap">
+                        Criar primeira apresentação
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

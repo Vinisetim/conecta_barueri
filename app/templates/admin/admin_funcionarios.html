@@ -20,7 +20,7 @@ Funcionários | Conecta Barueri
 
         <div>
             <h1>Funcionários</h1>
-            <p>Gerencie os funcionários da plataforma</p>
+            <p>Gerencie os funcionários cadastrados no banco de dados da plataforma</p>
         </div>
 
     </header>
@@ -35,7 +35,7 @@ Funcionários | Conecta Barueri
             <input
                 id="pesquisaFuncionario"
                 type="text"
-                placeholder="Pesquisar funcionário..."
+                placeholder="Pesquisar funcionário por nome ou e-mail..."
             >
 
         </div>
@@ -44,25 +44,25 @@ Funcionários | Conecta Barueri
             id="filtroPerfil"
             class="funcionarios-select"
         >
-            <option>Todos os perfis</option>
-            <option>Administrador</option>
-            <option>Editor</option>
-            <option>Visualizador</option>
+            <option value="Todos os perfis">Todos os perfis</option>
+            <option value="Administrador">Administrador</option>
+            <option value="Editor">Editor</option>
         </select>
 
         <select
             id="filtroStatus"
             class="funcionarios-select"
         >
-            <option>Todos os status</option>
-            <option>Ativo</option>
-            <option>Inativo</option>
+            <option value="Todos os status">Todos os status</option>
+            <option value="Ativo">Ativo</option>
+            <option value="Inativo">Inativo</option>
         </select>
 
         <button
             id="btnAdicionar"
             class="funcionarios-add"
             type="button"
+            title="Adicionar novo funcionário no banco de dados"
             aria-label="Adicionar funcionário"
         >
             <i class="bi bi-plus-lg"></i>
@@ -83,7 +83,7 @@ Funcionários | Conecta Barueri
                         <th>Funcionário</th>
                         <th>E-mail</th>
                         <th>Perfil</th>
-                        <th>Equipe</th>
+                        <th>Projetos / Pastas</th>
                         <th>Status</th>
                         <th>Ações</th>
                     </tr>
@@ -91,52 +91,77 @@ Funcionários | Conecta Barueri
                 </thead>
 
                 <tbody id="funcionariosBody">
+                    {% for u in usuarios %}
+                    <tr>
+                        <td>
+                            <div class="func-user-cell">
+                                <span class="func-user-avatar">{{ u.iniciais }}</span>
+                                <strong>{{ u.nome }}</strong>
+                            </div>
+                        </td>
 
-                    <!--
-                    Os funcionários serão
-                    carregados pelo JS
-                    -->
+                        <td>{{ u.email }}</td>
 
+                        <td>
+                            <span class="funcionarios-badge {{ 'perfil-admin' if u.admin else 'perfil-editor' }}">
+                                {{ 'Administrador' if u.admin else 'Editor' }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {% if u.projetos %}
+                                {{ u.projetos|length }} pasta(s): {{ u.projetos[:2] | map(attribute='nome') | join(', ') }}
+                            {% else %}
+                                Sem pastas
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <span class="funcionarios-badge {{ 'status-ativo' if u.status else 'status-inativo' }}">
+                                {{ 'Ativo' if u.status else 'Inativo' }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <button
+                                class="func-btn-edit"
+                                type="button"
+                                onclick="editarFuncionario({{ u.id }})"
+                                title="Editar funcionário"
+                            >
+                                <i class="bi bi-pencil"></i>
+                            </button>
+
+                            <button
+                                class="func-btn-delete"
+                                type="button"
+                                onclick="excluirFuncionario({{ u.id }})"
+                                title="Excluir funcionário"
+                            >
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6">Nenhum funcionário encontrado no banco de dados.</td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
 
             </table>
 
         </div>
 
-        <!-- PAGINAÇÃO -->
-
+        <!-- PAGINAÇÃO / RODAPÉ DE CONTAGEM REAL -->
         <div class="funcionarios-pagination">
 
-            <span>
-                Funcionários cadastrados
+            <span id="contadorFuncionarios">
+                {{ usuarios|length }} funcionário(s) cadastrado(s) no banco de dados
             </span>
 
             <div class="fontes-pages">
-
-                <a href="#">
-                    <i class="bi bi-chevron-left"></i>
-                </a>
-
-                <a href="#" class="active">
-                    1
-                </a>
-
-                <a href="#">
-                    2
-                </a>
-
-                <a href="#">
-                    3
-                </a>
-
-                <a href="#">
-                    4
-                </a>
-
-                <a href="#">
-                    <i class="bi bi-chevron-right"></i>
-                </a>
-
+                <a href="#" class="active" onclick="return false;">1</a>
             </div>
 
         </div>
@@ -145,6 +170,83 @@ Funcionários | Conecta Barueri
 
 </section>
 
+<!-- MODAL DE CRIAÇÃO / EDIÇÃO DE FUNCIONÁRIO NO BANCO DE DADOS -->
+<div id="modalFuncionario" class="func-modal-overlay" aria-hidden="true">
+    <div class="func-modal-box">
+        <div class="func-modal-header">
+            <h2 id="modalFuncionarioTitulo">Novo Funcionário</h2>
+            <button type="button" class="func-modal-close" id="btnFecharModalFunc" aria-label="Fechar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <form id="formFuncionario">
+            <input type="hidden" id="funcId" value="">
+
+            <div class="func-modal-body">
+                <div class="func-form-group">
+                    <label for="funcNome">Nome completo *</label>
+                    <input
+                        type="text"
+                        id="funcNome"
+                        placeholder="Ex.: Mariana Lima"
+                        required
+                    >
+                </div>
+
+                <div class="func-form-group">
+                    <label for="funcEmail">E-mail institucional *</label>
+                    <input
+                        type="email"
+                        id="funcEmail"
+                        placeholder="Ex.: servidor@barueri.sp.gov.br"
+                        required
+                    >
+                </div>
+
+                <div class="func-form-group">
+                    <label for="funcSenha" id="labelFuncSenha">Senha de acesso *</label>
+                    <input
+                        type="password"
+                        id="funcSenha"
+                        placeholder="Digite a senha de acesso"
+                    >
+                </div>
+
+                <div class="func-form-row">
+                    <div class="func-form-group">
+                        <label for="funcPerfil">Perfil no sistema</label>
+                        <select id="funcPerfil">
+                            <option value="Editor">Editor</option>
+                            <option value="Administrador">Administrador</option>
+                        </select>
+                    </div>
+
+                    <div class="func-form-group">
+                        <label for="funcStatus">Status da conta</label>
+                        <select id="funcStatus">
+                            <option value="Ativo">Ativo</option>
+                            <option value="Inativo">Inativo</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="func-modal-footer">
+                <button type="button" class="func-btn-cancel" id="btnCancelarModalFunc">
+                    Cancelar
+                </button>
+                <button type="submit" class="func-btn-save" id="btnSalvarModalFunc">
+                    Salvar no Banco
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    window.FUNCIONARIOS_DB = {{ (usuarios_json or []) | tojson | safe }};
+</script>
 <script
     src="{{ url_for('static', filename='js/funcionarios.js') }}"
 ></script>

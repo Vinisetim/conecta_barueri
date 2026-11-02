@@ -1,369 +1,310 @@
 // ========================================
-// DADOS INICIAIS
+// DADOS REAIS DO BANCO DE DADOS POSTGRESQL
 // ========================================
 
-let funcionarios =
-    JSON.parse(
-        localStorage.getItem("funcionarios")
-    ) || [
-        {
-            nome: "Mariana Lima",
-            email: "mariana.lima@barueri.sp.gov.br",
-            perfil: "Editor",
-            equipe: "Saúde",
-            status: "Ativo"
-        },
-        {
-            nome: "Ricardo Castro",
-            email: "ricardo.castro@barueri.sp.gov.br",
-            perfil: "Visualizador",
-            equipe: "Finanças",
-            status: "Ativo"
-        },
-        {
-            nome: "Ana Ferreira",
-            email: "ana.ferreira@barueri.sp.gov.br",
-            perfil: "Administrador",
-            equipe: "TI",
-            status: "Ativo"
-        },
-        {
-            nome: "João Silva",
-            email: "joao.silva@barueri.sp.gov.br",
-            perfil: "Editor",
-            equipe: "Educação",
-            status: "Inativo"
-        }
-    ];
-
-// ========================================
-// SALVAR LOCALSTORAGE
-// ========================================
-
-function salvarDados() {
-
-    localStorage.setItem(
-        "funcionarios",
-        JSON.stringify(funcionarios)
-    );
-}
+let funcionarios = Array.isArray(window.FUNCIONARIOS_DB)
+    ? window.FUNCIONARIOS_DB
+    : [];
 
 // ========================================
 // CLASSES DOS BADGES
 // ========================================
 
 function obterClassePerfil(perfil) {
-
     switch (perfil) {
-
         case "Administrador":
             return "perfil-admin";
-
         case "Editor":
             return "perfil-editor";
-
         default:
             return "perfil-visualizador";
     }
 }
 
 function obterClasseStatus(status) {
-
     return status === "Ativo"
         ? "status-ativo"
         : "status-inativo";
 }
 
+function obterIniciais(nome) {
+    if (!nome || !nome.trim()) return "US";
+    const partes = nome
+        .trim()
+        .split(/\s+/)
+        .filter(p => !["de", "da", "do", "dos", "das", "e"].includes(p.toLowerCase()));
+    const lista = partes.length ? partes : nome.trim().split(/\s+/);
+    if (lista.length >= 2) {
+        return (lista[0][0] + lista[lista.length - 1][0]).toUpperCase();
+    }
+    return lista[0].slice(0, 2).toUpperCase();
+}
+
 // ========================================
-// RENDERIZAR TABELA
+// RENDERIZAR TABELA COM FILTROS
 // ========================================
 
 function renderizarTabela() {
+    const tbody = document.getElementById("funcionariosBody");
+    if (!tbody) return;
 
-    const tbody =
-        document.getElementById(
-            "funcionariosBody"
-        );
+    const inputPesquisa = document.getElementById("pesquisaFuncionario");
+    const selectPerfil = document.getElementById("filtroPerfil");
+    const selectStatus = document.getElementById("filtroStatus");
+    const contadorEl = document.getElementById("contadorFuncionarios");
 
-    const pesquisa =
-        document
-            .getElementById(
-                "pesquisaFuncionario"
-            )
-            .value
-            .toLowerCase();
-
-    const perfil =
-        document
-            .getElementById(
-                "filtroPerfil"
-            )
-            .value;
-
-    const status =
-        document
-            .getElementById(
-                "filtroStatus"
-            )
-            .value;
+    const pesquisa = (inputPesquisa ? inputPesquisa.value : "").toLowerCase().trim();
+    const perfil = selectPerfil ? selectPerfil.value : "Todos os perfis";
+    const status = selectStatus ? selectStatus.value : "Todos os status";
 
     tbody.innerHTML = "";
 
-    const funcionariosFiltrados =
-        funcionarios.filter(
-            funcionario => {
+    const funcionariosFiltrados = funcionarios.filter(funcionario => {
+        const nomeStr = (funcionario.nome || "").toLowerCase();
+        const emailStr = (funcionario.email || "").toLowerCase();
 
-                const pesquisaOk =
+        const pesquisaOk = !pesquisa || nomeStr.includes(pesquisa) || emailStr.includes(pesquisa);
+        const perfilOk = perfil === "Todos os perfis" || funcionario.perfil === perfil;
+        const statusOk = status === "Todos os status" || funcionario.status === status;
 
-                    funcionario.nome
-                        .toLowerCase()
-                        .includes(pesquisa)
-
-                    ||
-
-                    funcionario.email
-                        .toLowerCase()
-                        .includes(pesquisa);
-
-                const perfilOk =
-
-                    perfil ===
-                    "Todos os perfis"
-
-                    ||
-
-                    funcionario.perfil ===
-                    perfil;
-
-                const statusOk =
-
-                    status ===
-                    "Todos os status"
-
-                    ||
-
-                    funcionario.status ===
-                    status;
-
-                return (
-                    pesquisaOk &&
-                    perfilOk &&
-                    statusOk
-                );
-            }
-        );
-
-    funcionariosFiltrados.forEach(
-        (funcionario, index) => {
-
-            tbody.innerHTML += `
-
-<tr>
-
-<td>
-    <strong>
-        ${funcionario.nome}
-    </strong>
-</td>
-
-<td>
-    ${funcionario.email}
-</td>
-
-<td>
-    <span class="
-        funcionarios-badge
-        ${obterClassePerfil(funcionario.perfil)}
-    ">
-        ${funcionario.perfil}
-    </span>
-</td>
-
-<td>
-    ${funcionario.equipe}
-</td>
-
-<td>
-    <span class="
-        funcionarios-badge
-        ${obterClasseStatus(funcionario.status)}
-    ">
-        ${funcionario.status}
-    </span>
-</td>
-
-<td>
-
-    <button
-        class="func-btn-edit"
-        onclick="editarFuncionario(${index})"
-        title="Editar"
-    >
-        <i class="bi bi-pencil"></i>
-    </button>
-
-    <button
-        class="func-btn-delete"
-        onclick="excluirFuncionario(${index})"
-        title="Excluir"
-    >
-        <i class="bi bi-trash"></i>
-    </button>
-
-</td>
-
-</tr>
-
-`;
-        }
-    );
-}
-
-// ========================================
-// ADICIONAR
-// ========================================
-
-function adicionarFuncionario() {
-
-    const nome =
-        prompt(
-            "Nome do funcionário:"
-        );
-
-    if (!nome) return;
-
-    const email =
-        prompt(
-            "E-mail:"
-        );
-
-    if (!email) return;
-
-    const perfil =
-        prompt(
-            "Perfil:\nAdministrador\nEditor\nVisualizador"
-        );
-
-    if (!perfil) return;
-
-    const equipe =
-        prompt(
-            "Equipe:"
-        );
-
-    if (!equipe) return;
-
-    funcionarios.push({
-        nome,
-        email,
-        perfil,
-        equipe,
-        status: "Ativo"
+        return pesquisaOk && perfilOk && statusOk;
     });
 
-    salvarDados();
+    if (contadorEl) {
+        contadorEl.textContent = `${funcionariosFiltrados.length} funcionário(s) exibido(s) de ${funcionarios.length} no banco de dados`;
+    }
 
-    renderizarTabela();
+    if (funcionariosFiltrados.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6">Nenhum funcionário encontrado para os filtros selecionados.</td>
+            </tr>
+        `;
+        return;
+    }
+
+    funcionariosFiltrados.forEach(funcionario => {
+        const iniciais = funcionario.iniciais || obterIniciais(funcionario.nome);
+        const equipeTexto = funcionario.equipe || "Sem pastas";
+
+        tbody.innerHTML += `
+            <tr>
+                <td>
+                    <div class="func-user-cell">
+                        <span class="func-user-avatar">${iniciais}</span>
+                        <strong>${funcionario.nome}</strong>
+                    </div>
+                </td>
+
+                <td>${funcionario.email}</td>
+
+                <td>
+                    <span class="funcionarios-badge ${obterClassePerfil(funcionario.perfil)}">
+                        ${funcionario.perfil}
+                    </span>
+                </td>
+
+                <td>${equipeTexto}</td>
+
+                <td>
+                    <span class="funcionarios-badge ${obterClasseStatus(funcionario.status)}">
+                        ${funcionario.status}
+                    </span>
+                </td>
+
+                <td>
+                    <button
+                        class="func-btn-edit"
+                        type="button"
+                        onclick="editarFuncionario(${funcionario.id})"
+                        title="Editar funcionário"
+                    >
+                        <i class="bi bi-pencil"></i>
+                    </button>
+
+                    <button
+                        class="func-btn-delete"
+                        type="button"
+                        onclick="excluirFuncionario(${funcionario.id})"
+                        title="Excluir funcionário"
+                    >
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
 }
 
 // ========================================
-// EDITAR
+// MODAL DE ADICIONAR / EDITAR NO BANCO
 // ========================================
 
-function editarFuncionario(index) {
+const modalOverlay = document.getElementById("modalFuncionario");
+const formFuncionario = document.getElementById("formFuncionario");
+const modalTitulo = document.getElementById("modalFuncionarioTitulo");
+const inputId = document.getElementById("funcId");
+const inputNome = document.getElementById("funcNome");
+const inputEmail = document.getElementById("funcEmail");
+const inputSenha = document.getElementById("funcSenha");
+const labelSenha = document.getElementById("labelFuncSenha");
+const selectModalPerfil = document.getElementById("funcPerfil");
+const selectModalStatus = document.getElementById("funcStatus");
+const btnSalvarModal = document.getElementById("btnSalvarModalFunc");
 
-    const funcionario =
-        funcionarios[index];
+function abrirModalNovoFuncionario() {
+    if (!modalOverlay) return;
+    modalTitulo.textContent = "Novo Funcionário";
+    inputId.value = "";
+    inputNome.value = "";
+    inputEmail.value = "";
+    inputSenha.value = "";
+    inputSenha.required = true;
+    inputSenha.placeholder = "Digite a senha de acesso";
+    if (labelSenha) labelSenha.textContent = "Senha de acesso *";
+    selectModalPerfil.value = "Editor";
+    selectModalStatus.value = "Ativo";
+    modalOverlay.classList.add("open");
+    inputNome.focus();
+}
 
-    const novoNome =
-        prompt(
-            "Nome:",
-            funcionario.nome
-        );
+function fecharModalFuncionario() {
+    if (!modalOverlay) return;
+    modalOverlay.classList.remove("open");
+}
 
-    if (!novoNome) return;
+function editarFuncionario(id) {
+    const funcionario = funcionarios.find(f => Number(f.id) === Number(id));
+    if (!funcionario || !modalOverlay) return;
 
-    const novoEmail =
-        prompt(
-            "E-mail:",
-            funcionario.email
-        );
+    modalTitulo.textContent = "Editar Funcionário";
+    inputId.value = funcionario.id;
+    inputNome.value = funcionario.nome || "";
+    inputEmail.value = funcionario.email || "";
+    inputSenha.value = "";
+    inputSenha.required = false;
+    inputSenha.placeholder = "Deixe em branco para manter a senha atual";
+    if (labelSenha) labelSenha.textContent = "Nova senha (opcional)";
+    selectModalPerfil.value = funcionario.perfil === "Administrador" ? "Administrador" : "Editor";
+    selectModalStatus.value = funcionario.status === "Inativo" ? "Inativo" : "Ativo";
 
-    if (!novoEmail) return;
+    modalOverlay.classList.add("open");
+    inputNome.focus();
+}
 
-    funcionario.nome =
-        novoNome;
+async function salvarFuncionarioNoBanco(event) {
+    event.preventDefault();
 
-    funcionario.email =
-        novoEmail;
+    const id = inputId.value.trim();
+    const payload = {
+        nome: inputNome.value.trim(),
+        email: inputEmail.value.trim(),
+        senha: inputSenha.value.trim(),
+        perfil: selectModalPerfil.value,
+        status: selectModalStatus.value
+    };
 
-    salvarDados();
+    if (!payload.nome || !payload.email) {
+        alert("Preencha o nome e o e-mail do funcionário.");
+        return;
+    }
 
-    renderizarTabela();
+    const url = id ? `/admin/usuario/editar/${id}` : "/admin/usuario/criar";
+
+    if (btnSalvarModal) {
+        btnSalvarModal.disabled = true;
+        btnSalvarModal.textContent = "Salvando...";
+    }
+
+    try {
+        const resposta = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const dados = await resposta.json();
+
+        if (!resposta.ok || dados.status !== "sucesso") {
+            alert(dados.mensagem || "Não foi possível salvar o funcionário no banco de dados.");
+            return;
+        }
+
+        if (id) {
+            const idx = funcionarios.findIndex(f => Number(f.id) === Number(id));
+            if (idx !== -1 && dados.usuario) {
+                funcionarios[idx] = dados.usuario;
+            }
+        } else if (dados.usuario) {
+            funcionarios.push(dados.usuario);
+        }
+
+        fecharModalFuncionario();
+        renderizarTabela();
+    } catch (erro) {
+        console.error("Erro ao salvar funcionário:", erro);
+        alert("Erro de comunicação ao tentar salvar no banco de dados.");
+    } finally {
+        if (btnSalvarModal) {
+            btnSalvarModal.disabled = false;
+            btnSalvarModal.textContent = "Salvar no Banco";
+        }
+    }
 }
 
 // ========================================
-// EXCLUIR
+// EXCLUIR DO BANCO DE DADOS
 // ========================================
 
-function excluirFuncionario(index) {
+async function excluirFuncionario(id) {
+    const funcionario = funcionarios.find(f => Number(f.id) === Number(id));
+    const nomeExibicao = funcionario ? funcionario.nome : `#${id}`;
 
-    const confirmar =
-        confirm(
-            "Deseja excluir este funcionário?"
-        );
-
+    const confirmar = confirm(`Deseja realmente excluir o funcionário "${nomeExibicao}" do banco de dados?`);
     if (!confirmar) return;
 
-    funcionarios.splice(
-        index,
-        1
-    );
+    try {
+        const resposta = await fetch(`/admin/usuario/excluir/${id}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
 
-    salvarDados();
+        const dados = await resposta.json();
 
-    renderizarTabela();
+        if (!resposta.ok || dados.status !== "sucesso") {
+            alert(dados.mensagem || "Não foi possível excluir o funcionário.");
+            return;
+        }
+
+        funcionarios = funcionarios.filter(f => Number(f.id) !== Number(id));
+        renderizarTabela();
+    } catch (erro) {
+        console.error("Erro ao excluir funcionário:", erro);
+        alert("Erro de comunicação ao tentar excluir do banco de dados.");
+    }
 }
 
 // ========================================
 // EVENTOS
 // ========================================
 
-document
-    .getElementById(
-        "btnAdicionar"
-    )
-    .addEventListener(
-        "click",
-        adicionarFuncionario
-    );
+document.getElementById("btnAdicionar")?.addEventListener("click", abrirModalNovoFuncionario);
+document.getElementById("btnFecharModalFunc")?.addEventListener("click", fecharModalFuncionario);
+document.getElementById("btnCancelarModalFunc")?.addEventListener("click", fecharModalFuncionario);
 
-document
-    .getElementById(
-        "pesquisaFuncionario"
-    )
-    .addEventListener(
-        "keyup",
-        renderizarTabela
-    );
+modalOverlay?.addEventListener("click", e => {
+    if (e.target === modalOverlay) fecharModalFuncionario();
+});
 
-document
-    .getElementById(
-        "filtroPerfil"
-    )
-    .addEventListener(
-        "change",
-        renderizarTabela
-    );
+formFuncionario?.addEventListener("submit", salvarFuncionarioNoBanco);
 
-document
-    .getElementById(
-        "filtroStatus"
-    )
-    .addEventListener(
-        "change",
-        renderizarTabela
-    );
+document.getElementById("pesquisaFuncionario")?.addEventListener("keyup", renderizarTabela);
+document.getElementById("filtroPerfil")?.addEventListener("change", renderizarTabela);
+document.getElementById("filtroStatus")?.addEventListener("change", renderizarTabela);
 
 // ========================================
 // INICIALIZAÇÃO
