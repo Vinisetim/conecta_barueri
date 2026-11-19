@@ -26,7 +26,12 @@ class Usuario(UserMixin, db.Model):
 
     # Relacionamento 1:1 com a tabela de credenciais (isolamento de segurança)
     senha_obj = db.relationship('Senha', backref='usuario', uselist=False)
-    projetos = db.relationship('Projeto', backref='dono', lazy=True)
+    pastas = db.relationship('Pasta', backref='dono', lazy=True, cascade='all, delete-orphan')
+
+    @property
+    def projetos(self):
+        """Compatibilidade: retorna as pastas do usuário."""
+        return self.pastas
 
     @property
     def iniciais(self):
@@ -79,43 +84,82 @@ class Senha(db.Model):
     #senha criptografada
     senha = db.Column(db.String(255), nullable=False)
 
-class Projeto(db.Model):
+class Pasta(db.Model):
     """
-    Mapeia a tabela apresentacao.projeto
-    Funciona como um 'pasta' que organiza apresentações de um Tema
+    Mapeia a tabela apresentacao.pasta (antigo 'projeto').
+    Funciona como uma 'pasta' pessoal que organiza as apresentações de um determinado servidor ou tema.
     """
-    __tablename__ = 'projeto'
-    #schema diferente para organizar
-    __table_args__ = {'schema':'apresentacao'}
+    __tablename__ = 'pasta'
+    __table_args__ = {'schema': 'apresentacao'}
 
     id = db.Column(db.Integer, primary_key=True)
-
-    #chave estrangeira que liga projeto ao usuario
     usuario_id = db.Column(db.Integer, db.ForeignKey('login.usuario.id'), nullable=False)
-
     nome = db.Column(db.String(255), nullable=False)
     descricao = db.Column(db.Text)
-    capa_uri = db.Column(db.String(255))
+    capa_uri = db.Column(db.String(500))
 
-    apresentacoes = db.relationship('Apresentacao', backref='projeto', lazy=True)
+    apresentacoes = db.relationship('Apresentacao', backref='pasta_pai', lazy=True, cascade='all, delete-orphan')
+
+
+class Projeto(db.Model):
+    """
+    Mapeia a tabela apresentacao.projeto.
+    Representa a Iniciativa Municipal Oficial (Portfólio do CIT de Barueri).
+    Funciona como vitrine institucional e provedor de Kits Modulares de Slides para reúso.
+    """
+    __tablename__ = 'projeto'
+    __table_args__ = {'schema': 'apresentacao'}
+
+    id = db.Column(db.Integer, primary_key=True)
+    slug = db.Column(db.String(200), unique=True, nullable=False)
+    nome = db.Column(db.String(255), nullable=False)
+    secretaria_principal = db.Column(db.String(150))
+    resumo = db.Column(db.Text)
+    descricao_completa = db.Column(db.Text)
+    foto_url = db.Column(db.String(500))
+    destaques = db.Column(db.JSON)       # Lista dos 3 pontos de destaque
+    beneficios = db.Column(db.JSON)      # Lista dos 3 cards de benefícios (Template 9)
+    data_implantacao = db.Column(db.String(50))
+    status_operacional = db.Column(db.String(100))
+    ods_vinculados = db.Column(db.JSON)  # IDs numéricos dos ODS
+    criado_em = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+    # Slides mestres que compõem o kit oficial do projeto
+    slides_kit = db.relationship('Slide', backref='projeto_pai', lazy=True, cascade='all, delete-orphan')
+
 
 class Apresentacao(db.Model):
     """
     Mapeia a tabela apresentacao.apresentacao.
-    É o que seria o Slide em si
+    Representa o arquivo executável de apresentação de slides de trabalho do servidor.
+    Pertence a uma Pasta.
     """
     __tablename__ = 'apresentacao'
-    __table_args__ = {'schema':'apresentacao'}
+    __table_args__ = {'schema': 'apresentacao'}
 
     id = db.Column(db.Integer, primary_key=True)
-
-    projeto_id = db.Column(db.Integer, db.ForeignKey('apresentacao.projeto.id'), nullable=False)
-
+    pasta_id = db.Column(db.Integer, db.ForeignKey('apresentacao.pasta.id'), nullable=False)
     nome = db.Column(db.String(200), nullable=False)
-
     data_criacao = db.Column(db.DateTime, default=db.func.current_timestamp())
 
     slides = db.relationship('Slide', backref='apresentacao_pai', lazy=True, cascade='all, delete-orphan')
+
+    # Propriedade de compatibilidade: permite ler e gravar 'projeto_id' redirecionando para 'pasta_id'
+    @property
+    def projeto_id(self):
+        return self.pasta_id
+
+    @projeto_id.setter
+    def projeto_id(self, valor):
+        self.pasta_id = valor
+
+    @property
+    def projeto(self):
+        return self.pasta_pai
+
+    @property
+    def pasta(self):
+        return self.pasta_pai
 
 
 class Templates(db.Model):
@@ -143,20 +187,29 @@ class Templates(db.Model):
 class Slide(db.Model):
     """
     Mapeia a tabela apresentacao.slide
-    Representa uma pagina individual dentro da apresentação
+    Representa uma página individual dentro de uma apresentação (usuário) 
+    OU um slide mestre de um kit oficial (projeto CIT).
     """
     __tablename__ = 'slide'
-    __table_args__ = {'schema':'apresentacao'}
+    __table_args__ = (
+        db.CheckConstraint(
+            '(apresentacao_id IS NOT NULL AND projeto_id IS NULL) OR '
+            '(apresentacao_id IS NULL AND projeto_id IS NOT NULL)',
+            name='chk_slide_origem_exclusiva'
+        ),
+        {'schema': 'apresentacao'}
+    )
 
     id = db.Column(db.Integer, primary_key=True)
 
-    #chave estrangeira para conectar o slide a apresentacao
-    apresentacao_id = db.Column(db.Integer, db.ForeignKey('apresentacao.apresentacao.id'), nullable=False)
+    # Pode pertencer a uma apresentacao de servidor OU a um projeto mestre do CIT:
+    apresentacao_id = db.Column(db.Integer, db.ForeignKey('apresentacao.apresentacao.id', ondelete='CASCADE'), nullable=True)
+    projeto_id = db.Column(db.Integer, db.ForeignKey('apresentacao.projeto.id', ondelete='CASCADE'), nullable=True)
 
-    #chave para identificar o tipo desse slide entre os templates
+    # Chave para identificar o tipo desse slide entre os templates
     template_id = db.Column(db.Integer, db.ForeignKey('apresentacao.templates.id'), nullable=False)
 
-    #numero da página (para definir ordem)
+    # Número da página (para definir ordem)
     ordem = db.Column(db.Integer, nullable=False)
 
     # Configurações visuais do slide (plano de fundo, alinhamento geral e cabeçalho)
@@ -185,6 +238,9 @@ class CampoPreenchido(db.Model):
 
     # O "slot" que esse campo ocupa. Ex: "titulo_principal", "imagem_fundo", "video_url"
     chave_campo = db.Column(db.String(100), nullable=False)
+
+    # Origem do dado ('manual', 'reuso_midia' ou 'indicador')
+    tipo_fonte = db.Column(db.String(50), default='manual')
 
     # As três fontes de dados possíveis:
     # Fonte 1: Manual (o editor adicionou um texto ou imagem nova)

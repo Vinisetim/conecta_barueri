@@ -2,7 +2,7 @@ import json
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
 from app import db
-from app.models import Projeto, Apresentacao, Slide, CampoPreenchido, Templates
+from app.models import Pasta, Projeto, Apresentacao, Slide, CampoPreenchido, Templates
 
 projetos_bp = Blueprint('projetos', __name__)
 
@@ -10,26 +10,31 @@ projetos_bp = Blueprint('projetos', __name__)
 @login_required
 def projetos():
     """Rota principal de projetos e listagem de apresentações salvas"""
-    # Se o usuário for admin, visualiza todos os projetos do sistema para gestão unificada.
-    # Caso contrário, visualiza os projetos sob sua titularidade.
+    # Se o usuário for admin, visualiza todas as pastas do sistema para gestão unificada.
+    # Caso contrário, visualiza as pastas sob sua titularidade.
     if getattr(current_user, 'admin', False):
-        projetos_usuario = Projeto.query.order_by(Projeto.nome.asc()).all()
+        pastas_usuario = Pasta.query.order_by(Pasta.nome.asc()).all()
     else:
-        projetos_usuario = Projeto.query.filter_by(usuario_id=current_user.id).order_by(Projeto.nome.asc()).all()
+        pastas_usuario = Pasta.query.filter_by(usuario_id=current_user.id).order_by(Pasta.nome.asc()).all()
 
-    # Recupera todas as apresentações dos projetos do usuário ordenadas por criação mais recente
-    projeto_ids = [p.id for p in projetos_usuario]
-    if projeto_ids:
+    # Recupera todas as apresentações das pastas do usuário ordenadas por criação mais recente
+    pasta_ids = [p.id for p in pastas_usuario]
+    if pasta_ids:
         apresentacoes = Apresentacao.query.filter(
-            Apresentacao.projeto_id.in_(projeto_ids)
+            Apresentacao.pasta_id.in_(pasta_ids)
         ).order_by(Apresentacao.data_criacao.desc()).all()
     else:
         apresentacoes = []
 
+    # Carrega também o catálogo de Projetos Oficiais do CIT para visualização institucional
+    projetos_oficiais = Projeto.query.order_by(Projeto.nome.asc()).all()
+
     return render_template(
         'admin/admin_projetos.html',
         apresentacoes=apresentacoes,
-        projetos=projetos_usuario
+        pastas=pastas_usuario,
+        projetos=pastas_usuario,  # Compatibilidade com templates existentes
+        projetos_oficiais=projetos_oficiais
     )
 
 @projetos_bp.route('/projetos/criar', methods=['POST'])
@@ -50,20 +55,21 @@ def criar_projeto():
         flash('O nome da pasta é obrigatório.', 'danger')
         return redirect(url_for('projetos.projetos'))
 
-    novo_projeto = Projeto(
+    nova_pasta = Pasta(
         usuario_id=current_user.id,
         nome=nome,
         descricao=descricao or 'Pasta de apresentações',
         capa_uri=cor
     )
-    db.session.add(novo_projeto)
+    db.session.add(nova_pasta)
     db.session.commit()
 
     if request.is_json:
         return jsonify({
             'status': 'sucesso',
-            'projeto_id': novo_projeto.id,
-            'nome': novo_projeto.nome,
+            'pasta_id': nova_pasta.id,
+            'projeto_id': nova_pasta.id,
+            'nome': nova_pasta.nome,
             'mensagem': f'Pasta "{nome}" criada com sucesso!'
         })
 
@@ -73,9 +79,9 @@ def criar_projeto():
 @projetos_bp.route('/projetos/editar/<int:id>', methods=['POST'])
 @login_required
 def editar_projeto(id):
-    projeto = Projeto.query.get_or_404(id)
+    pasta = Pasta.query.get_or_404(id)
     # Check permissions
-    if not getattr(current_user, 'admin', False) and projeto.usuario_id != current_user.id:
+    if not getattr(current_user, 'admin', False) and pasta.usuario_id != current_user.id:
         if request.is_json: return jsonify({'status': 'erro', 'mensagem': 'Permissão negada'}), 403
         flash('Permissão negada.', 'danger')
         return redirect(url_for('projetos.projetos'))
@@ -90,9 +96,9 @@ def editar_projeto(id):
         flash('O nome da pasta é obrigatório.', 'danger')
         return redirect(url_for('projetos.projetos'))
 
-    projeto.nome = nome
-    projeto.descricao = descricao
-    projeto.capa_uri = cor
+    pasta.nome = nome
+    pasta.descricao = descricao
+    pasta.capa_uri = cor
     db.session.commit()
 
     if request.is_json:
@@ -103,22 +109,22 @@ def editar_projeto(id):
 @projetos_bp.route('/projetos/deletar/<int:id>', methods=['POST', 'DELETE'])
 @login_required
 def deletar_projeto(id):
-    projeto = Projeto.query.get_or_404(id)
-    if not getattr(current_user, 'admin', False) and projeto.usuario_id != current_user.id:
+    pasta = Pasta.query.get_or_404(id)
+    if not getattr(current_user, 'admin', False) and pasta.usuario_id != current_user.id:
         if request.is_json: return jsonify({'status': 'erro', 'mensagem': 'Permissão negada'}), 403
         flash('Permissão negada.', 'danger')
         return redirect(url_for('projetos.projetos'))
 
     try:
-        # Busca todas as apresentações vinculadas a este projeto
-        apresentacoes = Apresentacao.query.filter_by(projeto_id=id).all()
+        # Busca todas as apresentações vinculadas a esta pasta
+        apresentacoes = Apresentacao.query.filter_by(pasta_id=id).all()
         for ap in apresentacoes:
             slides = Slide.query.filter_by(apresentacao_id=ap.id).all()
             for s in slides:
                 CampoPreenchido.query.filter_by(slide_id=s.id).delete(synchronize_session=False)
                 db.session.delete(s)
             db.session.delete(ap)
-        db.session.delete(projeto)
+        db.session.delete(pasta)
         db.session.commit()
 
         if request.is_json:
@@ -127,7 +133,7 @@ def deletar_projeto(id):
         return redirect(url_for('projetos.projetos'))
     except Exception as e:
         db.session.rollback()
-        print(f"[ERRO AO DELETAR PASTA/PROJETO]: {e}")
+        print(f"[ERRO AO DELETAR PASTA]: {e}")
         if request.is_json:
             return jsonify({'status': 'erro', 'mensagem': f'Erro ao deletar pasta: {str(e)}'}), 500
         flash('Erro ao deletar pasta.', 'danger')
@@ -140,13 +146,13 @@ def acervo_projeto(id):
     Retorna o acervo compartilhado de uma pasta (Projeto):
     - Todos os slides completos existentes em apresentações da pasta
     - Todos os dados manuais reutilizáveis (mídias, textos, indicadores, links)
-    Garante que o escopo de reuso é restrito ao mesmo projeto (conforme PDD v2.0).
+    Garante que o escopo de reuso é restrito à mesma pasta.
     """
-    projeto = Projeto.query.get_or_404(id)
-    if not getattr(current_user, 'admin', False) and projeto.usuario_id != current_user.id:
+    pasta = Pasta.query.get_or_404(id)
+    if not getattr(current_user, 'admin', False) and pasta.usuario_id != current_user.id:
         return jsonify({'status': 'erro', 'mensagem': 'Permissão negada'}), 403
 
-    apresentacoes = Apresentacao.query.filter_by(projeto_id=id).order_by(Apresentacao.data_criacao.desc()).all()
+    apresentacoes = Apresentacao.query.filter_by(pasta_id=id).order_by(Apresentacao.data_criacao.desc()).all()
 
     slides_compartilhados = []
     midias_coletadas = []
@@ -296,10 +302,10 @@ def acervo_projeto(id):
 @login_required
 def duplicar_slide_projeto(id):
     """
-    Copia um slide existente dentro do mesmo projeto para uma apresentação destino.
+    Copia um slide existente dentro da mesma pasta para uma apresentação destino.
     """
-    projeto = Projeto.query.get_or_404(id)
-    if not getattr(current_user, 'admin', False) and projeto.usuario_id != current_user.id:
+    pasta = Pasta.query.get_or_404(id)
+    if not getattr(current_user, 'admin', False) and pasta.usuario_id != current_user.id:
         return jsonify({'status': 'erro', 'mensagem': 'Permissão negada'}), 403
 
     data = request.get_json() or {}
@@ -312,9 +318,9 @@ def duplicar_slide_projeto(id):
     slide_origem = Slide.query.get_or_404(slide_origem_id)
     apresentacao_destino = Apresentacao.query.get_or_404(apresentacao_destino_id)
 
-    # Valida que ambos pertencem ao mesmo projeto
-    if slide_origem.apresentacao_pai.projeto_id != id or apresentacao_destino.projeto_id != id:
-        return jsonify({'status': 'erro', 'mensagem': 'O compartilhamento de slides só é permitido dentro do mesmo projeto'}), 400
+    # Valida que ambos pertencem à mesma pasta
+    if slide_origem.apresentacao_pai.pasta_id != id or apresentacao_destino.pasta_id != id:
+        return jsonify({'status': 'erro', 'mensagem': 'O compartilhamento de slides só é permitido dentro da mesma pasta'}), 400
 
     try:
         max_ordem = db.session.query(db.func.max(Slide.ordem)).filter_by(apresentacao_id=apresentacao_destino.id).scalar() or 0

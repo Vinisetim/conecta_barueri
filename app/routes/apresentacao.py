@@ -2,7 +2,7 @@ import json
 from flask import Blueprint, render_template, request, jsonify, abort, redirect, url_for, flash
 from flask_login import login_required, current_user
 from app import db
-from app.models import Apresentacao, Slide, CampoPreenchido, Templates, Projeto
+from app.models import Apresentacao, Slide, CampoPreenchido, Templates, Projeto, Pasta
 from app.forms import CriarApresentacaoForm
 
 apresentacao_bp = Blueprint('apresentacao', __name__)
@@ -12,24 +12,25 @@ apresentacao_bp = Blueprint('apresentacao', __name__)
 def apresentacao():
     """
     Rota principal de apresentações.
-    Busca os projetos (pastas) e apresentações salvas no banco de dados para o usuário autenticado.
+    Busca as pastas e apresentações salvas no banco de dados para o usuário autenticado.
     """
     if getattr(current_user, 'admin', False):
-        projetos_usuario = Projeto.query.order_by(Projeto.nome.asc()).all()
+        pastas_usuario = Pasta.query.order_by(Pasta.nome.asc()).all()
     else:
-        projetos_usuario = Projeto.query.filter_by(usuario_id=current_user.id).order_by(Projeto.nome.asc()).all()
+        pastas_usuario = Pasta.query.filter_by(usuario_id=current_user.id).order_by(Pasta.nome.asc()).all()
 
-    projeto_ids = [p.id for p in projetos_usuario]
-    if projeto_ids:
+    pasta_ids = [p.id for p in pastas_usuario]
+    if pasta_ids:
         apresentacoes = Apresentacao.query.filter(
-            Apresentacao.projeto_id.in_(projeto_ids)
+            Apresentacao.pasta_id.in_(pasta_ids)
         ).order_by(Apresentacao.data_criacao.desc()).all()
     else:
         apresentacoes = []
 
     return render_template(
         'apresentacao/apresentacao.html',
-        projetos=projetos_usuario,
+        pastas=pastas_usuario,
+        projetos=pastas_usuario,  # Compatibilidade com templates
         apresentacoes=apresentacoes
     )
 
@@ -38,35 +39,35 @@ def apresentacao():
 @login_required
 def criar_apresentacao():
     """
-    Rota para criação de uma nova apresentação vinculada a uma pasta (Projeto).
+    Rota para criação de uma nova apresentação vinculada a uma pasta.
     Utiliza CriarApresentacaoForm (Flask-WTF) com proteção CSRF.
     Ao validar os dados, instancia Apresentacao, persiste no banco e redireciona ao editor.
     """
     form = CriarApresentacaoForm()
 
-    # Busca as pastas (projetos) do usuário logado (ou todas se for admin)
+    # Busca as pastas do usuário logado (ou todas se for admin)
     try:
         if getattr(current_user, 'admin', False):
-            projetos_usuario = Projeto.query.order_by(Projeto.nome.asc()).all()
+            pastas_usuario = Pasta.query.order_by(Pasta.nome.asc()).all()
         else:
-            projetos_usuario = Projeto.query.filter_by(usuario_id=current_user.id).order_by(Projeto.nome.asc()).all()
+            pastas_usuario = Pasta.query.filter_by(usuario_id=current_user.id).order_by(Pasta.nome.asc()).all()
 
         # Se o usuário não possuir nenhuma pasta, cria uma pasta padrão institucional
-        if not projetos_usuario:
-            projeto_padrao = Projeto(
+        if not pastas_usuario:
+            pasta_padrao = Pasta(
                 usuario_id=current_user.id,
-                nome="Projeto Geral",
+                nome="Pasta Geral",
                 descricao="Pasta principal de apresentações institucionais"
             )
-            db.session.add(projeto_padrao)
+            db.session.add(pasta_padrao)
             db.session.commit()
-            projetos_usuario = [projeto_padrao]
+            pastas_usuario = [pasta_padrao]
     except Exception:
         db.session.rollback()
-        projetos_usuario = []
+        pastas_usuario = []
 
-    # Popula dinamicamente as opções do select com os projetos do usuário
-    form.projeto_id.choices = [(p.id, p.nome) for p in projetos_usuario] if projetos_usuario else [(1, 'Projeto Geral')]
+    # Popula dinamicamente as opções do select com as pastas do usuário
+    form.projeto_id.choices = [(p.id, p.nome) for p in pastas_usuario] if pastas_usuario else [(1, 'Pasta Geral')]
 
     # Pré-seleciona a pasta e o template inicial caso informados via query param (?projeto_id=X&template=Y)
     if request.method == 'GET':
@@ -187,20 +188,20 @@ def salvar_apresentacao():
     slides_data = data.get('slides') or []
 
     try:
-        # Se projeto_id não foi informado, associamos a um projeto do usuário ou criamos um padrão
-        projeto = None
+        # Se pasta_id/projeto_id não foi informado, associamos a uma pasta do usuário ou criamos um padrão
+        pasta = None
         if projeto_id:
-            projeto = db.session.get(Projeto, projeto_id)
+            pasta = db.session.get(Pasta, projeto_id)
         
-        if not projeto:
-            projeto = Projeto.query.filter_by(usuario_id=current_user.id).first()
-            if not projeto:
-                projeto = Projeto(
-                    nome='Meu Primeiro Projeto',
-                    descricao='Projeto padrão gerado automaticamente',
+        if not pasta:
+            pasta = Pasta.query.filter_by(usuario_id=current_user.id).first()
+            if not pasta:
+                pasta = Pasta(
+                    nome='Minha Primeira Pasta',
+                    descricao='Pasta padrão gerada automaticamente',
                     usuario_id=current_user.id
                 )
-                db.session.add(projeto)
+                db.session.add(pasta)
                 db.session.flush()
 
         # Verifica se é atualização ou criação de nova apresentação
@@ -220,7 +221,7 @@ def salvar_apresentacao():
         else:
             apresentacao = Apresentacao(
                 nome=titulo,
-                projeto_id=projeto.id
+                pasta_id=pasta.id
             )
             db.session.add(apresentacao)
             db.session.flush()
@@ -427,13 +428,14 @@ def editar_apresentacao(id):
 
     # Carrega as pastas para exibir no seletor de salvar
     if getattr(current_user, 'admin', False):
-        projetos = Projeto.query.order_by(Projeto.nome.asc()).all()
+        pastas = Pasta.query.order_by(Pasta.nome.asc()).all()
     else:
-        projetos = Projeto.query.filter_by(usuario_id=current_user.id).order_by(Projeto.nome.asc()).all()
+        pastas = Pasta.query.filter_by(usuario_id=current_user.id).order_by(Pasta.nome.asc()).all()
 
     return render_template(
         'apresentacao/criar-apresentacao.html',
         apresentacao=apresentacao,
         slides_iniciais=slides_iniciais,
-        projetos=projetos
+        projetos=pastas,
+        pastas=pastas
     )

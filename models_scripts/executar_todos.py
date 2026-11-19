@@ -1,13 +1,14 @@
 """
 Orquestrador Mestre: Executar Todos os Scripts e Seeds do Banco (Conecta Barueri)
 Executa a sequência completa de inicialização e carga inicial do banco de dados na ordem ideal de dependência:
-1. 01_criar_banco.py        -> Schemas e tabelas
+1. 01_criar_banco.py        -> Reset e recriação limpa do schema e tabelas
 2. 02_seed_usuarios.py      -> Admin e Servidor de teste (Bcrypt)
-3. 03_seed_templates.py     -> 8 Templates homologados de slide
+3. 03_seed_templates.py     -> 10 Templates homologados de slide
 4. 04_seed_ods.py           -> 17 ODS da ONU com CDN Wikimedia
 5. 05_seed_apresentadores.py-> Catálogo de autoridades (CIT/Barueri)
 6. 06_seed_indicadores.py   -> Mock de Indicadores tratados municipais
-7. 07_seed_projeto_vitrine.py-> Projeto e apresentação vitrine da banca
+7. 07_seed_projeto_vitrine.py-> Pastas, Apresentação demonstrativa e Projetos Oficiais com Kits
+8. 08_ingestao_portal_sit.py  -> Ingestão em lote do catálogo oficial do CIT de Barueri e geração dos kits
 """
 import os
 import sys
@@ -19,13 +20,14 @@ DIRETORIO_RAIZ = os.path.abspath(os.path.join(DIRETORIO_ATUAL, '..'))
 sys.path.insert(0, DIRETORIO_RAIZ)
 
 ETAPAS = [
-    ("01_criar_banco.py", "criar_banco", "1. Schemas e Tabelas"),
+    ("01_criar_banco.py", "criar_banco", "1. Reset e Criação de Tabelas"),
     ("02_seed_usuarios.py", "rodar_seed_usuarios", "2. Usuários de Teste"),
-    ("03_seed_templates.py", "rodar_seed_templates", "3. 8 Templates Homologados"),
+    ("03_seed_templates.py", "rodar_seed_templates", "3. 10 Templates Homologados"),
     ("04_seed_ods.py", "rodar_seed_ods", "4. 17 ODS da ONU"),
     ("05_seed_apresentadores.py", "rodar_seed_apresentadores", "5. Catálogo de Apresentadores"),
     ("06_seed_indicadores.py", "rodar_seed_indicadores", "6. Indicadores Municipais"),
-    ("07_seed_projeto_vitrine.py", "rodar_seed_projeto_vitrine", "7. Projeto Vitrine da Banca")
+    ("07_seed_projeto_vitrine.py", "rodar_seed_projeto_vitrine", "7. Pastas e Projetos Oficiais do CIT com Kits"),
+    ("08_ingestao_portal_sit.py", "executar_ingestao_padrao", "8. Ingestão em Lote do Portal CIT")
 ]
 
 def carregar_e_executar(arquivo_nome, funcao_nome):
