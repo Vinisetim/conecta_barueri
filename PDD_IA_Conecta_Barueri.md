@@ -41,7 +41,7 @@ Plataforma corporativa Flask/PostgreSQL de geração de apresentações instituc
 | **Dash (Python/Plotly)** | 🚫 PROIBIDO / DESCARTADO | Usar exclusivamente Chart.js no client-side |
 | **Analytics (Cliques, tempo por slide)** | 🚫 PROIBIDO | JAMAIS criar rotas/tabelas de métricas de uso |
 | **Hierarquia de 7 Papéis (CIT)** | 🚫 PROIBIDO | Manter estritamente `admin=True` e `admin=False` |
-| **Abertura Pública / Links sem Login** | 🚫 PROIBIDO | Manter todas as rotas internas protegidas por `@login_required` |
+| **Link Público de Apresentação (`/p/<id>`)** | ✅ PERMITIDO / OBRIGATÓRIO | Rota pública sem login para exibição em tela cheia (exigência formal pós-pré-banca) |
 
 ---
 
@@ -204,11 +204,13 @@ Para qualquer solicitação de código ou alteração de arquivos pelo usuário,
 
 ---
 
-## 6. DOCUMENTAÇÃO OPERACIONAL E PRÓXIMAS ETAPAS (SPRINTS)
-Para o detalhamento das responsabilidades de cada membro da equipe (Vinicius, Marianna, Lucas e Belloni), matriz de módulos para a Pré-Banca e checklist do GitHub Projects, consulte os documentos complementares:
-- **Plano de Ação e Especificação Técnica:** `PDDs/PDD_Plano_Acao_Proximas_Etapas.md`
-- **Checklist para GitHub Projects:** `PDDs/CHECKLIST_GITHUB_PROJECTS.md`
+## 6. DOCUMENTAÇÃO OPERACIONAL E SPRINT FINAL (BANCA DEFINITIVA)
+Para o detalhamento das responsabilidades de cada membro da equipe (Vinicius, Marianna, Lucas e Belloni), matriz de módulos para a Banca Final e checklist do GitHub Projects, consulte os documentos oficiais:
+- **PDD Mestre Completo e Unificado (Versão 3.0 Definitiva):** `PDDs/PDD_Completo_TCC_Conecta_Barueri.md` ⭐️ *(Documento Oficial Definitivo com regras de negócio, escopo, arquitetura conceitual e kits de projetos)*
+- **GAP Analysis e Próximos Passos:** `PDDs/GAP_ANALYSIS_E_PROXIMOS_PASSOS.md` 🔍 *(Diferença entre o que temos hoje e o que precisa ser entregue, com foco em o que é projeto no sistema)*
+- **PDD de Refinamento de Templates e Design System (Engenharia Reversa do Canva):** `PDDs/PDD_Refinamento_Templates_Design_System.md` 🎨 *(Especificação detalhada dos 8+2 templates, tokens de cores HEX, fontes e requisitos do editor)*
+- **Checklist Atualizado para GitHub Projects:** `PDDs/CHECKLIST_GITHUB_PROJECTS.md` 📋 *(Lista de tarefas urgentes DEV-URG, DB-URG e UI-URG)*
 - **Guia PDF de Divisão de Responsabilidades:** `PDDs/Divisao_Tarefas_Equipe_Conecta_Barueri.pdf`
 
 ---
-*PDD Especificação IA v2.1 — Fonte da verdade técnica e operacional para assistentes LLM.*
+*PDD Especificação IA v2.3 — Fonte da verdade técnica e operacional para assistentes LLM.*

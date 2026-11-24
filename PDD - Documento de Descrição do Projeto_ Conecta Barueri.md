@@ -489,6 +489,26 @@ Abaixo está o mapeamento detalhado das tabelas que compõem o banco de dados do
     </div>
     ```
 
+#### 11. `apresentacao.indicador` (Mock Engine de Indicadores Municipais Tratados)
+* **Objetivo:** Simular os dados abertos socioeconômicos e operacionais da Prefeitura de Barueri (resolvendo o bloqueio de chaves de API reais da CIT/Prefeitura) para abastecer os templates de indicadores e gráficos Chart.js de forma 100% dinâmica.
+* **Colunas:**
+  * `id` (`SERIAL PRIMARY KEY`): Identificador único do indicador.
+  * `secretaria` (`VARCHAR(100) NOT NULL`): Secretaria gestora (ex: *"Inovação e Tecnologia (CIT)"*, *"Saúde"*, *"Educação"*, *"Segurança Urbana"*, *"Finanças"*).
+  * `nome_metrica` (`VARCHAR(150) NOT NULL`): Nome descritivo da métrica (ex: *"Processos 100% Digitais (Barueri Sem Papel)"*, *"Consultas na Rede Básica"*).
+  * `valor_numerico` (`FLOAT NOT NULL`): Valor numérico consolidado mais recente.
+  * `unidade_medida` (`VARCHAR(30)`): Unidade de exibição (ex: `"%"` , `"milhões"`, `"escolas"`, `"R$ Milhões"`).
+  * `data_atualizacao` (`TIMESTAMP DEFAULT CURRENT_TIMESTAMP`): Carimbo de data da última sincronização.
+  * `historico_json` (`JSONB DEFAULT '[]'`): Série histórica anual/mensal para renderização automática de linhas e barras no Chart.js:
+    ```json
+    [
+      {"periodo": "2023", "valor": 64.0},
+      {"periodo": "2024", "valor": 81.5},
+      {"periodo": "2025", "valor": 92.0},
+      {"periodo": "2026", "valor": 98.4}
+    ]
+    ```
+* **Como usar:** No editor de apresentações, ao selecionar a fonte `'indicador'` em um card ou gráfico, o backend preenche automaticamente o valor e os pontos do gráfico a partir dessa tabela.
+
 ---
 
 ### 8.6. Backlog de Dados e Pendências Técnicas de Banco (Issue #29 & Roadmap)
@@ -497,11 +517,11 @@ Mapeamento das funcionalidades de dados registradas na Issue #29 do repositório
 
 | Item do Banco | Objetivo e Estrutura Prevista | Status de Entrega |
 | :--- | :--- | :--- |
-| **ODS da ONU (`apresentacao.ods`)** | Catálogo oficial dos 17 Objetivos da ONU com cores e ícones CDN. | ✅ **Concluído e Semeado** (Script `seed.py` rodado no Supabase). |
-| **Apresentadores (`apresentacao.apresentador`)** | Catálogo global compartilhado de autoridades com `topicos` e `midias_extras` em JSONB. | ✅ **Concluído e Modelado** (Codificado em `models.py`). |
-| **Indicadores / Dados Tratados** | Tabela `apresentacao.indicador` (`id`, `nome`, `valor`, `fonte`, `data_referencia`, `categoria_id`). Alimenta dinamicamente os slides de dados via `campo_preenchido.indicador_id`. | ⏳ **Próxima Entrega de Dados** (Postergado por alinhamento de escopo). |
-| **Pontos do Mapa Interativo** | Tabela `apresentacao.ponto_mapa` (`id`, `slide_id` FK, `latitude`, `longitude`, `titulo`, `descricao`, `indicador_id` FK). Marcadores do Leaflet.js. | ⏳ **Próxima Entrega de Dados** (Postergado junto aos Indicadores). |
-| **Colaboradores de Projeto** | Tabela associativa `apresentacao.projeto_colaborador` (`projeto_id` FK, `usuario_id` FK, `papel`: `'editor'` ou `'visualizador'`). | 🚫 **Pós-MVP** (No MVP, apenas o criador `usuario_id` acessa seu projeto). |
+| **ODS da ONU (`apresentacao.ods`)** | Catálogo oficial dos 17 Objetivos da ONU com cores e ícones CDN. | ✅ **Concluído e Semeado** (`models_scripts/04_seed_ods.py`). |
+| **Apresentadores (`apresentacao.apresentador`)** | Catálogo global compartilhado de autoridades com `topicos` e `midias_extras` em JSON. | ✅ **Concluído e Semeado** (`models_scripts/05_seed_apresentadores.py`). |
+| **Indicadores / Dados Tratados (`apresentacao.indicador`)** | Mock Engine de indicadores de Barueri com histórico para Chart.js. | ✅ **Concluído e Semeado** (`models_scripts/06_seed_indicadores.py`). |
+| **Pontos do Mapa Interativo (`apresentacao.ponto_mapa`)** | Tabela `apresentacao.ponto_mapa` (`id`, `slide_id` FK, `latitude`, `longitude`, `titulo`, `descricao`). | ⏳ **Próxima Entrega** (Para o template de mapa Leaflet.js). |
+| **Colaboradores de Projeto (`apresentacao.projeto_colaborador`)** | Tabela associativa N:N com `papel` (`'editor'` ou `'visualizador'`). | 🚫 **Pós-MVP** (No MVP, apenas o criador `usuario_id` acessa seu projeto). |
 
 ---
 
@@ -511,19 +531,20 @@ Para orientar a equipe de desenvolvimento (backend e frontend) sobre o que já e
 
 | Tabela | Schema | Status no Supabase | Ação Atual da Equipe de Dados | Impacto no Backend |
 | :--- | :--- | :--- | :--- | :--- |
-| **`usuario`** | `login` | 🟢 Ativa no banco | Estrutura concluída (com `status` boolean). | Pronto para rotas de autenticação e sessão. |
-| **`senha`** | `login` | 🟢 Ativa no banco | Estrutura 1:1 concluída com Bcrypt. | Pronto para rotas de validação de senha. |
-| **`projeto`** | `apresentacao` | 🟢 Ativa no banco | Estrutura concluída (agrupador e reuso). | Pronto para listagem e criação de projetos. |
-| **`apresentacao`** | `apresentacao` | 🟢 Ativa no banco | Estrutura concluída (arquivos de slides). | Pronto para rotas de criação de apresentações. |
-| **`template`** | `apresentacao` | 🟢 Ativa no banco | Populada com os 7 templates fixos via seed. | Backend pode listar templates nos formulários. |
-| **`slide`** | `apresentacao` | 🟢 Codificada em `models.py` | Configurações de fundo (`filtro_fundo`, `estilo_fundo`) e alinhamento (`alinhamento_texto`). Tipografia transferida para `campo_preenchido`. | Backend deve salvar os controles de fundo nos endpoints de slide. |
-| **`slot_flexivel`** | `apresentacao` | 🟢 Codificada em `models.py` | Suporte a ODS, QR Code e Logos sobrepostos na matriz 3×3 via JSONB. | Backend pode montar endpoints para ancorar elementos. |
+| **`usuario`** | `login` | 🟢 Ativa no banco | Estrutura concluída com `status` boolean. Seed pronto em `02_seed_usuarios.py`. | Liberado para rotas de autenticação e governança `/admin`. |
+| **`senha`** | `login` | 🟢 Ativa no banco | Estrutura 1:1 concluída com Bcrypt. | Liberado para validação de login. |
+| **`projeto`** | `apresentacao` | 🟢 Ativa no banco | Estrutura concluída (agrupador e reuso). | Liberado para listagem e criação de projetos. |
+| **`apresentacao`** | `apresentacao` | 🟢 Ativa no banco | Estrutura concluída (arquivos de slides). | Liberado para rotas de criação de apresentações. |
+| **`template`** | `apresentacao` | 🟢 Ativa no banco | 8 templates homologados semeados via `03_seed_templates.py`. | Liberado para dropdowns de seleção de template. |
+| **`slide`** | `apresentacao` | 🟢 Codificada em `models.py` | Configurações de fundo (`filtro_fundo`, `estilo_fundo`), alinhamento (`alinhamento_texto`) e cabeçalho (`cabecalho_ativo`). | Backend deve salvar os controles nos endpoints de slide. |
+| **`slot_flexivel`** | `apresentacao` | 🟢 Codificada em `models.py` | Suporte a ODS, QR Code e Logos sobrepostos na matriz 3×3 via JSON. | Backend pode montar endpoints para ancorar elementos. |
 | **`campo_preenchido`** | `apresentacao` | 🟢 Codificada em `models.py` | Suporte a preenchimento manual, reuso de mídias e estilização tipográfica individual (`tamanho_texto`, `cor_texto`, `fonte`). | Backend utilizará para salvar o conteúdo e estilo tipográfico dos templates. |
-| **`ods`** | `apresentacao` | 🟢 Ativa e Semeada | Populada via seed com os 17 selos da ONU, cores hex e URLs web oficiais. | Liberada para consumo em dropdowns/switches de slots flexíveis. |
-| **`apresentador`** | `apresentacao` | 🟢 Codificada em `models.py` | Catálogo global de autoridades com `topicos` e `midias_extras` em JSONB. | Liberada para rotas do catálogo de autoridades e template Perfil/Bio. |
+| **`ods`** | `apresentacao` | 🟢 Ativa e Semeada | Populada com os 17 selos da ONU, cores hex e URLs web oficiais em português via `04_seed_ods.py`. | Liberada para consumo em dropdowns/switches de slots flexíveis. |
+| **`apresentador`** | `apresentacao` | 🟢 Codificada em `models.py` | Catálogo global de autoridades com `topicos` e `midias_extras` em JSON via `05_seed_apresentadores.py`. | Liberada para rotas do catálogo de autoridades e template Perfil/Bio. |
+| **`indicador`** | `apresentacao` | 🟢 Codificada em `models.py` | Mock Engine de dados tratados municipais semeada via `06_seed_indicadores.py`. | Liberada para preenchimento dinâmico e gráficos Chart.js. |
 
 ### 8.8. Próximo Passo Prioritário de Dados
-* **Próxima Entrega:** Modelagem e implementação das tabelas de **Indicadores (`apresentacao.indicador`)** e **Pontos do Mapa (`apresentacao.ponto_mapa`)**, responsáveis por alimentar dinamicamente os slides de dados socioeconômicos e o mapa interativo Leaflet.js de Barueri.
+* **Próxima Entrega:** Modelagem e implementação da tabela de **Pontos do Mapa (`apresentacao.ponto_mapa`)** para marcadores georreferenciados no Leaflet.js de Barueri, e apoio na integração dos endpoints do `/admin` e do seletor dinâmico.
 
 ---
 

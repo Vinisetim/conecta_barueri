@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Projetos e Pastas | Conecta Barueri{% endblock %}
+{% block title %}Pastas | Conecta Barueri{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/apresentacao/apresentacao.css') }}">
@@ -112,8 +112,8 @@
     <!-- CABEÇALHO -->
     <div class="page-header-ap">
         <div class="page-title-wrap">
-            <h1>Projetos e Pastas</h1>
-            <p>Gerencie suas pastas de projetos e acesse todas as apresentações salvas no banco de dados.</p>
+            <h1>Minhas Pastas</h1>
+            <p>Gerencie suas pastas de trabalho e acesse todas as apresentações salvas no banco de dados.</p>
         </div>
         <div class="d-flex align-items-center gap-2">
             <a href="{{ url_for('apresentacao.criar_apresentacao') }}" class="btn btn-primary d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 shadow-sm text-decoration-none" style="background: #0052ff; border: none; font-weight: 500;">
@@ -268,7 +268,7 @@
             <div class="no-projects-box" style="grid-column: 1 / -1; padding: 48px 24px; text-align: center; background: #ffffff; border-radius: 16px; border: 1px dashed #cbd5e1; margin-bottom: 20px;">
                 <i class="bi bi-folder-x" style="font-size: 3.5rem; color: #94a3b8; display: block; margin-bottom: 16px;"></i>
                 <h4 style="margin: 0 0 8px 0; color: #1e293b; font-weight: 600;">Nenhuma pasta encontrada</h4>
-                <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 24px;">Crie sua primeira pasta de projetos para organizar suas apresentações.</p>
+                <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 24px;">Crie sua primeira pasta para organizar suas apresentações.</p>
                 <button type="button" onclick="document.getElementById('btnNovoProjeto').click()" class="btn btn-primary" style="background: #0052ff; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 500;">
                     <i class="bi bi-folder-plus me-1"></i> Criar Nova Pasta
                 </button>
@@ -287,13 +287,13 @@
                 </div>
                 <div class="card-body-ap">
                     <div class="card-meta-top">
-                        <span class="badge-modulo saude"><i class="bi bi-folder2 me-1"></i>{{ ap.projeto.nome if ap.projeto else 'Projeto Geral' }}</span>
+                        <span class="badge-modulo saude"><i class="bi bi-folder2 me-1"></i>{{ ap.pasta.nome if ap.pasta else (ap.projeto.nome if ap.projeto else 'Pasta Geral') }}</span>
                         <span class="badge-status" style="color: #64748b; font-weight: 500;">
                             {{ ap.slides|length }} slide(s)
                         </span>
                     </div>
                     <h5 class="card-title">{{ ap.nome }}</h5>
-                    <p class="card-desc">Salva na pasta <strong>{{ ap.projeto.nome if ap.projeto else 'Projeto Geral' }}</strong> • Criada em {{ ap.data_criacao.strftime('%d/%m/%Y') if ap.data_criacao else 'Recente' }}</p>
+                    <p class="card-desc">Salva na pasta <strong>{{ ap.pasta.nome if ap.pasta else (ap.projeto.nome if ap.projeto else 'Pasta Geral') }}</strong> • Criada em {{ ap.data_criacao.strftime('%d/%m/%Y') if ap.data_criacao else 'Recente' }}</p>
                     <div class="card-creator">
                         <div class="creator-avatar saude">{{ current_user.nome[:2].upper() if current_user.nome else 'CB' }}</div>
                         <div class="creator-info">
