@@ -543,6 +543,7 @@
 .quick-card-icon.green { background: #dcfce7; color: #16a34a; }
 .quick-card-icon.purple { background: #f3e8ff; color: #9333ea; }
 .quick-card-icon.orange { background: #ffedd5; color: #ea580c; }
+.quick-card-icon.teal { background: #ccfbf1; color: #0d9488; }
 
 .quick-card-text {
     display: flex;
