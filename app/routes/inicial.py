@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from app import db, bcrypt
-from app.models import Projeto, Apresentacao, Slide, Senha
+from app.models import Pasta, Projeto, Apresentacao, Slide, Senha
 
 app_bp = Blueprint('app', __name__)
 
@@ -18,12 +18,12 @@ def perfil():
     Carrega os dados pessoais do usuário logado no banco de dados,
     suas estatísticas de uso (pastas/projetos, apresentações e slides) e projetos recentes.
     """
-    projetos_usuario = Projeto.query.filter_by(usuario_id=current_user.id).order_by(Projeto.id.desc()).all()
-    projeto_ids = [p.id for p in projetos_usuario]
+    pastas_usuario = Pasta.query.filter_by(usuario_id=current_user.id).order_by(Pasta.id.desc()).all()
+    pasta_ids = [p.id for p in pastas_usuario]
 
-    if projeto_ids:
+    if pasta_ids:
         apresentacoes_usuario = Apresentacao.query.filter(
-            Apresentacao.projeto_id.in_(projeto_ids)
+            Apresentacao.pasta_id.in_(pasta_ids)
         ).order_by(Apresentacao.data_criacao.desc()).all()
         apresentacao_ids = [ap.id for ap in apresentacoes_usuario]
         total_slides = Slide.query.filter(Slide.apresentacao_id.in_(apresentacao_ids)).count() if apresentacao_ids else 0
@@ -34,9 +34,11 @@ def perfil():
     return render_template(
         'auth/perfil.html',
         usuario=current_user,
-        projetos=projetos_usuario,
+        pastas=pastas_usuario,
+        projetos=pastas_usuario,  # Compatibilidade com templates
         apresentacoes=apresentacoes_usuario,
-        total_projetos=len(projetos_usuario),
+        total_projetos=len(pastas_usuario),
+        total_pastas=len(pastas_usuario),
         total_apresentacoes=len(apresentacoes_usuario),
         total_slides=total_slides
     )

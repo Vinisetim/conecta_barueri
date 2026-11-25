@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
@@ -17,9 +18,13 @@ def create_app():
     app = Flask(__name__)
 
     # SECRET_KEY string para assinar cookies de sessão, protege dados do usuário
-    app.config['SECRET_KEY'] = 'chave_temporaria_dev'
-    #URI do banco de dados
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:conecta123!@db.gzfefwbmhafiuybiislx.supabase.co:5432/postgres'
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'chave_temporaria_dev')
+    #URI do banco de dados (permite injeção via variável de ambiente para CI/CD ou mantém default)
+    default_uri = 'postgresql://postgres:conecta123!@db.gzfefwbmhafiuybiislx.supabase.co:5432/postgres'
+    raw_uri = os.environ.get('DATABASE_URL') or default_uri
+    if raw_uri and raw_uri.startswith('postgres://'):
+        raw_uri = raw_uri.replace('postgres://', 'postgresql://', 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = raw_uri
 
     #Conecta extensões ao app
     bcrypt.init_app(app)

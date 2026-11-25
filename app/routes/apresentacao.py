@@ -2,7 +2,7 @@ import json
 from flask import Blueprint, render_template, request, jsonify, abort, redirect, url_for, flash
 from flask_login import login_required, current_user
 from app import db
-from app.models import Apresentacao, Slide, CampoPreenchido, Templates, Pasta, Projeto, Indicador, Ods
+from app.models import Apresentacao, Slide, CampoPreenchido, Templates, Projeto
 from app.forms import CriarApresentacaoForm
 
 apresentacao_bp = Blueprint('apresentacao', __name__)
@@ -15,22 +15,21 @@ def apresentacao():
     Busca os projetos (pastas) e apresentações salvas no banco de dados para o usuário autenticado.
     """
     if getattr(current_user, 'admin', False):
-        pastas_usuario = Pasta.query.order_by(Pasta.nome.asc()).all()
+        projetos_usuario = Projeto.query.order_by(Projeto.nome.asc()).all()
     else:
-        pastas_usuario = Pasta.query.filter_by(usuario_id=current_user.id).order_by(Pasta.nome.asc()).all()
+        projetos_usuario = Projeto.query.filter_by(usuario_id=current_user.id).order_by(Projeto.nome.asc()).all()
 
-    pasta_ids = [p.id for p in pastas_usuario]
-    if pasta_ids:
+    projeto_ids = [p.id for p in projetos_usuario]
+    if projeto_ids:
         apresentacoes = Apresentacao.query.filter(
-            Apresentacao.pasta_id.in_(pasta_ids)
+            Apresentacao.projeto_id.in_(projeto_ids)
         ).order_by(Apresentacao.data_criacao.desc()).all()
     else:
         apresentacoes = []
 
     return render_template(
         'apresentacao/apresentacao.html',
-        projetos=pastas_usuario,
-        pastas=pastas_usuario,
+        projetos=projetos_usuario,
         apresentacoes=apresentacoes
     )
 
@@ -48,26 +47,26 @@ def criar_apresentacao():
     # Busca as pastas (projetos) do usuário logado (ou todas se for admin)
     try:
         if getattr(current_user, 'admin', False):
-            pastas_usuario = Pasta.query.order_by(Pasta.nome.asc()).all()
+            projetos_usuario = Projeto.query.order_by(Projeto.nome.asc()).all()
         else:
-            pastas_usuario = Pasta.query.filter_by(usuario_id=current_user.id).order_by(Pasta.nome.asc()).all()
+            projetos_usuario = Projeto.query.filter_by(usuario_id=current_user.id).order_by(Projeto.nome.asc()).all()
 
         # Se o usuário não possuir nenhuma pasta, cria uma pasta padrão institucional
-        if not pastas_usuario:
-            pasta_padrao = Pasta(
+        if not projetos_usuario:
+            projeto_padrao = Projeto(
                 usuario_id=current_user.id,
-                nome="Pasta Geral",
+                nome="Projeto Geral",
                 descricao="Pasta principal de apresentações institucionais"
             )
-            db.session.add(pasta_padrao)
+            db.session.add(projeto_padrao)
             db.session.commit()
-            pastas_usuario = [pasta_padrao]
+            projetos_usuario = [projeto_padrao]
     except Exception:
         db.session.rollback()
         projetos_usuario = []
 
     # Popula dinamicamente as opções do select com os projetos do usuário
-    form.projeto_id.choices = [(p.id, p.nome) for p in pastas_usuario] if pastas_usuario else [(1, 'Pasta Geral')]
+    form.projeto_id.choices = [(p.id, p.nome) for p in projetos_usuario] if projetos_usuario else [(1, 'Projeto Geral')]
 
     # Pré-seleciona a pasta e o template inicial caso informados via query param (?projeto_id=X&template=Y)
     if request.method == 'GET':
@@ -90,7 +89,7 @@ def criar_apresentacao():
         # Criação da entidade Apresentacao apontando para a pasta (projeto_id) escolhida
         nova_ap = Apresentacao(
             nome=nome_ap,
-            pasta_id=proj_id
+            projeto_id=proj_id
         )
         db.session.add(nova_ap)
         db.session.flush()
@@ -140,44 +139,14 @@ def criar_apresentacao():
                 )
             ]
 
-            # Se o usuário escolheu começar por Indicadores, busca métricas oficiais do banco de dados
+            # Se o usuário escolheu começar por Indicadores, já pré-carrega os 4 principais indicadores municipais
             if tpl_escolhido == 'indicadores':
-                inds_db = Indicador.query.order_by(Indicador.id.asc()).limit(4).all()
-                icones_map = {
-                    'Saúde': 'bi-heart-pulse',
-                    'Educação': 'bi-book',
-                    'Segurança Urbana': 'bi-shield-check',
-                    'Segurança': 'bi-shield-check',
-                    'Inovação e Tecnologia (CIT)': 'bi-cpu',
-                    'Mobilidade': 'bi-car-front',
-                    'Finanças e Planejamento': 'bi-graph-up-arrow'
-                }
-                cores_map = {
-                    'Saúde': '#3b82f6',
-                    'Educação': '#f59e0b',
-                    'Segurança Urbana': '#a855f7',
-                    'Segurança': '#a855f7',
-                    'Inovação e Tecnologia (CIT)': '#0052ff',
-                    'Mobilidade': '#10b981',
-                    'Finanças e Planejamento': '#ef4444'
-                }
-                indicadores_iniciais = []
-                for ind in inds_db:
-                    indicadores_iniciais.append({
-                        'id': ind.id,
-                        'id_padrao': ind.id,
-                        'nome': ind.nome_metrica,
-                        'valor': f"{ind.valor_numerico:g} {ind.unidade_medida}".strip(),
-                        'icone': icones_map.get(ind.secretaria, 'bi-graph-up'),
-                        'cor': cores_map.get(ind.secretaria, '#0052ff')
-                    })
-                if not indicadores_iniciais:
-                    indicadores_iniciais = [
-                        {"id": 1, "id_padrao": 1, "nome": "Processos Digitais", "valor": "98.4 %", "icone": "bi-cpu", "cor": "#0052ff"},
-                        {"id": 2, "id_padrao": 2, "nome": "Wi-Fi Gratuito", "valor": "185 pontos", "icone": "bi-wifi", "cor": "#10b981"},
-                        {"id": 3, "id_padrao": 3, "nome": "Consultas Básicas", "valor": "2.45 M", "icone": "bi-heart-pulse", "cor": "#3b82f6"},
-                        {"id": 4, "id_padrao": 4, "nome": "Cobertura Vacinal", "valor": "96.8 %", "icone": "bi-shield-check", "cor": "#a855f7"}
-                    ]
+                indicadores_iniciais = [
+                    {"id": 101, "id_padrao": 1, "nome": "Saúde", "valor": "3.237", "icone": "bi-heart-pulse", "cor": "#3b82f6"},
+                    {"id": 102, "id_padrao": 2, "nome": "Segurança", "valor": "3.847", "icone": "bi-shield-check", "cor": "#a855f7"},
+                    {"id": 103, "id_padrao": 3, "nome": "Educação", "valor": "3.755", "icone": "bi-book", "cor": "#f59e0b"},
+                    {"id": 104, "id_padrao": 4, "nome": "Mobilidade", "valor": "4.687", "icone": "bi-car-front", "cor": "#10b981"}
+                ]
                 campos_iniciais.append(
                     CampoPreenchido(
                         slide_id=slide_inicial.id,
@@ -218,20 +187,20 @@ def salvar_apresentacao():
     slides_data = data.get('slides') or []
 
     try:
-        # Se projeto_id (pasta_id) não foi informado, associamos a uma pasta do usuário ou criamos uma padrão
-        pasta = None
+        # Se projeto_id não foi informado, associamos a um projeto do usuário ou criamos um padrão
+        projeto = None
         if projeto_id:
-            pasta = db.session.get(Pasta, projeto_id)
+            projeto = db.session.get(Projeto, projeto_id)
         
-        if not pasta:
-            pasta = Pasta.query.filter_by(usuario_id=current_user.id).first()
-            if not pasta:
-                pasta = Pasta(
-                    nome='Minha Primeira Pasta',
-                    descricao='Pasta padrão gerada automaticamente',
+        if not projeto:
+            projeto = Projeto.query.filter_by(usuario_id=current_user.id).first()
+            if not projeto:
+                projeto = Projeto(
+                    nome='Meu Primeiro Projeto',
+                    descricao='Projeto padrão gerado automaticamente',
                     usuario_id=current_user.id
                 )
-                db.session.add(pasta)
+                db.session.add(projeto)
                 db.session.flush()
 
         # Verifica se é atualização ou criação de nova apresentação
@@ -251,7 +220,7 @@ def salvar_apresentacao():
         else:
             apresentacao = Apresentacao(
                 nome=titulo,
-                pasta_id=pasta.id
+                projeto_id=projeto.id
             )
             db.session.add(apresentacao)
             db.session.flush()
@@ -293,13 +262,7 @@ def salvar_apresentacao():
                 'periodo': item.get('periodo', 'Últimos 12 meses'),
                 'indicadores': json.dumps(item.get('indicadores') or []) if item.get('indicadores') is not None else None,
                 'mapaTipo': item.get('mapaTipo', 'barueri'),
-                'mapaPins': json.dumps(item.get('mapaPins') or []) if item.get('mapaPins') is not None else None,
-                'pilar_1_titulo': item.get('pilar_1_titulo'),
-                'pilar_1_texto': item.get('pilar_1_texto'),
-                'pilar_2_titulo': item.get('pilar_2_titulo'),
-                'pilar_2_texto': item.get('pilar_2_texto'),
-                'pilar_3_titulo': item.get('pilar_3_titulo'),
-                'pilar_3_texto': item.get('pilar_3_texto')
+                'mapaPins': json.dumps(item.get('mapaPins') or []) if item.get('mapaPins') is not None else None
             }
 
             origens_campos = item.get('origens_campos') or {}
@@ -334,7 +297,7 @@ def salvar_apresentacao():
 def deletar_apresentacao(id):
     apresentacao = Apresentacao.query.get_or_404(id)
     # Check permissions (assuming current user must own the project unless admin)
-    if not getattr(current_user, 'admin', False) and apresentacao.pasta and apresentacao.pasta.usuario_id != current_user.id:
+    if not getattr(current_user, 'admin', False) and apresentacao.projeto and apresentacao.projeto.usuario_id != current_user.id:
         if request.is_json: return jsonify({'status': 'erro', 'mensagem': 'Permissão negada'}), 403
         flash('Permissão negada.', 'danger')
         return redirect(url_for('projetos.projetos'))
@@ -399,12 +362,6 @@ def editar_apresentacao(id):
             'indicadores': [],
             'mapaTipo': 'barueri',
             'mapaPins': [],
-            'pilar_1_titulo': '',
-            'pilar_1_texto': '',
-            'pilar_2_titulo': '',
-            'pilar_2_texto': '',
-            'pilar_3_titulo': '',
-            'pilar_3_texto': '',
             'origens_campos': {}
         }
 
@@ -468,107 +425,15 @@ def editar_apresentacao(id):
             'mapaPins': []
         }]
 
-    # Carrega as pastas do usuário diretamente do banco para o seletor de salvar
+    # Carrega as pastas para exibir no seletor de salvar
     if getattr(current_user, 'admin', False):
-        pastas = Pasta.query.order_by(Pasta.nome.asc()).all()
+        projetos = Projeto.query.order_by(Projeto.nome.asc()).all()
     else:
-        pastas = Pasta.query.filter_by(usuario_id=current_user.id).order_by(Pasta.nome.asc()).all()
+        projetos = Projeto.query.filter_by(usuario_id=current_user.id).order_by(Projeto.nome.asc()).all()
 
     return render_template(
         'apresentacao/criar-apresentacao.html',
         apresentacao=apresentacao,
         slides_iniciais=slides_iniciais,
-        pastas=pastas,
-        projetos=pastas
+        projetos=projetos
     )
-
-
-# ==============================================================================
-# APIS DE DADOS OFICIAIS DO BANCO DE DADOS (INDICADORES E ODS)
-# ==============================================================================
-
-@apresentacao_bp.route('/api/indicadores', methods=['GET'])
-@login_required
-def api_indicadores():
-    """
-    Retorna métricas e indicadores oficiais do município de Barueri puxados diretamente
-    da tabela apresentacao.indicador, incluindo suas séries históricas para gráficos.
-    """
-    inds = Indicador.query.order_by(Indicador.id.asc()).all()
-    icones_map = {
-        'Saúde': 'bi-heart-pulse',
-        'Educação': 'bi-book',
-        'Segurança Urbana': 'bi-shield-check',
-        'Segurança': 'bi-shield-check',
-        'Inovação e Tecnologia (CIT)': 'bi-cpu',
-        'Mobilidade': 'bi-car-front',
-        'Finanças e Planejamento': 'bi-graph-up-arrow'
-    }
-    cores_map = {
-        'Saúde': '#3b82f6',
-        'Educação': '#f59e0b',
-        'Segurança Urbana': '#a855f7',
-        'Segurança': '#a855f7',
-        'Inovação e Tecnologia (CIT)': '#0052ff',
-        'Mobilidade': '#10b981',
-        'Finanças e Planejamento': '#ef4444'
-    }
-    resultado = []
-    for i in inds:
-        resultado.append({
-            'id': i.id,
-            'id_padrao': i.id,
-            'secretaria': i.secretaria,
-            'nome': i.nome_metrica,
-            'nome_metrica': i.nome_metrica,
-            'valor': f"{i.valor_numerico:g} {i.unidade_medida}".strip(),
-            'valor_numerico': i.valor_numerico,
-            'unidade_medida': i.unidade_medida,
-            'icone': icones_map.get(i.secretaria, 'bi-graph-up'),
-            'cor': cores_map.get(i.secretaria, '#0052ff'),
-            'historico': i.historico_json or []
-        })
-    return jsonify({'status': 'sucesso', 'total': len(resultado), 'indicadores': resultado})
-
-
-@apresentacao_bp.route('/api/indicadores/<int:id>', methods=['GET'])
-@login_required
-def api_indicador_detalhes(id):
-    """Retorna os dados detalhados e série histórica de um indicador específico do banco."""
-    ind = Indicador.query.get_or_404(id)
-    return jsonify({
-        'status': 'sucesso',
-        'indicador': {
-            'id': ind.id,
-            'secretaria': ind.secretaria,
-            'nome_metrica': ind.nome_metrica,
-            'valor_numerico': ind.valor_numerico,
-            'unidade_medida': ind.unidade_medida,
-            'valor_formatado': f"{ind.valor_numerico:g} {ind.unidade_medida}".strip(),
-            'historico': ind.historico_json or []
-        }
-    })
-
-
-@apresentacao_bp.route('/api/ods', methods=['GET'])
-@login_required
-def api_ods():
-    """
-    Retorna os 17 Objetivos de Desenvolvimento Sustentável (ODS) da ONU
-    puxados diretamente da tabela apresentacao.ods do banco de dados.
-    """
-    ods_list = Ods.query.order_by(Ods.numero.asc()).all()
-    resultado = []
-    for o in ods_list:
-        resultado.append({
-            'id': o.id,
-            'numero': o.numero,
-            'num': str(o.numero),
-            'titulo': o.titulo,
-            'label': o.titulo,
-            'descricao': o.descricao or '',
-            'icone_url': o.icone_url or '',
-            'cor_hex': o.cor_hex or '#0052ff',
-            'color': o.cor_hex or '#0052ff'
-        })
-    return jsonify({'status': 'sucesso', 'total': len(resultado), 'ods': resultado})

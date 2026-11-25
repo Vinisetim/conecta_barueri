@@ -1,0 +1,33 @@
+name: Ingestao Continua do Portal CIT
+
+on:
+  schedule:
+    # Executa todo domingo as 05:00 da manha (Horario de Brasilia - UTC-3 -> 08:00 UTC)
+    - cron: '0 8 * * 0'
+  workflow_dispatch: # Permite disparar manualmente a qualquer momento pelo painel do GitHub Actions
+
+jobs:
+  sincronizar-projetos-cit:
+    name: Sincronizar Iniciativas Municipais do CIT
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do Repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Ambiente Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Instalar Dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Executar Pipeline de Ingestao do CIT
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://postgres:conecta123!@db.gzfefwbmhafiuybiislx.supabase.co:5432/postgres' }}
+        run: |
+          python models_scripts/08_ingestao_portal_sit.py todas

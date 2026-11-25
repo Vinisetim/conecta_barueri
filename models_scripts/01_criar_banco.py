@@ -12,29 +12,36 @@ from app import create_app, db
 from sqlalchemy import text
 # Importa todos os models para registro no metadata do SQLAlchemy
 from app.models import (
-    Usuario, Senha, Projeto, Apresentacao, Templates,
+    Usuario, Senha, Pasta, Projeto, Apresentacao, Templates,
     Slide, CampoPreenchido, SlotFlexivel, Ods, Apresentador, Indicador
 )
 
-def criar_banco():
+def criar_banco(resetar_apresentacao=True):
     app = create_app()
     with app.app_context():
         print("=" * 60)
-        print("🛠️  [01/07] CRIANDO SCHEMAS E TABELAS NO POSTGRESQL...")
+        print("🛠️  [01/07] CONFIGURANDO SCHEMAS E TABELAS NO POSTGRESQL...")
         print("=" * 60)
 
-        # 1. Criação dos schemas organizacionais
-        print("📌 Criando schemas 'login' e 'apresentacao'...")
+        # 1. Reset do schema 'apresentacao' (se solicitado para recomeço limpo)
+        if resetar_apresentacao:
+            print("🔄 [RESET] Limpando e recriando schema 'apresentacao'...")
+            db.session.execute(text('DROP SCHEMA IF EXISTS apresentacao CASCADE;'))
+            db.session.commit()
+            print("✨ Schema 'apresentacao' limpo com sucesso (todas as tabelas anteriores removidas).")
+
+        # 2. Criação dos schemas organizacionais
+        print("📌 Garantindo schemas 'login' e 'apresentacao'...")
         db.session.execute(text('CREATE SCHEMA IF NOT EXISTS login;'))
         db.session.execute(text('CREATE SCHEMA IF NOT EXISTS apresentacao;'))
         db.session.commit()
         print("✅ Schemas garantidos com sucesso.")
 
-        # 2. Criação de todas as tabelas mapeadas no SQLAlchemy
-        print("📌 Criando tabelas mapeadas via ORM...")
+        # 3. Criação de todas as tabelas mapeadas no SQLAlchemy
+        print("📌 Criando tabelas mapeadas via ORM (Pasta, Projeto, Apresentação, Slide...)...")
         db.create_all()
         print("✅ Todas as tabelas foram criadas/verificadas com sucesso no Supabase!")
         print("=" * 60 + "\n")
 
 if __name__ == '__main__':
-    criar_banco()
+    criar_banco(resetar_apresentacao=True)

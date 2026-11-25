@@ -59,6 +59,16 @@ TEMPLATES_HOMOLOGADOS = [
         "nome": "Encerramento",
         "codigo": "encerramento",
         "descricao": "Slide final com agradecimentos, canais de atendimento da prefeitura e logotipos de apoio."
+    },
+    {
+        "nome": "Módulos e Pilares",
+        "codigo": "modulos_pilares",
+        "descricao": "Grid institucional em 3 cards com título e explicação de benefícios e pilares da iniciativa municipal."
+    },
+    {
+        "nome": "Prêmios e Reconhecimentos",
+        "codigo": "premios_marcos",
+        "descricao": "Grade institucional destacando troféus, certificações e conquistas históricas de inovação de Barueri."
     }
 ]
 
@@ -66,7 +76,7 @@ def rodar_seed_templates():
     app = create_app()
     with app.app_context():
         print("=" * 60)
-        print("📐 [03/07] SEMEANDO OS 8 TEMPLATES HOMOLOGADOS...")
+        print("📐 [03/07] SEMEANDO OS 10 TEMPLATES HOMOLOGADOS...")
         print("=" * 60)
 
         for dados in TEMPLATES_HOMOLOGADOS:
@@ -86,7 +96,7 @@ def rodar_seed_templates():
                 print(f"🔄 Template atualizado: [{dados['codigo']}] {dados['nome']}")
 
         db.session.commit()
-        print("✅ Todos os 8 templates estão garantidos na base de dados!")
+        print("✅ Todos os 10 templates estão garantidos na base de dados!")
         print("=" * 60 + "\n")
 
 if __name__ == '__main__':

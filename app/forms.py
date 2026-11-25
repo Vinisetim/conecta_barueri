@@ -54,7 +54,7 @@ class CriarApresentacaoForm(FlaskForm):
         ('indicadores', 'Indicadores & Métricas'),
         ('grafico', 'Gráficos com Chart.js'),
         ('imagem_texto', 'Imagem + Texto'),
-        ('mapa', 'Mapa Interativo')
+        ('mapa', 'Mapa Interativo'), ('encerramento', 'Slide de Encerramento')
     ], default='capa')
 
     submit = SubmitField('Criar e Ir para o Editor')

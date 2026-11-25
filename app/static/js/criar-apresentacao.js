@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
-    let ODS_OPTIONS = {
+    const ODS_OPTIONS = {
         "1":  { num: "1",  label: "Erradicação da Pobreza",            color: "#E5243B" },
         "2":  { num: "2",  label: "Fome Zero",                          color: "#DDA63A" },
         "3":  { num: "3",  label: "Saúde e Bem-Estar",                  color: "#4C9F38" },
@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const inputPinImgUrl = document.getElementById("inputPinImgUrl");
     const btnUploadPinImg = document.getElementById("btnUploadPinImg");
     const inputUploadPinImgFile = document.getElementById("inputUploadPinImgFile");
-    const btnAddPin = document.getElementById("btnAddPinMapa") || document.getElementById("btnAddPin");
+    const btnAddPin = document.getElementById("btnAddPin");
     const listaPinsAdicionados = document.getElementById("listaPinsAdicionados");
 
     let slideMapInstance = null;
@@ -567,7 +567,6 @@ document.addEventListener("DOMContentLoaded", function() {
         updatePreviewMedia();
         if(slide.template === "grafico") renderChart(slide);
         if(slide.template === "indicadores") renderIndicadores(slide);
-        if(slide.template === "modulos_pilares") syncPilaresSlide(slide);
         if(slide.template === "mapa") {
             slide.mapaTipo = slide.mapaTipo || "barueri";
             slide.mapaPins = slide.mapaPins || [];
@@ -823,91 +822,68 @@ document.addEventListener("DOMContentLoaded", function() {
         });
 
         const selectChartIndicador = document.getElementById("selectChartIndicador");
-        if (selectChartIndicador) selectChartIndicador.value = slide.chartIndicador || 1;
+        if(selectChartIndicador) selectChartIndicador.value = slide.chartIndicador || 1;
 
         const selectPeriodo = document.getElementById("selectPeriodo");
-        if (selectPeriodo) selectPeriodo.value = slide.periodo || "Últimos 12 meses";
+        if(selectPeriodo) selectPeriodo.value = slide.periodo || "Últimos 12 meses";
 
         const previewPeriodo = document.getElementById("previewPeriodo");
-        if (previewPeriodo) previewPeriodo.textContent = slide.periodo || "Últimos 12 meses";
+        if(previewPeriodo) previewPeriodo.textContent = slide.periodo || "Últimos 12 meses";
 
         const ctx = document.getElementById('slideChart');
-        if (!ctx) return;
+        if(!ctx) return;
 
         let type = slide.chartType || "line";
         let data, options;
 
-        const idInd = parseInt(slide.chartIndicador) || 1;
-        const ind = (INDICADORES_PREDEFINIDOS && INDICADORES_PREDEFINIDOS.find(i => i.id === idInd || i.id_padrao === idInd)) || (INDICADORES_PREDEFINIDOS && INDICADORES_PREDEFINIDOS[0]) || { nome: "Métrica", cor: "#0052ff", valor: "100" };
-
-        let labels = [];
-        let valores = [];
-        if (ind && Array.isArray(ind.historico) && ind.historico.length > 0) {
-            labels = ind.historico.map(h => String(h.periodo || ''));
-            valores = ind.historico.map(h => typeof h.valor === 'number' ? h.valor : parseFloat(h.valor) || 0);
-        } else {
-            labels = ['2020', '2021', '2022', '2023', '2024'];
-            const baseVal = parseFloat(String(ind.valor || '100').replace(/[^0-9.]/g, '')) || 100;
-            valores = [
-                Math.round(baseVal * 0.70 * 10) / 10,
-                Math.round(baseVal * 0.80 * 10) / 10,
-                Math.round(baseVal * 0.88 * 10) / 10,
-                Math.round(baseVal * 0.94 * 10) / 10,
-                baseVal
-            ];
-        }
-
-        const corPrincipal = ind.cor || '#0052ff';
-        const nomeMetrica = ind.nome_metrica || ind.nome || 'Métrica Municipal';
+        const idInd = slide.chartIndicador || 1;
+        const ind = INDICADORES_PREDEFINIDOS.find(i => i.id_padrao === idInd) || INDICADORES_PREDEFINIDOS[0];
+        const baseVal = parseFloat(ind.valor.replace('.', ''));
 
         if (type === "line" || type === "bar") {
             data = {
-                labels: labels,
+                labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
                 datasets: [{
-                    label: nomeMetrica,
-                    data: valores,
-                    borderColor: corPrincipal,
-                    backgroundColor: type === "line" ? corPrincipal + '25' : corPrincipal,
+                    label: ind.nome,
+                    data: [
+                        Math.round(baseVal * 0.75), 
+                        Math.round(baseVal * 0.82), 
+                        Math.round(baseVal * 0.90), 
+                        Math.round(baseVal * 0.85), 
+                        Math.round(baseVal * 0.95), 
+                        baseVal
+                    ],
+                    borderColor: ind.cor,
+                    backgroundColor: type === "line" ? ind.cor + '33' : ind.cor,
                     borderWidth: type === "line" ? 3 : 0,
-                    tension: 0.35,
+                    tension: 0.4,
                     fill: type === "line",
-                    borderRadius: type === "bar" ? 5 : 0
+                    borderRadius: type === "bar" ? 4 : 0
                 }]
             };
             options = {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return ` ${nomeMetrica}: ${context.parsed.y} ${ind.unidade_medida || ''}`.trim();
-                            }
-                        }
-                    }
-                },
+                plugins: { legend: { display: false } },
                 scales: {
-                    y: { beginAtZero: false, grid: { color: '#f1f5f9' }, border: { display: false } },
+                    y: { beginAtZero: true, grid: { color: '#f1f5f9' }, border: { display: false } },
                     x: { grid: { display: false }, border: { display: false } }
                 }
             };
         } else if (type === "pie") {
-            const coresPie = ['#0052ff', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4'];
             data = {
-                labels: labels.slice(-5),
+                labels: ['Região Norte', 'Região Sul', 'Região Centro'],
                 datasets: [{
-                    data: valores.slice(-5),
-                    backgroundColor: coresPie.slice(0, Math.min(valores.length, 5)),
-                    borderWidth: 2,
-                    borderColor: '#ffffff'
+                    data: [45, 35, 20],
+                    backgroundColor: [ind.cor, ind.cor + '99', ind.cor + '44'],
+                    borderWidth: 0
                 }]
             };
             options = {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } }
+                    legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 8, font: { size: 10 } } }
                 }
             };
         }
@@ -978,12 +954,6 @@ document.addEventListener("DOMContentLoaded", function() {
             tplCapa.forEach(el => el.style.display = "flex");
             labelTitulo.textContent = "Título";
             labelSubtitulo.textContent = "Subtítulo";
-            fgSubtitulo.style.display = "flex";
-        } else if(val === "modulos_pilares") {
-            if (layoutModulosPilares) layoutModulosPilares.style.display = "flex";
-            tplModulosPilares.forEach(el => el.style.display = "flex");
-            labelTitulo.textContent = "Título dos Pilares";
-            labelSubtitulo.textContent = "Subtítulo / Introdução";
             fgSubtitulo.style.display = "flex";
         } else if(val === "imagem_texto") {
             layoutImgTexto.style.display = "flex";
@@ -1252,102 +1222,21 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // --- INDICADORES OFICIAIS DO BANCO DE DADOS (apresentacao.indicador) ---
-    let INDICADORES_PREDEFINIDOS = [
-        { id: 1, id_padrao: 1, secretaria: "Inovação e Tecnologia (CIT)", nome: "Processos 100% Digitais (Barueri Sem Papel)", nome_metrica: "Processos 100% Digitais (Barueri Sem Papel)", valor: "98.4 %", valor_numerico: 98.4, unidade_medida: "%", icone: "bi-cpu", cor: "#0052ff", historico: [{"periodo": "2020", "valor": 34.0}, {"periodo": "2021", "valor": 61.5}, {"periodo": "2022", "valor": 82.0}, {"periodo": "2023", "valor": 94.2}, {"periodo": "2024", "valor": 98.4}] },
-        { id: 2, id_padrao: 2, secretaria: "Inovação e Tecnologia (CIT)", nome: "Pontos de Conexão Wi-Fi Gratuita nos Bairros", nome_metrica: "Pontos de Conexão Wi-Fi Gratuita nos Bairros", valor: "185 pontos", valor_numerico: 185, unidade_medida: "pontos", icone: "bi-wifi", cor: "#10b981", historico: [{"periodo": "2020", "valor": 45}, {"periodo": "2021", "valor": 80}, {"periodo": "2022", "valor": 120}, {"periodo": "2023", "valor": 160}, {"periodo": "2024", "valor": 185}] },
-        { id: 3, id_padrao: 3, secretaria: "Saúde", nome: "Consultas Médicas Realizadas na Rede Básica", nome_metrica: "Consultas Médicas Realizadas na Rede Básica", valor: "2.45 milhões", valor_numerico: 2.45, unidade_medida: "milhões", icone: "bi-heart-pulse", cor: "#3b82f6", historico: [{"periodo": "2020", "valor": 1.8}, {"periodo": "2021", "valor": 1.95}, {"periodo": "2022", "valor": 2.15}, {"periodo": "2023", "valor": 2.38}, {"periodo": "2024", "valor": 2.45}] },
-        { id: 4, id_padrao: 4, secretaria: "Saúde", nome: "Índice de Cobertura Vacinal Pediátrica", nome_metrica: "Índice de Cobertura Vacinal Pediátrica", valor: "96.8 %", valor_numerico: 96.8, unidade_medida: "%", icone: "bi-shield-check", cor: "#a855f7", historico: [{"periodo": "2020", "valor": 88.5}, {"periodo": "2021", "valor": 91.2}, {"periodo": "2022", "valor": 93.7}, {"periodo": "2023", "valor": 95.4}, {"periodo": "2024", "valor": 96.8}] },
-        { id: 5, id_padrao: 5, secretaria: "Educação", nome: "Alunos Matriculados na Rede Municipal", nome_metrica: "Alunos Matriculados na Rede Municipal", valor: "68.2 mil alunos", valor_numerico: 68.2, unidade_medida: "mil alunos", icone: "bi-book", cor: "#f59e0b", historico: [{"periodo": "2020", "valor": 61.0}, {"periodo": "2021", "valor": 62.8}, {"periodo": "2022", "valor": 65.4}, {"periodo": "2023", "valor": 67.1}, {"periodo": "2024", "valor": 68.2}] },
-        { id: 6, id_padrao: 6, secretaria: "Educação", nome: "Escolas com Laboratórios Maker e Robótica", nome_metrica: "Escolas com Laboratórios Maker e Robótica", valor: "74 escolas", valor_numerico: 74, unidade_medida: "escolas", icone: "bi-robot", cor: "#f59e0b", historico: [{"periodo": "2020", "valor": 12}, {"periodo": "2021", "valor": 28}, {"periodo": "2022", "valor": 45}, {"periodo": "2023", "valor": 62}, {"periodo": "2024", "valor": 74}] },
-        { id: 7, id_padrao: 7, secretaria: "Segurança Urbana", nome: "Câmeras Inteligentes Conectadas ao COI", nome_metrica: "Câmeras Inteligentes Conectadas ao COI", valor: "620 câmeras", valor_numerico: 620, unidade_medida: "câmeras", icone: "bi-shield-check", cor: "#a855f7", historico: [{"periodo": "2020", "valor": 210}, {"periodo": "2021", "valor": 320}, {"periodo": "2022", "valor": 440}, {"periodo": "2023", "valor": 530}, {"periodo": "2024", "valor": 620}] },
-        { id: 8, id_padrao: 8, secretaria: "Finanças e Planejamento", nome: "Investimento Municipal em Modernização Tecnológica", nome_metrica: "Investimento Municipal em Modernização Tecnológica", valor: "142.5 R$ Milhões", valor_numerico: 142.5, unidade_medida: "R$ Milhões", icone: "bi-graph-up-arrow", cor: "#ef4444", historico: [{"periodo": "2020", "valor": 48.2}, {"periodo": "2021", "valor": 72.5}, {"periodo": "2022", "valor": 98.0}, {"periodo": "2023", "valor": 121.4}, {"periodo": "2024", "valor": 142.5}] }
+    const INDICADORES_PREDEFINIDOS = [
+        { id_padrao: 1, nome: "Saúde", valor: "3.237", icone: "bi-heart-pulse", cor: "#3b82f6" },
+        { id_padrao: 2, nome: "Segurança", valor: "3.847", icone: "bi-shield-check", cor: "#a855f7" },
+        { id_padrao: 3, nome: "Educação", valor: "3.755", icone: "bi-book", cor: "#f59e0b" },
+        { id_padrao: 4, nome: "Mobilidade", valor: "4.687", icone: "bi-car-front", cor: "#10b981" },
+        { id_padrao: 5, nome: "Meio Ambiente", valor: "1.240", icone: "bi-tree", cor: "#84cc16" },
+        { id_padrao: 6, nome: "Economia", valor: "8.921", icone: "bi-graph-up-arrow", cor: "#ef4444" }
     ];
-
-    function popularSelectsIndicadores() {
-        const selectIndicadorNovo = document.getElementById("selectIndicadorNovo");
-        if (selectIndicadorNovo) {
-            const valAntigo = selectIndicadorNovo.value;
-            selectIndicadorNovo.innerHTML = INDICADORES_PREDEFINIDOS.map(ind => 
-                `<option value="${ind.id}">${escapeHtml(ind.nome_metrica || ind.nome)} (${escapeHtml(ind.valor)})</option>`
-            ).join("");
-            if (valAntigo && INDICADORES_PREDEFINIDOS.some(i => String(i.id) === String(valAntigo))) {
-                selectIndicadorNovo.value = valAntigo;
-            }
-        }
-
-        const selectChartIndicador = document.getElementById("selectChartIndicador");
-        if (selectChartIndicador) {
-            const valAntigo = selectChartIndicador.value;
-            selectChartIndicador.innerHTML = INDICADORES_PREDEFINIDOS.map(ind => 
-                `<option value="${ind.id}">${escapeHtml(ind.nome_metrica || ind.nome)} (${escapeHtml(ind.secretaria || '')})</option>`
-            ).join("");
-            if (valAntigo && INDICADORES_PREDEFINIDOS.some(i => String(i.id) === String(valAntigo))) {
-                selectChartIndicador.value = valAntigo;
-            }
-        }
-
-        const selectPinGraficoIndicador = document.getElementById("selectPinGraficoIndicador");
-        if (selectPinGraficoIndicador) {
-            const valAntigo = selectPinGraficoIndicador.value;
-            selectPinGraficoIndicador.innerHTML = INDICADORES_PREDEFINIDOS.map(ind => 
-                `<option value="${ind.id}">${escapeHtml(ind.nome_metrica || ind.nome)}</option>`
-            ).join("");
-            if (valAntigo && INDICADORES_PREDEFINIDOS.some(i => String(i.id) === String(valAntigo))) {
-                selectPinGraficoIndicador.value = valAntigo;
-            }
-        }
-    }
-
-    async function carregarIndicadoresDoBanco() {
-        try {
-            const resp = await fetch('/api/indicadores');
-            const data = await resp.json();
-            if (resp.ok && data.status === 'sucesso' && Array.isArray(data.indicadores) && data.indicadores.length > 0) {
-                INDICADORES_PREDEFINIDOS = data.indicadores;
-                popularSelectsIndicadores();
-                const curSlide = slides.find(s => s.id === activeSlideId);
-                if (curSlide && curSlide.template === 'grafico') {
-                    renderChart(curSlide);
-                } else if (curSlide && curSlide.template === 'indicadores') {
-                    renderIndicadores(curSlide);
-                }
-            }
-        } catch (err) {
-            console.warn("Aviso ao carregar indicadores dinâmicos do banco:", err);
-        }
-    }
-
-    async function carregarOdsDoBanco() {
-        try {
-            const resp = await fetch('/api/ods');
-            const data = await resp.json();
-            if (resp.ok && data.status === 'sucesso' && Array.isArray(data.ods) && data.ods.length > 0) {
-                data.ods.forEach(o => {
-                    const numKey = String(o.numero);
-                    ODS_OPTIONS[numKey] = {
-                        num: numKey,
-                        label: o.titulo,
-                        color: o.cor_hex || '#0052ff',
-                        icone_url: o.icone_url
-                    };
-                });
-                const curSlide = slides.find(s => s.id === activeSlideId);
-                if (curSlide && curSlide.ods) {
-                    updateSlotsVisibility();
-                }
-            }
-        } catch (err) {
-            console.warn("Aviso ao carregar ODS do banco:", err);
-        }
-    }
 
     const btnAddIndicador = document.getElementById("btnAddIndicador");
     if (btnAddIndicador) {
         btnAddIndicador.addEventListener("click", () => {
             const selectInd = document.getElementById("selectIndicadorNovo");
             const val = parseInt(selectInd.value);
-            const template = INDICADORES_PREDEFINIDOS.find(i => i.id === val || i.id_padrao === val);
+            const template = INDICADORES_PREDEFINIDOS.find(i => i.id_padrao === val);
 
             if (template) {
                 const slide = slides.find(s => s.id === activeSlideId);
@@ -1360,7 +1249,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
 
                     // Verify if it's already added
-                    if (slide.indicadores.some(i => i.id_padrao === val || i.id === val)) {
+                    if (slide.indicadores.some(i => i.id_padrao === val)) {
                         alert("Este indicador já está no slide.");
                         return;
                     }
@@ -1757,29 +1646,20 @@ document.addEventListener("DOMContentLoaded", function() {
     const modalAcervoPasta = document.getElementById("modalAcervoPasta");
     const btnCloseAcervoModal = document.getElementById("btnCloseAcervoModal");
     const btnFecharAcervoModal = document.getElementById("btnFecharAcervoModal");
-    const tabBtnKitsCit = document.getElementById("tabBtnKitsCit");
     const tabBtnAcervoSlides = document.getElementById("tabBtnAcervoSlides");
     const tabBtnAcervoDados = document.getElementById("tabBtnAcervoDados");
-    const painelKitsCit = document.getElementById("painelKitsCit");
     const painelAcervoSlides = document.getElementById("painelAcervoSlides");
     const painelAcervoDados = document.getElementById("painelAcervoDados");
-    const countKitsCit = document.getElementById("countKitsCit");
+    const spanAcervoNomePasta = document.getElementById("spanAcervoNomePasta");
     const countAcervoSlides = document.getElementById("countAcervoSlides");
     const countAcervoDados = document.getElementById("countAcervoDados");
-    const gridKitsCit = document.getElementById("gridKitsCit");
-    const emptyKitsCit = document.getElementById("emptyKitsCit");
     const gridAcervoSlides = document.getElementById("gridAcervoSlides");
     const emptyAcervoSlides = document.getElementById("emptyAcervoSlides");
     const gridAcervoDados = document.getElementById("gridAcervoDados");
     const emptyAcervoDados = document.getElementById("emptyAcervoDados");
-    const inputBuscaKitsCit = document.getElementById("inputBuscaKitsCit");
-    const selectFiltroSecretariaCit = document.getElementById("selectFiltroSecretariaCit");
     const inputBuscaAcervoSlides = document.getElementById("inputBuscaAcervoSlides");
-    const selectFiltroPastaAcervo = document.getElementById("selectFiltroPastaAcervo");
     const selectFiltroTemplateAcervo = document.getElementById("selectFiltroTemplateAcervo");
     const btnAcervoPasta = document.getElementById("btnAcervoPasta");
-
-    let kitsCitCache = null;
 
     function fecharAcervoModal() {
         if (modalAcervoPasta) modalAcervoPasta.style.display = "none";
@@ -1794,30 +1674,31 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function alternarAbaAcervo(aba) {
-        if (painelKitsCit) painelKitsCit.style.display = (aba === 'kits') ? 'block' : 'none';
-        if (painelAcervoSlides) painelAcervoSlides.style.display = (aba === 'slides') ? 'block' : 'none';
-        if (painelAcervoDados) painelAcervoDados.style.display = (aba === 'dados') ? 'block' : 'none';
-
-        [tabBtnKitsCit, tabBtnAcervoSlides, tabBtnAcervoDados].forEach(btn => {
-            if (btn) {
-                btn.style.color = '#64748b';
-                btn.style.borderBottom = '2px solid transparent';
+        if (aba === 'slides') {
+            if (painelAcervoSlides) painelAcervoSlides.style.display = 'block';
+            if (painelAcervoDados) painelAcervoDados.style.display = 'none';
+            if (tabBtnAcervoSlides) {
+                tabBtnAcervoSlides.style.color = '#0052ff';
+                tabBtnAcervoSlides.style.borderBottom = '2px solid #0052ff';
             }
-        });
-
-        if (aba === 'kits' && tabBtnKitsCit) {
-            tabBtnKitsCit.style.color = '#0052ff';
-            tabBtnKitsCit.style.borderBottom = '2px solid #0052ff';
-        } else if (aba === 'slides' && tabBtnAcervoSlides) {
-            tabBtnAcervoSlides.style.color = '#0052ff';
-            tabBtnAcervoSlides.style.borderBottom = '2px solid #0052ff';
-        } else if (aba === 'dados' && tabBtnAcervoDados) {
-            tabBtnAcervoDados.style.color = '#0052ff';
-            tabBtnAcervoDados.style.borderBottom = '2px solid #0052ff';
+            if (tabBtnAcervoDados) {
+                tabBtnAcervoDados.style.color = '#64748b';
+                tabBtnAcervoDados.style.borderBottom = '2px solid transparent';
+            }
+        } else {
+            if (painelAcervoSlides) painelAcervoSlides.style.display = 'none';
+            if (painelAcervoDados) painelAcervoDados.style.display = 'block';
+            if (tabBtnAcervoDados) {
+                tabBtnAcervoDados.style.color = '#0052ff';
+                tabBtnAcervoDados.style.borderBottom = '2px solid #0052ff';
+            }
+            if (tabBtnAcervoSlides) {
+                tabBtnAcervoSlides.style.color = '#64748b';
+                tabBtnAcervoSlides.style.borderBottom = '2px solid transparent';
+            }
         }
     }
 
-    if (tabBtnKitsCit) tabBtnKitsCit.addEventListener("click", () => alternarAbaAcervo('kits'));
     if (tabBtnAcervoSlides) tabBtnAcervoSlides.addEventListener("click", () => alternarAbaAcervo('slides'));
     if (tabBtnAcervoDados) tabBtnAcervoDados.addEventListener("click", () => alternarAbaAcervo('dados'));
 
@@ -1831,8 +1712,15 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    async function carregarAcervoPasta(tabPadrao = 'kits', targetFilter = null) {
+    async function carregarAcervoPasta(tabPadrao = 'slides', targetFilter = null) {
         acervoTargetField = targetFilter;
+        const projId = getEffectiveProjetoId();
+
+        if (!projId) {
+            alert("Esta apresentação ainda não está vinculada a uma pasta salva. Salve a apresentação em uma pasta primeiro para habilitar o compartilhamento de acervo.");
+            return;
+        }
+
         if (modalAcervoPasta) modalAcervoPasta.style.display = "flex";
         alternarAbaAcervo(tabPadrao);
 
@@ -1849,231 +1737,35 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         }
 
-        carregarKitsCit();
-        carregarAcervoGlobal();
-    }
-
-    // =========================================================================
-    // KITS DE PROJETOS OFICIAIS DO CIT
-    // =========================================================================
-    async function carregarKitsCit() {
-        if (!gridKitsCit) return;
-        if (!kitsCitCache) {
-            gridKitsCit.innerHTML = `
+        if (gridAcervoSlides) {
+            gridAcervoSlides.innerHTML = `
                 <div style="grid-column: 1/-1; text-align:center; padding: 40px; color: #64748b;">
                     <i class="bi bi-arrow-repeat spin" style="font-size: 2rem; color: #0052ff; display:block; margin-bottom: 8px;"></i>
-                    Carregando 114 projetos oficiais do CIT de Barueri...
+                    Carregando slides compartilhados da pasta...
                 </div>
             `;
-            try {
-                const resp = await fetch('/api/projetos-cit');
-                const data = await resp.json();
-                if (resp.ok && data.status === 'sucesso') {
-                    kitsCitCache = data.projetos || [];
-                    if (countKitsCit) countKitsCit.textContent = kitsCitCache.length;
-                    popularFiltroSecretarias(kitsCitCache);
-                } else {
-                    gridKitsCit.innerHTML = '<p class="text-danger text-center w-100">Falha ao carregar projetos do CIT.</p>';
-                    return;
-                }
-            } catch (err) {
-                console.error("Erro ao buscar projetos do CIT:", err);
-                gridKitsCit.innerHTML = '<p class="text-danger text-center w-100">Erro de rede ao buscar projetos do CIT.</p>';
-                return;
-            }
         }
-        renderGradeKitsCit();
-    }
-
-    function popularFiltroSecretarias(projetos) {
-        if (!selectFiltroSecretariaCit) return;
-        const secretarias = new Set();
-        projetos.forEach(p => {
-            if (p.secretaria) secretarias.add(p.secretaria);
-        });
-        const atual = selectFiltroSecretariaCit.value;
-        selectFiltroSecretariaCit.innerHTML = '<option value="todas">Todas as Secretarias</option>';
-        Array.from(secretarias).sort().forEach(sec => {
-            const opt = document.createElement('option');
-            opt.value = sec;
-            opt.textContent = sec;
-            selectFiltroSecretariaCit.appendChild(opt);
-        });
-        if (atual) selectFiltroSecretariaCit.value = atual;
-    }
-
-    function renderGradeKitsCit() {
-        if (!gridKitsCit || !kitsCitCache) return;
-        const termo = (inputBuscaKitsCit ? inputBuscaKitsCit.value : '').toLowerCase().trim();
-        const secFiltro = selectFiltroSecretariaCit ? selectFiltroSecretariaCit.value : 'todas';
-
-        const filtrados = kitsCitCache.filter(p => {
-            const matchBusca = !termo ||
-                (p.nome && p.nome.toLowerCase().includes(termo)) ||
-                (p.resumo && p.resumo.toLowerCase().includes(termo)) ||
-                (p.secretaria && p.secretaria.toLowerCase().includes(termo));
-            const matchSec = (secFiltro === 'todas') || (p.secretaria === secFiltro);
-            return matchBusca && matchSec;
-        });
-
-        if (countKitsCit) countKitsCit.textContent = filtrados.length;
-
-        if (filtrados.length === 0) {
-            gridKitsCit.innerHTML = '';
-            if (emptyKitsCit) emptyKitsCit.style.display = 'block';
-            return;
-        }
-
-        if (emptyKitsCit) emptyKitsCit.style.display = 'none';
-
-        gridKitsCit.innerHTML = filtrados.map(p => {
-            const fotoEstilo = p.foto_url 
-                ? `background-image: url('${escapeHtml(p.foto_url)}'); background-size: cover; background-position: center;`
-                : `background: linear-gradient(135deg, #0052ff 0%, #0284c7 100%);`;
-
-            return `
-                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
-                    <div style="height: 110px; ${fotoEstilo} position: relative; padding: 10px; display: flex; flex-direction: column; justify-content: space-between;">
-                        <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(15,23,42,0.2) 0%, rgba(15,23,42,0.75) 100%); z-index: 1;"></div>
-                        <div style="position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: flex-start;">
-                            <span style="font-size: 0.68rem; font-weight: 700; background: rgba(255,255,255,0.92); color: #0052ff; padding: 2px 8px; border-radius: 12px; text-transform: uppercase;">CIT Oficial</span>
-                            <span style="font-size: 0.68rem; font-weight: 600; background: rgba(16,185,129,0.9); color: #fff; padding: 2px 8px; border-radius: 12px;">${escapeHtml(p.status_operacional || 'Ativo')}</span>
-                        </div>
-                        <div style="position: relative; z-index: 2; color: #fff;">
-                            <span style="font-size: 0.72rem; opacity: 0.9; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(p.secretaria || 'Prefeitura de Barueri')}</span>
-                        </div>
-                    </div>
-                    <div style="padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; flex: 1; justify-content: space-between;">
-                        <div>
-                            <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 700; color: #0f172a; line-height: 1.3;" title="${escapeHtml(p.nome)}">${escapeHtml(p.nome)}</h4>
-                            <p style="margin: 0; font-size: 0.8rem; color: #64748b; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="${escapeHtml(p.resumo || '')}">
-                                ${escapeHtml(p.resumo || 'Iniciativa inovadora integrada ao catálogo de projetos municipais.')}
-                            </p>
-                        </div>
-                        <div style="margin-top: 6px;">
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-                                <span style="font-size: 0.72rem; font-weight: 600; color: #0052ff; background: #eff6ff; padding: 3px 8px; border-radius: 6px; border: 1px solid #bfdbfe;">
-                                    <i class="bi bi-stack me-1"></i> Kit com ${p.total_slides || 3} slides
-                                </span>
-                            </div>
-                            <button type="button" class="btn btn-primary w-100 d-inline-flex align-items-center justify-content-center gap-1" onclick="window.inserirKitProjeto(${p.id})" style="background: #0052ff; border: none; font-size: 0.82rem; padding: 8px 12px; border-radius: 8px; font-weight: 600;">
-                                <i class="bi bi-plus-circle-fill"></i> Inserir Kit Completo (${p.total_slides || 3} slides)
-                            </button>
-                        </div>
-                    </div>
+        if (gridAcervoDados) {
+            gridAcervoDados.innerHTML = `
+                <div style="grid-column: 1/-1; text-align:center; padding: 40px; color: #64748b;">
+                    <i class="bi bi-arrow-repeat spin" style="font-size: 2rem; color: #0052ff; display:block; margin-bottom: 8px;"></i>
+                    Carregando mídias e dados do acervo...
                 </div>
             `;
-        }).join('');
-    }
+        }
 
-    window.inserirKitProjeto = async function(projetoId) {
         try {
-            mostrarToastNotificacao("Carregando kit de slides do projeto...", "#0052ff");
-            const resp = await fetch(`/api/projetos-cit/${projetoId}/slides`);
+            const resp = await fetch(`/projetos/${projId}/acervo`);
             const data = await resp.json();
 
             if (!resp.ok || data.status !== 'sucesso') {
-                alert("Erro ao obter kit de slides: " + (data.mensagem || "Erro inesperado"));
-                return;
-            }
-
-            const slidesKit = data.slides || [];
-            if (slidesKit.length === 0) {
-                alert("Este projeto não possui slides pré-configurados no kit.");
-                return;
-            }
-
-            let primeiroNovoId = null;
-
-            slidesKit.forEach((sMestre, idx) => {
-                slideCounter++;
-                const novoSlide = {
-                    id: slideCounter,
-                    template: sMestre.template || 'capa',
-                    titulo: sMestre.titulo || '',
-                    subtitulo: sMestre.subtitulo || '',
-                    tamanhoTitulo: sMestre.tamanhoTitulo || 4.0,
-                    tamanhoSubtitulo: sMestre.tamanhoSubtitulo || 1.8,
-                    corTitulo: sMestre.corTitulo || '#0f172a',
-                    corSubtitulo: sMestre.corSubtitulo || '#64748b',
-                    corFundo: sMestre.corFundo || '#ffffff',
-                    logos: Array.isArray(sMestre.logos) ? [...sMestre.logos] : ['barueri'],
-                    customLogoImg: sMestre.customLogoImg || null,
-                    ods: !!sMestre.ods,
-                    odsNums: Array.isArray(sMestre.odsNums) ? [...sMestre.odsNums] : [],
-                    qr: !!sMestre.qr,
-                    qrLink: sMestre.qrLink || '',
-                    bgCapa: sMestre.bgCapa || null,
-                    bgGeral: sMestre.bgGeral || sMestre.bgCapa || null,
-                    imgTexto: sMestre.imgTexto || null,
-                    chartType: sMestre.chartType || 'line',
-                    chartIndicador: sMestre.chartIndicador || 1,
-                    periodo: sMestre.periodo || 'Últimos 12 meses',
-                    indicadores: Array.isArray(sMestre.indicadores) ? JSON.parse(JSON.stringify(sMestre.indicadores)) : [],
-                    mapaTipo: sMestre.mapaTipo || 'barueri',
-                    mapaPins: Array.isArray(sMestre.mapaPins) ? JSON.parse(JSON.stringify(sMestre.mapaPins)) : [],
-                    pilar_1_titulo: sMestre.pilar_1_titulo || '',
-                    pilar_1_texto: sMestre.pilar_1_texto || '',
-                    pilar_2_titulo: sMestre.pilar_2_titulo || '',
-                    pilar_2_texto: sMestre.pilar_2_texto || '',
-                    pilar_3_titulo: sMestre.pilar_3_titulo || '',
-                    pilar_3_texto: sMestre.pilar_3_texto || '',
-                    origens_campos: {}
-                };
-
-                slides.push(novoSlide);
-                if (idx === 0) primeiroNovoId = novoSlide.id;
-            });
-
-            if (primeiroNovoId) activeSlideId = primeiroNovoId;
-            renderThumbnails();
-            renderActiveSlide();
-            if (slidesThumbsList) slidesThumbsList.scrollTop = slidesThumbsList.scrollHeight;
-
-            fecharAcervoModal();
-            mostrarToastNotificacao(`Kit "${data.projeto?.nome || 'Projeto'}" inserido com sucesso (${slidesKit.length} slides)!`);
-        } catch (err) {
-            console.error("Erro ao inserir kit do projeto:", err);
-            alert("Erro de comunicação ao inserir kit do projeto.");
-        }
-    };
-
-    // =========================================================================
-    // SLIDES E DADOS COMPARTILHADOS DE TODA A PLATAFORMA
-    // =========================================================================
-    async function carregarAcervoGlobal() {
-        if (!gridAcervoSlides) return;
-        gridAcervoSlides.innerHTML = `
-            <div style="grid-column: 1/-1; text-align:center; padding: 40px; color: #64748b;">
-                <i class="bi bi-arrow-repeat spin" style="font-size: 2rem; color: #0052ff; display:block; margin-bottom: 8px;"></i>
-                Carregando slides compartilhados de toda a plataforma...
-            </div>
-        `;
-
-        try {
-            const resp = await fetch('/api/acervo/global');
-            const data = await resp.json();
-
-            if (!resp.ok || data.status !== 'sucesso') {
-                gridAcervoSlides.innerHTML = '<p class="text-danger text-center w-100">Falha ao buscar acervo.</p>';
+                alert("Erro ao consultar acervo: " + (data.mensagem || "Erro inesperado"));
                 return;
             }
 
             acervoCache = data;
-            if (countAcervoSlides) countAcervoSlides.textContent = data.total_slides || (data.slides ? data.slides.length : 0);
-
-            // Popula o select de filtro por pasta
-            if (selectFiltroPastaAcervo && data.pastas) {
-                const pastaAtual = selectFiltroPastaAcervo.value;
-                selectFiltroPastaAcervo.innerHTML = '<option value="">Todas as Pastas</option>';
-                data.pastas.forEach(p => {
-                    const opt = document.createElement('option');
-                    opt.value = p.id;
-                    opt.textContent = p.nome;
-                    selectFiltroPastaAcervo.appendChild(opt);
-                });
-                if (pastaAtual) selectFiltroPastaAcervo.value = pastaAtual;
-            }
+            if (spanAcervoNomePasta) spanAcervoNomePasta.textContent = data.projeto.nome;
+            if (countAcervoSlides) countAcervoSlides.textContent = data.total_slides;
 
             const totalDados = (data.dados_manuais.midias?.length || 0) +
                                (data.dados_manuais.textos?.length || 0) +
@@ -2084,8 +1776,9 @@ document.addEventListener("DOMContentLoaded", function() {
             renderGradeAcervoSlides();
             renderGradeAcervoDados(acervoFiltroDadoAtual);
         } catch (err) {
-            console.error("Falha ao carregar acervo global:", err);
-            gridAcervoSlides.innerHTML = '<p class="text-danger text-center w-100">Erro de conexão ao buscar acervo.</p>';
+            console.error("Falha ao carregar acervo da pasta:", err);
+            if (gridAcervoSlides) gridAcervoSlides.innerHTML = '<p class="text-danger text-center w-100">Erro de conexão ao buscar acervo.</p>';
+            if (gridAcervoDados) gridAcervoDados.innerHTML = '<p class="text-danger text-center w-100">Erro de conexão ao buscar acervo.</p>';
         }
     }
 
@@ -2094,17 +1787,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
         const termo = (inputBuscaAcervoSlides ? inputBuscaAcervoSlides.value : '').toLowerCase().trim();
         const tplFiltro = selectFiltroTemplateAcervo ? selectFiltroTemplateAcervo.value : '';
-        const pastaFiltro = selectFiltroPastaAcervo ? selectFiltroPastaAcervo.value : '';
 
         const slidesFiltrados = (acervoCache.slides || []).filter(s => {
             const matchBusca = !termo ||
                 (s.titulo && s.titulo.toLowerCase().includes(termo)) ||
                 (s.subtitulo && s.subtitulo.toLowerCase().includes(termo)) ||
-                (s.apresentacao_nome && s.apresentacao_nome.toLowerCase().includes(termo)) ||
-                (s.pasta_nome && s.pasta_nome.toLowerCase().includes(termo));
+                (s.apresentacao_nome && s.apresentacao_nome.toLowerCase().includes(termo));
             const matchTpl = !tplFiltro || s.template === tplFiltro;
-            const matchPasta = !pastaFiltro || (s.pasta_id && String(s.pasta_id) === String(pastaFiltro));
-            return matchBusca && matchTpl && matchPasta;
+            return matchBusca && matchTpl;
         });
 
         if (slidesFiltrados.length === 0) {
@@ -2118,29 +1808,22 @@ document.addEventListener("DOMContentLoaded", function() {
         gridAcervoSlides.innerHTML = slidesFiltrados.map(s => {
             const tplBadge = {
                 'capa': { label: 'Capa', bg: '#eff6ff', color: '#1d4ed8' },
-                'modulos_pilares': { label: 'Pilares', bg: '#ecfdf5', color: '#047857' },
                 'imagem_texto': { label: 'Imagem + Texto', bg: '#f0fdf4', color: '#15803d' },
                 'grafico': { label: 'Gráfico', bg: '#fef3c7', color: '#b45309' },
-                'indicadores': { label: 'Indicadores', bg: '#f5f3ff', color: '#6d28d9' },
-                'mapa': { label: 'Mapa', bg: '#e0f2fe', color: '#0369a1' }
+                'indicadores': { label: 'Indicadores', bg: '#f5f3ff', color: '#6d28d9' }
             }[s.template] || { label: 'Slide', bg: '#f1f5f9', color: '#475569' };
 
             return `
                 <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
                     <div style="padding: 10px 12px; background: #f8fafc; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 0.74rem; font-weight: 700; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px;" title="${escapeHtml(s.apresentacao_nome)}">
+                        <span style="font-size: 0.75rem; font-weight: 700; color: #334155; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px;" title="${escapeHtml(s.apresentacao_nome)}">
                             <i class="bi bi-file-earmark-slides text-primary me-1"></i>${escapeHtml(s.apresentacao_nome)}
                         </span>
-                        <div style="display: flex; gap: 4px; align-items: center;">
-                            <span style="font-size: 0.66rem; font-weight: 600; padding: 2px 5px; border-radius: 4px; background: #f1f5f9; color: #475569;" title="Pasta: ${escapeHtml(s.pasta_nome || 'Geral')}">
-                                <i class="bi bi-folder2 me-1"></i>${escapeHtml(s.pasta_nome || 'Geral')}
-                            </span>
-                            <span style="font-size: 0.68rem; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: ${tplBadge.bg}; color: ${tplBadge.color};">
-                                ${tplBadge.label}
-                            </span>
-                        </div>
+                        <span style="font-size: 0.7rem; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: ${tplBadge.bg}; color: ${tplBadge.color};">
+                            ${tplBadge.label}
+                        </span>
                     </div>
-                    <div style="padding: 10px; display: flex; justify-content: center; align-items: center; background: #f8fafc;">
+                    <div style="padding: 10px; display: flex; justify-content: center; align-items: center; background: #f1f5f9;">
                         <div class="thumb-canvas-mini" style="height: 90px; aspect-ratio: 16/9; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); background: #fff; position: relative;">
                             ${renderMiniSlidePreview(s)}
                         </div>
@@ -2189,12 +1872,6 @@ document.addEventListener("DOMContentLoaded", function() {
             indicadores: Array.isArray(sOrigem.indicadores) ? JSON.parse(JSON.stringify(sOrigem.indicadores)) : [],
             mapaTipo: sOrigem.mapaTipo || 'barueri',
             mapaPins: Array.isArray(sOrigem.mapaPins) ? JSON.parse(JSON.stringify(sOrigem.mapaPins)) : [],
-            pilar_1_titulo: sOrigem.pilar_1_titulo || '',
-            pilar_1_texto: sOrigem.pilar_1_texto || '',
-            pilar_2_titulo: sOrigem.pilar_2_titulo || '',
-            pilar_2_texto: sOrigem.pilar_2_texto || '',
-            pilar_3_titulo: sOrigem.pilar_3_titulo || '',
-            pilar_3_texto: sOrigem.pilar_3_texto || '',
             origens_campos: {}
         };
 
@@ -2205,7 +1882,7 @@ document.addEventListener("DOMContentLoaded", function() {
         if (slidesThumbsList) slidesThumbsList.scrollTop = slidesThumbsList.scrollHeight;
 
         fecharAcervoModal();
-        mostrarToastNotificacao(`Slide importado com sucesso!`);
+        mostrarToastNotificacao(`Slide importado com sucesso da pasta!`);
     };
 
     function renderGradeAcervoDados(filtro = 'todos') {
@@ -2215,7 +1892,7 @@ document.addEventListener("DOMContentLoaded", function() {
         let htmlCards = '';
         let totalExibidos = 0;
 
-        // Renderização de Mídias
+        // Renderização de Mídias (Fundos, Imagens, Logos)
         let midiasFiltradas = [];
         if (filtro === 'todos' || filtro === 'bgCapa' || filtro === 'imgTexto' || filtro === 'customLogoImg') {
             midiasFiltradas = midias.filter(m => filtro === 'todos' || m.tipo === filtro);
@@ -2243,7 +1920,7 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         }
 
-        // Renderização de Textos
+        // Renderização de Textos (Títulos e Subtítulos)
         let textosFiltrados = [];
         if (filtro === 'todos' || filtro === 'textos') {
             textosFiltrados = textos;
@@ -2282,20 +1959,19 @@ document.addEventListener("DOMContentLoaded", function() {
                 totalExibidos++;
                 htmlCards += `
                     <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; gap: 8px;">
-                        <div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                                <span style="font-size: 0.7rem; font-weight: 700; color: ${ind.cor || '#0052ff'}; text-transform: uppercase;">Indicador</span>
-                                <span style="font-size: 0.7rem; color: #94a3b8;">${escapeHtml(ind.apresentacao_nome)}</span>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 38px; height: 38px; border-radius: 8px; background: #eff6ff; display: flex; align-items: center; justify-content: center; color: ${ind.cor || '#0052ff'}; font-size: 1.2rem; flex-shrink: 0;">
+                                <i class="bi ${ind.icone || 'bi-graph-up'}"></i>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 8px; margin: 4px 0;">
-                                <i class="bi ${ind.icone || 'bi-graph-up'}" style="font-size: 1.2rem; color: ${ind.cor || '#0052ff'};"></i>
-                                <div>
-                                    <div style="font-size: 1rem; font-weight: 700; color: #0f172a;">${escapeHtml(ind.valor || '-')}</div>
-                                    <div style="font-size: 0.75rem; color: #64748b;">${escapeHtml(ind.nome || 'Métrica')}</div>
-                                </div>
+                            <div style="min-width: 0; flex: 1;">
+                                <div style="font-size: 1rem; font-weight: 800; color: #0f172a; line-height: 1.1;">${escapeHtml(ind.valor)}</div>
+                                <div style="font-size: 0.75rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(ind.nome)}</div>
                             </div>
                         </div>
-                        <button type="button" class="btn btn-sm btn-outline-primary w-100 btn-aplicar-indicador-acervo" data-idx="${idx}" style="font-size: 0.74rem; font-weight: 600; padding: 4px;">
+                        <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 2px;">
+                            De: ${escapeHtml(ind.apresentacao_nome)}
+                        </div>
+                        <button type="button" class="btn btn-sm btn-primary w-100 btn-aplicar-indicador-acervo" data-idx="${idx}" style="font-size: 0.75rem; font-weight: 600; padding: 5px; background: #0052ff; border: none;">
                             <i class="bi bi-plus-circle me-1"></i> Inserir no Slide
                         </button>
                     </div>
@@ -2312,88 +1988,125 @@ document.addEventListener("DOMContentLoaded", function() {
         if (emptyAcervoDados) emptyAcervoDados.style.display = "none";
         gridAcervoDados.innerHTML = htmlCards;
 
-        // Binds de botões de aplicação avulsa
+        // Atribuir event listeners dinâmicos com isolamento de dados
         gridAcervoDados.querySelectorAll('.btn-aplicar-midia-acervo').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const idx = parseInt(btn.dataset.idx);
-                const item = midiasFiltradas[idx];
-                if (item) window.aplicarMidiaDoAcervo(item);
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const idx = parseInt(btn.dataset.idx, 10);
+                const m = midiasFiltradas[idx];
+                if (m) window.aplicarMidiaAcervo(m.tipo, m.valor, m.campo_id);
             });
         });
 
         gridAcervoDados.querySelectorAll('.btn-aplicar-texto-acervo').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const idx = parseInt(btn.dataset.idx);
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const idx = parseInt(btn.dataset.idx, 10);
                 const alvo = btn.dataset.alvo;
-                const item = textosFiltrados[idx];
-                if (item) window.aplicarTextoDoAcervo(item, alvo);
+                const t = textosFiltrados[idx];
+                if (t) window.aplicarTextoAcervo(alvo, t.valor, t.campo_id);
             });
         });
 
         gridAcervoDados.querySelectorAll('.btn-aplicar-indicador-acervo').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const idx = parseInt(btn.dataset.idx);
-                const item = indicadoresFiltrados[idx];
-                if (item) window.aplicarIndicadorDoAcervo(item);
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const idx = parseInt(btn.dataset.idx, 10);
+                const ind = indicadoresFiltrados[idx];
+                if (ind) window.aplicarIndicadorAcervo(ind, ind.campo_id);
             });
         });
     }
 
-    window.aplicarMidiaDoAcervo = function(item) {
+    window.aplicarMidiaAcervo = function(tipo, valor, campoId) {
         const slide = slides.find(s => s.id === activeSlideId);
         if (!slide) return;
-        const target = acervoTargetField || item.tipo;
-        if (target === 'bgCapa' || target === 'bgGeral') {
-            slide.bgCapa = item.valor;
-            slide.bgGeral = item.valor;
-        } else if (target === 'imgTexto') {
-            slide.imgTexto = item.valor;
-        } else if (target === 'customLogoImg') {
-            slide.customLogoImg = item.valor;
-            slide.logos = ['custom'];
+        if (!slide.origens_campos) slide.origens_campos = {};
+
+        if (tipo === 'bgCapa') {
+            slide.bgGeral = valor;
+            slide.bgCapa = valor;
+            slide.origens_campos['bgCapa'] = campoId;
+            updatePreviewMedia();
+        } else if (tipo === 'imgTexto') {
+            slide.imgTexto = valor;
+            slide.origens_campos['imgTexto'] = campoId;
+            updatePreviewMedia();
+        } else if (tipo === 'customLogoImg') {
+            slide.customLogoImg = valor;
+            if (!slide.logos) slide.logos = [];
+            if (!slide.logos.includes('custom')) slide.logos.push('custom');
+            slide.origens_campos['customLogoImg'] = campoId;
+            if (chkLogoCustom) chkLogoCustom.checked = true;
+            if (fgLogoCustom) fgLogoCustom.style.display = 'block';
+            updateSlotsVisibility();
+        } else if (tipo === 'pinImg') {
+            if (inputPinImgUrl) inputPinImgUrl.value = valor;
         }
-        slide.origens_campos = slide.origens_campos || {};
-        slide.origens_campos[target] = item.campo_id;
-        updatePreviewMedia();
+
         updateActiveThumbnail();
         fecharAcervoModal();
-        mostrarToastNotificacao(`Mídia aplicada com sucesso ao slide!`);
+        mostrarToastNotificacao("Mídia aplicada ao slide com sucesso!");
     };
 
-    window.aplicarTextoDoAcervo = function(item, alvo) {
+        window.aplicarTextoAcervo = function(campoAlvo, valor, campoId) {
         const slide = slides.find(s => s.id === activeSlideId);
         if (!slide) return;
-        if (alvo === 'titulo') {
-            slide.titulo = item.valor;
-            if (inputTitulo) inputTitulo.value = item.valor;
+        if (!slide.origens_campos) slide.origens_campos = {};
+
+        if (campoAlvo === 'titulo') {
+            slide.titulo = valor;
+            if (inputTitulo) {
+                inputTitulo.value = valor;
+                try { inputTitulo.dispatchEvent(new Event('input', { bubbles: true })); } catch(e){}
+            }
         } else {
-            slide.subtitulo = item.valor;
-            if (inputSubtitulo) inputSubtitulo.value = item.valor;
+            slide.subtitulo = valor;
+            if (inputSubtitulo) {
+                inputSubtitulo.value = valor;
+                try { inputSubtitulo.dispatchEvent(new Event('input', { bubbles: true })); } catch(e){}
+            }
         }
-        slide.origens_campos = slide.origens_campos || {};
-        slide.origens_campos[alvo] = item.campo_id;
+        slide.origens_campos[campoAlvo] = campoId;
+
         updatePreviewTexts();
         updateActiveThumbnail();
         fecharAcervoModal();
-        mostrarToastNotificacao(`Texto aplicado como ${alvo} com sucesso!`);
+        mostrarToastNotificacao(`Texto inserido como ${campoAlvo === 'titulo' ? 'Título' : 'Subtítulo'}!`);
     };
 
-    window.aplicarIndicadorDoAcervo = function(item) {
+    window.aplicarIndicadorAcervo = function(item, campoId) {
         const slide = slides.find(s => s.id === activeSlideId);
         if (!slide) return;
+
         if (slide.template !== 'indicadores') {
-            slide.template = 'indicadores';
-            if (selectTemplate) selectTemplate.value = 'indicadores';
-            switchTemplate();
+            if (confirm("O slide atual não está usando o template de Indicadores. Deseja alternar o template deste slide para Indicadores para adicionar este item?")) {
+                slide.template = 'indicadores';
+                if (selectTemplate) selectTemplate.value = 'indicadores';
+                switchTemplate();
+            } else {
+                return;
+            }
         }
-        slide.indicadores = slide.indicadores || [];
+
+        if (!slide.indicadores) slide.indicadores = [];
+        if (slide.indicadores.length >= 4) {
+            alert("Você só pode adicionar no máximo 4 indicadores por slide.");
+            return;
+        }
+
         slide.indicadores.push({
             id: Date.now(),
+            id_padrao: null,
             nome: item.nome,
             valor: item.valor,
             icone: item.icone || 'bi-graph-up',
             cor: item.cor || '#0284c7'
         });
+
+        if (!slide.origens_campos) slide.origens_campos = {};
+        slide.origens_campos['indicadores'] = campoId;
+
         renderIndicadores(slide);
         updateActiveThumbnail();
         fecharAcervoModal();
@@ -2402,15 +2115,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
     if (btnAcervoPasta) {
         btnAcervoPasta.addEventListener("click", () => {
-            carregarAcervoPasta('kits');
+            carregarAcervoPasta('slides');
         });
     }
-
-    if (inputBuscaKitsCit) inputBuscaKitsCit.addEventListener("input", renderGradeKitsCit);
-    if (selectFiltroSecretariaCit) selectFiltroSecretariaCit.addEventListener("change", renderGradeKitsCit);
-    if (inputBuscaAcervoSlides) inputBuscaAcervoSlides.addEventListener("input", renderGradeAcervoSlides);
-    if (selectFiltroPastaAcervo) selectFiltroPastaAcervo.addEventListener("change", renderGradeAcervoSlides);
-    if (selectFiltroTemplateAcervo) selectFiltroTemplateAcervo.addEventListener("change", renderGradeAcervoSlides);
 
     document.querySelectorAll(".btn-abrir-acervo-midia").forEach(btn => {
         btn.addEventListener("click", () => {
@@ -2426,6 +2133,9 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
+    if (inputBuscaAcervoSlides) inputBuscaAcervoSlides.addEventListener("input", renderGradeAcervoSlides);
+    if (selectFiltroTemplateAcervo) selectFiltroTemplateAcervo.addEventListener("change", renderGradeAcervoSlides);
+
     document.querySelectorAll('.filter-dado-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.filter-dado-btn').forEach(b => {
@@ -2440,9 +2150,10 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
 
-    // =========================================================================
-    // MAPA TEMPLATE - IMPLEMENTAÇÃO COMPLETA COM BANCO DE DADOS & TRAVAMENTO
-    // =========================================================================
+    // ============================================================
+    // IMPLEMENTAÇÃO DO TEMPLATE DE MAPA E GERENCIAMENTO DE PINS
+    // ============================================================
+
     let activeTipoPopup = "texto";
 
     function populateSelectPinLocal(regiao) {
@@ -2520,6 +2231,7 @@ document.addEventListener("DOMContentLoaded", function() {
             `;
         }).join("");
 
+        // Vincular eventos de remover e centralizar
         listaPinsAdicionados.querySelectorAll(".btn-remover-pin").forEach(btn => {
             btn.addEventListener("click", () => {
                 const pinId = btn.getAttribute("data-pin-id");
@@ -2569,6 +2281,7 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
 
+        // Destroi mapa anterior se existir para reinicializar limpo
         if (slideMapInstance) {
             try {
                 slideMapInstance.remove();
@@ -2581,6 +2294,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         const isBrasil = (slide.mapaTipo === "brasil");
 
+        // Atualiza tags de cabeçalho
         const tagHeader = document.getElementById("mapaRegiaoTag");
         if (tagHeader) {
             tagHeader.textContent = isBrasil ? "República Federativa do Brasil" : "Município de Barueri";
@@ -2591,9 +2305,11 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         // Bounding box e limites rígidos de travamento
+        // Barueri BBox: lat [-23.554, -23.470], lng [-46.966, -46.799]
         const barueriBounds = [[-23.565, -46.985], [-23.455, -46.775]];
         const barueriCenter = [-23.5080, -46.8760];
 
+        // Brasil BBox: lat [-33.77, 5.24], lng [-73.99, -34.73]
         const brasilBounds = [[-34.5, -74.5], [5.5, -34.0]];
         const brasilCenter = [-14.235, -51.925];
 
@@ -2603,6 +2319,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const minZ = isBrasil ? 4 : 12;
         const maxZ = isBrasil ? 8 : 16;
 
+        // O mapa é travado no território com maxBounds e maxBoundsViscosity = 1.0 (não sai dele)
         slideMapInstance = L.map('slideMapContainer', {
             center: centerCoord,
             zoom: zoomLevel,
@@ -2614,6 +2331,7 @@ document.addEventListener("DOMContentLoaded", function() {
             attributionControl: false
         });
 
+        // Camada base OpenStreetMap (100% gratuita, sem marca d'água)
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors',
             maxZoom: 19
@@ -2621,7 +2339,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
         L.control.zoom({ position: 'bottomright' }).addTo(slideMapInstance);
 
-        // GeoJSON com borda azul e máscara
+        // ============================================================
+        // GEOJSON: Limites marcados de azul + máscara externa translúcida
+        // ============================================================
         const geojsonUrl = isBrasil ? '/static/data/brasil.geojson' : '/static/data/barueri.geojson';
 
         fetch(geojsonUrl)
@@ -2629,6 +2349,7 @@ document.addEventListener("DOMContentLoaded", function() {
             .then(geoData => {
                 if (!slideMapInstance) return;
 
+                // 1. Máscara branca no exterior para isolar o território com destaque (como no exemplo)
                 const mundo = [[-90, -180], [-90, 180], [90, 180], [90, -180], [-90, -180]];
                 let polyHoles = [];
                 if (geoData.features && geoData.features.length > 0) {
@@ -2655,12 +2376,13 @@ document.addEventListener("DOMContentLoaded", function() {
                     });
                 }
 
+                // 2. Limites marcados de azul vibrante e preenchimento suave
                 L.geoJSON(geoData, {
                     style: {
-                        color: '#0052ff',
+                        color: '#0052ff', // Linha azul nítida
                         weight: 3,
                         opacity: 1,
-                        fillColor: '#38bdf8',
+                        fillColor: '#38bdf8', // Azul claro destacado
                         fillOpacity: 0.16
                     },
                     interactive: false
@@ -2668,6 +2390,9 @@ document.addEventListener("DOMContentLoaded", function() {
             })
             .catch(err => console.warn('Erro ao carregar GeoJSON de limites:', err));
 
+        // ============================================================
+        // PINS NO MAPA COM BADGES ESTILO GOOGLE MAPS / MOCKUP
+        // ============================================================
         const pins = slide.mapaPins || [];
         slideMapMarkers = [];
 
@@ -2720,44 +2445,18 @@ document.addEventListener("DOMContentLoaded", function() {
                     setTimeout(() => {
                         const canvas = document.getElementById(chartCanvasId);
                         if (!canvas) return;
-
-                        const indKey = pin.chartIndicador || 1;
-                        const indId = parseInt(indKey) || 1;
-                        const indData = (INDICADORES_PREDEFINIDOS && INDICADORES_PREDEFINIDOS.find(i => i.id === indId || i.id_padrao === indId || String(i.id) === String(indKey))) ||
-                                        (POPUP_CHART_INDICADORES && POPUP_CHART_INDICADORES[indKey]) ||
-                                        (INDICADORES_PREDEFINIDOS && INDICADORES_PREDEFINIDOS[0]);
-
+                        const indKey = pin.chartIndicador || 'saude';
+                        const indData = POPUP_CHART_INDICADORES[indKey] || POPUP_CHART_INDICADORES.saude;
                         const ctype = pin.chartType || 'bar';
-
-                        let pLabels = [];
-                        let pData = [];
-                        let pColor = '#0052ff';
-                        let pNome = 'Métrica';
-
-                        if (indData && Array.isArray(indData.historico) && indData.historico.length > 0) {
-                            pLabels = indData.historico.map(h => String(h.periodo || ''));
-                            pData = indData.historico.map(h => typeof h.valor === 'number' ? h.valor : parseFloat(h.valor) || 0);
-                            pColor = indData.cor || '#0052ff';
-                            pNome = indData.nome_metrica || indData.nome || 'Métrica';
-                        } else if (indData && Array.isArray(indData.data)) {
-                            pLabels = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'];
-                            pData = indData.data;
-                            pColor = indData.color || '#0052ff';
-                            pNome = indData.label || 'Métrica';
-                        } else {
-                            pLabels = ['2020', '2021', '2022', '2023', '2024'];
-                            pData = [100, 120, 150, 180, 200];
-                        }
-
                         new Chart(canvas.getContext('2d'), {
                             type: ctype,
                             data: {
-                                labels: pLabels,
+                                labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
                                 datasets: [{
-                                    label: pNome,
-                                    data: pData,
-                                    backgroundColor: ctype === 'pie' ? ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899'] : pColor + 'cc',
-                                    borderColor: pColor,
+                                    label: indData.label,
+                                    data: indData.data,
+                                    backgroundColor: ctype === 'pie' ? ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899'] : indData.color + 'bb',
+                                    borderColor: indData.color,
                                     borderWidth: 1.5,
                                     borderRadius: ctype === 'bar' ? 4 : 0,
                                     fill: (ctype === 'line')
@@ -2794,6 +2493,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 marker.bindPopup(popupContent);
 
             } else {
+                // Texto
                 popupContent = `
                     <div class="popup-box-inner">
                         <div class="popup-box-header">
@@ -2811,7 +2511,9 @@ document.addEventListener("DOMContentLoaded", function() {
             slideMapMarkers.push(marker);
         });
 
-        // Legenda flutuante de pontos de interesse
+        // ============================================================
+        // LEGENDA FLUTUANTE DE PONTOS DE INTERESSE (DIREITA)
+        // ============================================================
         const cardPontos = document.getElementById("mapaPontosInteresseCard");
         const listaPontos = document.getElementById("mapaPontosInteresseLista");
         if (cardPontos && listaPontos) {
@@ -2841,6 +2543,7 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         }
 
+        // Invalidate size para garantir renderização perfeita
         setTimeout(() => {
             if (slideMapInstance) {
                 slideMapInstance.invalidateSize();
@@ -2929,7 +2632,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 novoPin.popupTitulo = inputPinGraficoTitulo ? inputPinGraficoTitulo.value.trim() : "";
                 if (!novoPin.popupTitulo) novoPin.popupTitulo = localObj.nome;
                 novoPin.chartType = selectPinGraficoTipo ? selectPinGraficoTipo.value : "bar";
-                novoPin.chartIndicador = selectPinGraficoIndicador ? selectPinGraficoIndicador.value : "1";
+                novoPin.chartIndicador = selectPinGraficoIndicador ? selectPinGraficoIndicador.value : "saude";
             } else if (activeTipoPopup === "imagem") {
                 novoPin.popupTitulo = inputPinImgTitulo ? inputPinImgTitulo.value.trim() : "";
                 if (!novoPin.popupTitulo) novoPin.popupTitulo = localObj.nome;
@@ -2944,6 +2647,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
             slide.mapaPins.push(novoPin);
 
+            // Limpa campos
             if (inputPinTextoTitulo) inputPinTextoTitulo.value = "";
             if (inputPinTextoDescricao) inputPinTextoDescricao.value = "";
             if (inputPinGraficoTitulo) inputPinGraficoTitulo.value = "";
@@ -2955,19 +2659,12 @@ document.addEventListener("DOMContentLoaded", function() {
             renderThumbnails();
             updateActiveThumbnail();
 
+            // Abre o popup do novo pin para confirmação visual imediata
             setTimeout(() => {
                 focarPinNoMapa(novoPin.id);
             }, 300);
         });
     }
-
-    window.removerPinDoMapa = removerPinDoMapa;
-    window.focarPinNoMapa = focarPinNoMapa;
-
-    // --- INICIALIZAÇÃO DE DADOS DINÂMICOS DO BANCO ---
-    popularSelectsIndicadores();
-    carregarIndicadoresDoBanco();
-    carregarOdsDoBanco();
 
     renderThumbnails();
     renderActiveSlide();
