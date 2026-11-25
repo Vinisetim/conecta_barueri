@@ -26,7 +26,12 @@ class Usuario(UserMixin, db.Model):
 
     # Relacionamento 1:1 com a tabela de credenciais (isolamento de segurança)
     senha_obj = db.relationship('Senha', backref='usuario', uselist=False)
-    projetos = db.relationship('Projeto', backref='dono', lazy=True)
+    pastas = db.relationship('Pasta', backref='dono', lazy=True)
+
+    @property
+    def projetos(self):
+        """Compatibilidade com código legado: retorna as pastas do usuário."""
+        return self.pastas
 
     @property
     def iniciais(self):
@@ -79,43 +84,80 @@ class Senha(db.Model):
     #senha criptografada
     senha = db.Column(db.String(255), nullable=False)
 
-class Projeto(db.Model):
+class Pasta(db.Model):
     """
-    Mapeia a tabela apresentacao.projeto
-    Funciona como um 'pasta' que organiza apresentações de um Tema
+    Mapeia a tabela apresentacao.pasta
+    Diretório pessoal do usuário para organizar apresentações de slides.
     """
-    __tablename__ = 'projeto'
-    #schema diferente para organizar
-    __table_args__ = {'schema':'apresentacao'}
+    __tablename__ = 'pasta'
+    __table_args__ = {'schema': 'apresentacao'}
 
     id = db.Column(db.Integer, primary_key=True)
-
-    #chave estrangeira que liga projeto ao usuario
     usuario_id = db.Column(db.Integer, db.ForeignKey('login.usuario.id'), nullable=False)
-
     nome = db.Column(db.String(255), nullable=False)
     descricao = db.Column(db.Text)
     capa_uri = db.Column(db.String(255))
 
-    apresentacoes = db.relationship('Apresentacao', backref='projeto', lazy=True)
+    apresentacoes = db.relationship('Apresentacao', backref='pasta_pai', lazy=True, cascade='all, delete-orphan')
+
+
+class Projeto(db.Model):
+    """
+    Mapeia a tabela apresentacao.projeto
+    Iniciativa Municipal Oficial do CIT de Barueri.
+    Guarda metadados institucionais e provê os slides mestres do Kit modular.
+    """
+    __tablename__ = 'projeto'
+    __table_args__ = {'schema': 'apresentacao'}
+
+    id = db.Column(db.Integer, primary_key=True)
+    slug = db.Column(db.String(200), unique=True, nullable=False)
+    nome = db.Column(db.String(255), nullable=False)
+    secretaria_principal = db.Column(db.String(150))
+    resumo = db.Column(db.Text)
+    descricao_completa = db.Column(db.Text)
+    foto_url = db.Column(db.String(500))
+    destaques = db.Column(db.JSON)       # 3 marcos de destaque
+    beneficios = db.Column(db.JSON)      # 3 cards de pilares de benefícios
+    data_implantacao = db.Column(db.String(50))
+    status_operacional = db.Column(db.String(100))
+    ods_vinculados = db.Column(db.JSON)  # IDs numéricos dos ODS
+    criado_em = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+    slides_kit = db.relationship('Slide', backref='projeto_pai', lazy=True, cascade='all, delete-orphan')
+
 
 class Apresentacao(db.Model):
     """
     Mapeia a tabela apresentacao.apresentacao.
-    É o que seria o Slide em si
+    Arquivo renderizável de slides do usuário.
     """
     __tablename__ = 'apresentacao'
-    __table_args__ = {'schema':'apresentacao'}
+    __table_args__ = {'schema': 'apresentacao'}
 
     id = db.Column(db.Integer, primary_key=True)
-
-    projeto_id = db.Column(db.Integer, db.ForeignKey('apresentacao.projeto.id'), nullable=False)
-
+    pasta_id = db.Column(db.Integer, db.ForeignKey('apresentacao.pasta.id'), nullable=False)
     nome = db.Column(db.String(200), nullable=False)
-
     data_criacao = db.Column(db.DateTime, default=db.func.current_timestamp())
 
     slides = db.relationship('Slide', backref='apresentacao_pai', lazy=True, cascade='all, delete-orphan')
+
+    # Propriedades de compatibilidade com o código legado:
+    @property
+    def projeto_id(self):
+        return self.pasta_id
+
+    @projeto_id.setter
+    def projeto_id(self, val):
+        self.pasta_id = val
+
+    @property
+    def projeto(self):
+        return self.pasta_pai
+
+    @property
+    def pasta(self):
+        return self.pasta_pai
 
 
 class Templates(db.Model):
@@ -123,43 +165,31 @@ class Templates(db.Model):
     Mapeia a tabela apresentacao.templates
     Representa o template (o 'molde') do slide
     """
-
     __tablename__ = 'templates'
-    __table_args__ = {'schema':'apresentacao'}
+    __table_args__ = {'schema': 'apresentacao'}
 
     id = db.Column(db.Integer, primary_key=True)
-
-    #Nome do template na tela
     nome = db.Column(db.String(100), nullable=False)
-
-    #nome interno do template
     codigo = db.Column(db.String(50), nullable=False, unique=True)
-
-    #descrição para mostrar quando for selecionar um template (opicional)
     descricao = db.Column(db.String(255))
 
     slides_que_usam = db.relationship('Slide', backref='template_usado', lazy=True)
 
+
 class Slide(db.Model):
     """
     Mapeia a tabela apresentacao.slide
-    Representa uma pagina individual dentro da apresentação
+    Pode pertencer a uma Apresentação de usuário OU a um Projeto do CIT (kit mestre).
     """
     __tablename__ = 'slide'
-    __table_args__ = {'schema':'apresentacao'}
+    __table_args__ = {'schema': 'apresentacao'}
 
     id = db.Column(db.Integer, primary_key=True)
-
-    #chave estrangeira para conectar o slide a apresentacao
-    apresentacao_id = db.Column(db.Integer, db.ForeignKey('apresentacao.apresentacao.id'), nullable=False)
-
-    #chave para identificar o tipo desse slide entre os templates
+    apresentacao_id = db.Column(db.Integer, db.ForeignKey('apresentacao.apresentacao.id'), nullable=True)
+    projeto_id = db.Column(db.Integer, db.ForeignKey('apresentacao.projeto.id'), nullable=True)
     template_id = db.Column(db.Integer, db.ForeignKey('apresentacao.templates.id'), nullable=False)
-
-    #numero da página (para definir ordem)
     ordem = db.Column(db.Integer, nullable=False)
 
-    # Configurações visuais do slide (plano de fundo, alinhamento geral e cabeçalho)
     alinhamento_texto = db.Column(db.String(20), default='left')
     filtro_fundo = db.Column(db.String(20), default='nenhum')
     estilo_fundo = db.Column(db.String(30), default='contained')
@@ -167,6 +197,7 @@ class Slide(db.Model):
 
     campos = db.relationship('CampoPreenchido', backref='slide_pai', lazy=True, cascade='all, delete-orphan')
     slots_flexiveis = db.relationship('SlotFlexivel', backref='slide_pai', lazy=True, cascade='all, delete-orphan')
+
 
 class CampoPreenchido(db.Model):
     """

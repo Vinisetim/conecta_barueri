@@ -55,9 +55,9 @@
                 <i class="bi bi-plus-lg"></i>
                 <span>Novo Slide</span>
             </button>
-            <button type="button" class="btn-novo-slide" id="btnAcervoPasta" style="margin-top: 8px; background: #eff6ff; color: #0052ff; border: 1.5px dashed #bfdbfe; font-weight: 600; display:flex; align-items:center; justify-content:center; gap:6px;" title="Reutilizar slide completo existente de outra apresentação desta pasta">
-                <i class="bi bi-folder-symlink"></i>
-                <span>Reutilizar Slide da Pasta</span>
+            <button type="button" class="btn-novo-slide" id="btnAcervoPasta" style="margin-top: 8px; background: #eff6ff; color: #0052ff; border: 1.5px dashed #bfdbfe; font-weight: 600; display:flex; align-items:center; justify-content:center; gap:6px;" title="Banco de Slides da Plataforma e Kits de Projetos do CIT">
+                <i class="bi bi-collection-play-fill"></i>
+                <span>Banco de Slides & Kits CIT</span>
             </button>
         </aside>
 
@@ -81,6 +81,38 @@
                         <div class="slide-main-content">
                             <h1 class="slide-title-preview preview-titulo">Capa</h1>
                             <h2 class="slide-subtitle-preview preview-subtitulo">Apresentação Executiva - Indicadores Municipais</h2>
+                        </div>
+                    </div>
+
+                    <!-- MODULOS E PILARES LAYOUT (KIT PROJETO CIT) -->
+                    <div class="layout-modulos-pilares" style="display: none; padding: 2.5cqw 4cqw; height: 100%; box-sizing: border-box; flex-direction: column;">
+                        <div class="slide-top-brand">
+                            <img src="/static/img/logo-barueri.jpeg" alt="Logo Barueri" class="slide-logo">
+                            <div class="slide-brand-text">
+                                <span>Prefeitura de</span>
+                                <strong>Barueri</strong>
+                            </div>
+                        </div>
+                        <div class="mp-header" style="margin-bottom: 2cqw;">
+                            <h1 class="slide-title-preview preview-titulo">Pilares de Sustentação</h1>
+                            <p class="slide-subtitle-preview preview-subtitulo"></p>
+                        </div>
+                        <div class="mp-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5cqw; flex: 1;">
+                            <div class="mp-card" style="background: rgba(255,255,255,0.92); border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 1.5cqw; display: flex; flex-direction: column; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
+                                <div style="width: 32px; height: 32px; border-radius: 8px; background: #eff6ff; color: #0052ff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1cqw; margin-bottom: 1cqw;">1</div>
+                                <h3 class="preview-pilar-1-titulo" style="font-size: 1.45cqw; font-weight: 700; color: #0f172a; margin: 0 0 0.8cqw 0;">Pilar 1</h3>
+                                <p class="preview-pilar-1-texto" style="font-size: 1.05cqw; color: #475569; line-height: 1.45; margin: 0; flex: 1;">Descrição do pilar</p>
+                            </div>
+                            <div class="mp-card" style="background: rgba(255,255,255,0.92); border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 1.5cqw; display: flex; flex-direction: column; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
+                                <div style="width: 32px; height: 32px; border-radius: 8px; background: #eff6ff; color: #0052ff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1cqw; margin-bottom: 1cqw;">2</div>
+                                <h3 class="preview-pilar-2-titulo" style="font-size: 1.45cqw; font-weight: 700; color: #0f172a; margin: 0 0 0.8cqw 0;">Pilar 2</h3>
+                                <p class="preview-pilar-2-texto" style="font-size: 1.05cqw; color: #475569; line-height: 1.45; margin: 0; flex: 1;">Descrição do pilar</p>
+                            </div>
+                            <div class="mp-card" style="background: rgba(255,255,255,0.92); border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 1.5cqw; display: flex; flex-direction: column; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
+                                <div style="width: 32px; height: 32px; border-radius: 8px; background: #eff6ff; color: #0052ff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1cqw; margin-bottom: 1cqw;">3</div>
+                                <h3 class="preview-pilar-3-titulo" style="font-size: 1.45cqw; font-weight: 700; color: #0f172a; margin: 0 0 0.8cqw 0;">Pilar 3</h3>
+                                <p class="preview-pilar-3-texto" style="font-size: 1.05cqw; color: #475569; line-height: 1.45; margin: 0; flex: 1;">Descrição do pilar</p>
+                            </div>
                         </div>
                     </div>
 
@@ -221,7 +253,60 @@
                         </div>
                     </div>
 
-<!-- SLOTS (Global posicionado absoluto ou no rodapé) -->
+
+                    <!-- ENCERRAMENTO LAYOUT -->
+                    <div class="layout-encerramento" style="display: none; flex: 1; min-height: 0; flex-direction: column; justify-content: space-between; width: 100%; height: 100%; position: relative; z-index: 2;">
+                        <div class="slide-top-brand">
+                            <img src="{{ url_for('static', filename='img/logo-barueri.jpeg') }}" alt="Logo Barueri" class="slide-logo">
+                            <div class="slide-brand-text">
+                                <span>Prefeitura de</span>
+                                <strong>Barueri</strong>
+                            </div>
+                        </div>
+
+                        <div class="enc-center-hero" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 1cqw 5cqw;">
+                            <div style="display: inline-flex; align-items: center; gap: 0.6cqw; background: #eff6ff; color: #0052ff; border: 1px solid #bfdbfe; border-radius: 999px; padding: 0.45cqw 1.4cqw; font-size: 1.05cqw; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 1.4cqw;">
+                                <i class="bi bi-check2-circle" style="font-size: 1.25cqw;"></i>
+                                <span>Encerramento Institucional</span>
+                            </div>
+                            <h1 class="slide-title-preview preview-titulo" style="margin: 0 0 1cqw 0; font-size: 4.5cqw; font-weight: 800; color: #0f172a; line-height: 1.15;">Obrigado!</h1>
+                            <p class="slide-subtitle-preview preview-subtitulo" style="margin: 0; max-width: 78%; font-size: 1.8cqw; color: #64748b; line-height: 1.45;">Juntos construindo uma cidade cada vez mais inteligente, humana e sustentável.</p>
+                        </div>
+
+                        <div class="enc-footer-contacts" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4cqw; padding-top: 1.4cqw; border-top: 1px solid rgba(226, 232, 240, 0.9);">
+                            <div style="display: flex; align-items: center; gap: 0.9cqw; background: rgba(248, 250, 252, 0.92); border: 1px solid #e2e8f0; border-radius: 1cqw; padding: 0.9cqw 1.2cqw;">
+                                <div style="width: 3cqw; height: 3cqw; border-radius: 0.7cqw; background: #eff6ff; color: #0052ff; display: flex; align-items: center; justify-content: center; font-size: 1.4cqw; flex-shrink: 0;">
+                                    <i class="bi bi-envelope-fill"></i>
+                                </div>
+                                <div style="min-width: 0; text-align: left;">
+                                    <small style="display: block; font-size: 0.85cqw; font-weight: 700; color: #64748b; text-transform: uppercase; line-height: 1.1;">E-mail / Contato</small>
+                                    <strong id="previewEncEmail" style="display: block; font-size: 1.1cqw; font-weight: 700; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">contato@barueri.sp.gov.br</strong>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; align-items: center; gap: 0.9cqw; background: rgba(248, 250, 252, 0.92); border: 1px solid #e2e8f0; border-radius: 1cqw; padding: 0.9cqw 1.2cqw;">
+                                <div style="width: 3cqw; height: 3cqw; border-radius: 0.7cqw; background: #ecfdf5; color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 1.4cqw; flex-shrink: 0;">
+                                    <i class="bi bi-telephone-fill"></i>
+                                </div>
+                                <div style="min-width: 0; text-align: left;">
+                                    <small style="display: block; font-size: 0.85cqw; font-weight: 700; color: #64748b; text-transform: uppercase; line-height: 1.1;">Telefone / Ouvidoria</small>
+                                    <strong id="previewEncTelefone" style="display: block; font-size: 1.1cqw; font-weight: 700; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">(11) 4199-8000</strong>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; align-items: center; gap: 0.9cqw; background: rgba(248, 250, 252, 0.92); border: 1px solid #e2e8f0; border-radius: 1cqw; padding: 0.9cqw 1.2cqw;">
+                                <div style="width: 3cqw; height: 3cqw; border-radius: 0.7cqw; background: #f5f3ff; color: #7c3aed; display: flex; align-items: center; justify-content: center; font-size: 1.4cqw; flex-shrink: 0;">
+                                    <i class="bi bi-globe2"></i>
+                                </div>
+                                <div style="min-width: 0; text-align: left;">
+                                    <small style="display: block; font-size: 0.85cqw; font-weight: 700; color: #64748b; text-transform: uppercase; line-height: 1.1;">Portal Oficial</small>
+                                    <strong id="previewEncSite" style="display: block; font-size: 1.1cqw; font-weight: 700; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">www.barueri.sp.gov.br</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SLOTS (Global posicionado absoluto ou no rodapé) -->
                     <div class="global-slots-container" style="z-index: 1000; position: absolute; bottom: 12px; right: 12px; display: flex; gap: 10px; align-items: flex-end;">
                         <div class="slide-slot-item" id="slotODS" style="display: none; flex-direction: row; gap: 3px; flex-wrap: nowrap; flex-shrink: 0;">
                             <!-- badges gerados pelo JS -->
@@ -250,10 +335,12 @@
                     <div class="select-wrapper">
                         <select id="selectTemplate" class="form-control-ap">
                             <option value="capa" selected>Capa / Abertura</option>
+                            <option value="modulos_pilares">Módulos e Pilares (Kit CIT)</option>
                             <option value="imagem_texto">Imagem + Texto</option>
                             <option value="indicadores">Indicadores</option>
                             <option value="grafico">Gráfico</option>
                             <option value="mapa">Mapa Interativo</option>
+                            <option value="encerramento">Encerramento</option>
                         </select>
                         <i class="bi bi-chevron-down select-chevron"></i>
                     </div>
@@ -469,7 +556,32 @@
                     </div>
                 </div>
 
-<!-- Estilos de Texto -->
+
+                <!-- Encerramento específicos -->
+                <div class="form-group-ap tpl-encerramento" style="display: none;">
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
+                        <label style="font-size: 0.85rem; font-weight: 700; color: #1e293b; margin-bottom: 10px; display: block;">
+                            <i class="bi bi-person-lines-fill me-1 text-primary"></i> Canais de Contato no Rodapé
+                        </label>
+
+                        <div style="margin-bottom: 8px;">
+                            <label for="inputEncEmail" style="font-size: 0.74rem; font-weight: 600; color: #475569; display: block; margin-bottom: 3px;">E-mail / Contato</label>
+                            <input type="text" id="inputEncEmail" class="form-control-ap" value="contato@barueri.sp.gov.br" placeholder="Ex: contato@barueri.sp.gov.br" style="font-size: 0.82rem; padding: 6px 10px;">
+                        </div>
+
+                        <div style="margin-bottom: 8px;">
+                            <label for="inputEncTelefone" style="font-size: 0.74rem; font-weight: 600; color: #475569; display: block; margin-bottom: 3px;">Telefone / Ouvidoria</label>
+                            <input type="text" id="inputEncTelefone" class="form-control-ap" value="(11) 4199-8000" placeholder="Ex: (11) 4199-8000" style="font-size: 0.82rem; padding: 6px 10px;">
+                        </div>
+
+                        <div>
+                            <label for="inputEncSite" style="font-size: 0.74rem; font-weight: 600; color: #475569; display: block; margin-bottom: 3px;">Portal Oficial / Site</label>
+                            <input type="text" id="inputEncSite" class="form-control-ap" value="www.barueri.sp.gov.br" placeholder="Ex: www.barueri.sp.gov.br" style="font-size: 0.82rem; padding: 6px 10px;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estilos de Texto -->
                 <div class="config-slots-section mt-3">
                     <div class="slots-header" data-bs-toggle="collapse" data-bs-target="#collapseTexto" role="button" aria-expanded="false" aria-controls="collapseTexto" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
                         <h4>Estilos de Texto</h4>
@@ -651,64 +763,100 @@
     <i class="bi bi-check-circle" style="font-size:1.2rem;"></i> <span id="saveToastText">Apresentação salva com sucesso!</span>
 </div>
 
-<!-- MODAL ACERVO DA PASTA (COMPARTILHAMENTO DE SLIDES E DADOS) -->
-<div id="modalAcervoPasta" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.65); z-index:9998; align-items:center; justify-content:center; padding:20px; backdrop-filter: blur(4px);">
-    <div style="width: 100%; max-width: 880px; max-height: 90vh; background: #ffffff; border-radius: 14px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); display: flex; flex-direction: column; overflow: hidden;">
+<!-- MODAL BANCO DE SLIDES & KITS DE PROJETOS DO CIT -->
+<div id="modalAcervoPasta" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.68); z-index:9998; align-items:center; justify-content:center; padding:20px; backdrop-filter: blur(5px);">
+    <div style="width: 100%; max-width: 960px; max-height: 90vh; background: #ffffff; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); display: flex; flex-direction: column; overflow: hidden;">
         <!-- Header do Modal -->
         <div style="padding: 18px 24px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; background: #f8fafc;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <div style="width: 42px; height: 42px; border-radius: 10px; background: #eff6ff; display: flex; align-items: center; justify-content: center; color: #0052ff; font-size: 1.3rem;">
-                    <i class="bi bi-folder-symlink-fill"></i>
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); display: flex; align-items: center; justify-content: center; color: #0052ff; font-size: 1.4rem; box-shadow: 0 2px 6px rgba(0,82,255,0.12);">
+                    <i class="bi bi-collection-play-fill"></i>
                 </div>
                 <div>
-                    <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700; color: #0f172a;">Acervo Compartilhado da Pasta: <span id="spanAcervoNomePasta" style="color:#0052ff;">...</span></h3>
-                    <p style="margin: 2px 0 0; font-size: 0.8rem; color: #64748b;">Compartilhe slides completos ou reutilize imagens e dados manuais desta pasta.</p>
+                    <h3 style="margin: 0; font-size: 1.2rem; font-weight: 700; color: #0f172a;">Banco de Slides & Kits de Projetos CIT</h3>
+                    <p style="margin: 2px 0 0; font-size: 0.82rem; color: #64748b;">Insira kits completos de projetos oficiais do CIT ou reutilize slides e mídias de toda a plataforma.</p>
                 </div>
             </div>
-            <button type="button" id="btnCloseAcervoModal" style="background: none; border: none; font-size: 1.3rem; color: #64748b; cursor: pointer; padding: 4px;"><i class="bi bi-x-lg"></i></button>
+            <button type="button" id="btnCloseAcervoModal" style="background: none; border: none; font-size: 1.3rem; color: #64748b; cursor: pointer; padding: 6px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='none'"><i class="bi bi-x-lg"></i></button>
         </div>
 
         <!-- Abas do Modal -->
-        <div style="display: flex; border-bottom: 1px solid #e2e8f0; padding: 0 24px; background: #fff; gap: 20px;">
-            <button type="button" class="tab-acervo-btn active" id="tabBtnAcervoSlides" style="padding: 12px 6px; border: none; background: none; font-weight: 600; font-size: 0.9rem; color: #0052ff; border-bottom: 2px solid #0052ff; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-                <i class="bi bi-collection-play"></i> Slides Completos (<span id="countAcervoSlides">0</span>)
+        <div style="display: flex; border-bottom: 1px solid #e2e8f0; padding: 0 24px; background: #fff; gap: 24px;">
+            <button type="button" class="tab-acervo-btn active" id="tabBtnKitsCit" style="padding: 13px 4px; border: none; background: none; font-weight: 600; font-size: 0.92rem; color: #0052ff; border-bottom: 2px solid #0052ff; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                <i class="bi bi-stars text-primary"></i> Projetos do CIT (Kits de Slides) (<span id="countKitsCit">114</span>)
             </button>
-            <button type="button" class="tab-acervo-btn" id="tabBtnAcervoDados" style="padding: 12px 6px; border: none; background: none; font-weight: 500; font-size: 0.9rem; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-                <i class="bi bi-images"></i> Mídias e Dados Manuais (<span id="countAcervoDados">0</span>)
+            <button type="button" class="tab-acervo-btn" id="tabBtnAcervoSlides" style="padding: 13px 4px; border: none; background: none; font-weight: 500; font-size: 0.92rem; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                <i class="bi bi-collection-play"></i> Slides da Plataforma (<span id="countAcervoSlides">0</span>)
+            </button>
+            <button type="button" class="tab-acervo-btn" id="tabBtnAcervoDados" style="padding: 13px 4px; border: none; background: none; font-weight: 500; font-size: 0.92rem; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                <i class="bi bi-images"></i> Mídias e Textos (<span id="countAcervoDados">0</span>)
             </button>
         </div>
 
         <!-- Corpo do Modal -->
-        <div style="padding: 20px 24px; overflow-y: auto; flex: 1; min-height: 380px;">
-            <!-- Painel 1: Slides Completos -->
-            <div id="painelAcervoSlides">
-                <!-- Filtros e busca -->
+        <div style="padding: 20px 24px; overflow-y: auto; flex: 1; min-height: 420px; background: #fcfdfe;">
+            
+            <!-- Painel 1: Projetos Oficiais do CIT (Kits de Slides) -->
+            <div id="painelKitsCit">
+                <!-- Filtros e Busca CIT -->
                 <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
-                    <div style="flex: 1; position: relative;">
+                    <div style="flex: 1; min-width: 260px; position: relative;">
+                        <i class="bi bi-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.85rem;"></i>
+                        <input type="text" id="inputBuscaKitsCit" placeholder="Buscar por projeto (ex: Barueri Sem Papel, Metaverso, SIT...)" style="width: 100%; padding: 8px 12px 8px 34px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.85rem;">
+                    </div>
+                    <select id="selectFiltroSecretariaCit" style="padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.85rem; color: #334155; background: #fff; max-width: 280px;">
+                        <option value="todas">Todas as Secretarias</option>
+                        <option value="Inovação e Tecnologia">Secretaria de Inovação e Tecnologia (CIT)</option>
+                    </select>
+                </div>
+
+                <!-- Grade de Projetos CIT -->
+                <div id="gridKitsCit" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
+                    <!-- Preenchido dinamicamente via JS -->
+                </div>
+                <div id="emptyKitsCit" style="display: none; text-align: center; padding: 40px 20px; color: #64748b;">
+                    <i class="bi bi-search" style="font-size: 2.5rem; color: #cbd5e1; display: block; margin-bottom: 10px;"></i>
+                    <p style="margin: 0; font-weight: 500;">Nenhum projeto do CIT encontrado com este filtro.</p>
+                </div>
+            </div>
+
+            <!-- Painel 2: Slides Salvos da Plataforma -->
+            <div id="painelAcervoSlides" style="display: none;">
+                <!-- Filtros e busca Universal -->
+                <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 220px; position: relative;">
                         <i class="bi bi-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.85rem;"></i>
                         <input type="text" id="inputBuscaAcervoSlides" placeholder="Buscar slide por título ou apresentação..." style="width: 100%; padding: 8px 12px 8px 34px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.85rem;">
                     </div>
+                    <!-- Filtro por Pasta (Permite ver Todas as Pastas ou uma específica) -->
+                    <select id="selectFiltroPastaAcervo" style="padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.85rem; color: #334155; background: #fff; max-width: 220px;">
+                        <option value="">Todas as Pastas</option>
+                    </select>
+                    <!-- Filtro por Template -->
                     <select id="selectFiltroTemplateAcervo" style="padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.85rem; color: #334155; background: #fff;">
                         <option value="">Todos os Templates</option>
                         <option value="capa">Capa / Abertura</option>
+                        <option value="modulos_pilares">Módulos e Pilares</option>
                         <option value="imagem_texto">Imagem + Texto</option>
                         <option value="grafico">Gráfico</option>
                         <option value="indicadores">Indicadores</option>
+                        <option value="mapa">Mapa</option>
+                        <option value="encerramento">Encerramento</option>
                     </select>
                 </div>
 
                 <!-- Grade de Slides -->
-                <div id="gridAcervoSlides" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px;">
+                <div id="gridAcervoSlides" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px;">
                     <!-- Preenchido dinamicamente via JS -->
                 </div>
                 <div id="emptyAcervoSlides" style="display: none; text-align: center; padding: 40px 20px; color: #64748b;">
                     <i class="bi bi-folder2-open" style="font-size: 2.5rem; color: #cbd5e1; display: block; margin-bottom: 10px;"></i>
-                    <p style="margin: 0; font-weight: 500;">Nenhum outro slide encontrado nesta pasta.</p>
-                    <small>Ao criar outras apresentações nesta pasta, seus slides ficarão disponíveis aqui para reuso imediato.</small>
+                    <p style="margin: 0; font-weight: 500;">Nenhum outro slide encontrado.</p>
+                    <small>Os slides salvos nas suas apresentações de qualquer pasta aparecerão aqui para reutilização.</small>
                 </div>
             </div>
 
-            <!-- Painel 2: Mídias e Dados Manuais -->
+            <!-- Painel 3: Mídias e Dados Manuais -->
             <div id="painelAcervoDados" style="display: none;">
                 <div style="margin-bottom: 14px; display: flex; gap: 8px; flex-wrap: wrap;" id="filtrosTipoDados">
                     <button type="button" class="btn btn-sm btn-primary filter-dado-btn" data-tipo="todos">Todas as Mídias</button>
@@ -719,19 +867,21 @@
                     <button type="button" class="btn btn-sm btn-outline-secondary filter-dado-btn" data-tipo="indicadores">Indicadores</button>
                 </div>
 
-                <div id="gridAcervoDados" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px;">
+                <div id="gridAcervoDados" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px;">
                     <!-- Preenchido dinamicamente via JS -->
                 </div>
                 <div id="emptyAcervoDados" style="display: none; text-align: center; padding: 40px 20px; color: #64748b;">
                     <i class="bi bi-images" style="font-size: 2.5rem; color: #cbd5e1; display: block; margin-bottom: 10px;"></i>
-                    <p style="margin: 0; font-weight: 500;">Nenhuma mídia ou dado manual encontrado nesta pasta.</p>
-                    <small>Imagens enviadas e indicadores manuais criados nas apresentações desta pasta aparecerão aqui.</small>
+                    <p style="margin: 0; font-weight: 500;">Nenhuma mídia ou dado manual encontrado.</p>
                 </div>
             </div>
         </div>
 
         <!-- Footer do Modal -->
-        <div style="padding: 12px 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; background: #f8fafc;">
+        <div style="padding: 12px 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; background: #f8fafc;">
+            <div style="font-size: 0.8rem; color: #64748b;">
+                <i class="bi bi-info-circle me-1"></i> Kits do CIT inserem slides oficiais prontos com 1 clique.
+            </div>
             <button type="button" id="btnFecharAcervoModal" class="btn btn-light px-4" style="border: 1px solid #cbd5e1; font-weight: 500;">Fechar</button>
         </div>
     </div>
