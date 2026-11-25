@@ -126,6 +126,44 @@ document.addEventListener("DOMContentLoaded", function() {
     const previewEncEmail = document.getElementById("previewEncEmail");
     const previewEncTelefone = document.getElementById("previewEncTelefone");
     const previewEncSite = document.getElementById("previewEncSite");
+    const layoutApresentador = document.querySelector(".layout-apresentador");
+    const tplApresentador = document.querySelectorAll(".tpl-apresentador");
+    const selectImportarAutoridade = document.getElementById("selectImportarAutoridade");
+    const btnSalvarAutoridadeCatalogo = document.getElementById("btnSalvarAutoridadeCatalogo");
+    const inputApresCargo = document.getElementById("inputApresCargo");
+    const inputApresSecretaria = document.getElementById("inputApresSecretaria");
+    const btnUploadApresFoto = document.getElementById("btnUploadApresFoto");
+    const inputUploadApresFoto = document.getElementById("inputUploadApresFoto");
+    const apresFotoThumbPreview = document.getElementById("apresFotoThumbPreview");
+    const inputApresConq1 = document.getElementById("inputApresConq1");
+    const inputApresConq2 = document.getElementById("inputApresConq2");
+    const inputApresConq3 = document.getElementById("inputApresConq3");
+    const inputApresConq4 = document.getElementById("inputApresConq4");
+    const previewApresFoto = document.getElementById("previewApresFoto");
+    const previewApresCargoBadge = document.getElementById("previewApresCargoBadge");
+    const previewApresSecretariaBadge = document.getElementById("previewApresSecretariaBadge");
+    const previewApresConq1 = document.getElementById("previewApresConq1");
+    const previewApresConq2 = document.getElementById("previewApresConq2");
+    const previewApresConq3 = document.getElementById("previewApresConq3");
+    const previewApresConq4 = document.getElementById("previewApresConq4");
+
+    const DEFAULT_APRES_FOTO = "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=800&q=80";
+    let catalogoAutoridades = [
+        {
+            id: "randal_jonatas",
+            nome: "Jonatas Randal",
+            cargo: "Secretário Municipal",
+            secretaria: "Secretaria de Inovação e Tecnologia (SIT)",
+            biografia: "Secretário Municipal de Inovação e Tecnologia de Barueri, liderando projetos de transformação digital, governo sem papel e modernização do atendimento ao cidadão.",
+            foto_url: DEFAULT_APRES_FOTO,
+            conquistas: [
+                "+27 anos na política",
+                "Criador do Barueri sem Papel",
+                "+20 prêmios",
+                "1º Secretário do Metaverso"
+            ]
+        }
+    ];
     const slideMapContainer = document.getElementById("slideMapContainer");
     const mapaTipoRadios = document.querySelectorAll("input[name='mapaTipoRadio']");
     const mapaPinsBadge = document.getElementById("mapaPinsBadge");
@@ -445,6 +483,41 @@ document.addEventListener("DOMContentLoaded", function() {
             `;
         }
 
+        if (tpl === 'apresentador') {
+            const logoHtml = buildLogosHtml(slide, true);
+            const defaultTextColor = hasBgImg ? '#ffffff' : '#0f172a';
+            const defaultSubColor = hasBgImg ? 'rgba(255,255,255,0.85)' : '#475569';
+            const textColor = slide.corTitulo || defaultTextColor;
+            const subColor = slide.corSubtitulo || defaultSubColor;
+            const titleSize = slide.tamanhoTitulo ? (slide.tamanhoTitulo * 1.4) + 'px' : '5.8px';
+            const subSize = slide.tamanhoSubtitulo ? (slide.tamanhoSubtitulo * 1.2) + 'px' : '3.4px';
+            const fotoSrc = slide.apresFoto || DEFAULT_APRES_FOTO;
+            const cargoVal = escapeHtml(slide.apresCargo || 'Secretário Municipal');
+            const conqs = Array.isArray(slide.apresConquistas) && slide.apresConquistas.length ? slide.apresConquistas : ['+27 anos na política', 'Criador do Barueri sem Papel', '+20 prêmios', '1º Secretário do Metaverso'];
+
+            return `
+                <div style="width:100%; height:100%; position:relative; padding:3px 4px; display:flex; flex-direction:column; justify-content:space-between; ${globalBgStyle} box-sizing:border-box; overflow:hidden;">
+                    ${hasBgImg ? '<div style="position:absolute; inset:0; background:rgba(255,255,255,0.65); z-index:0;"></div>' : ''}
+                    <div style="position:relative; z-index:1;">${logoHtml}</div>
+                    <div style="position:relative; z-index:1; flex:1; display:grid; grid-template-columns:34% 63%; gap:3%; align-items:center; min-height:0;">
+                        <div style="height:92%; border-radius:2px; overflow:hidden; border:0.6px solid #0052ff; position:relative; background:#0f172a;">
+                            <img src="${fotoSrc}" style="width:100%; height:100%; object-fit:cover; display:block;">
+                            <span style="position:absolute; bottom:1px; left:1px; right:1px; background:rgba(0,82,255,0.9); color:#fff; font-size:2.2px; font-weight:800; padding:0.5px 1px; border-radius:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center;">${cargoVal}</span>
+                        </div>
+                        <div style="display:flex; flex-direction:column; justify-content:center; min-width:0; gap:1px;">
+                            <div style="font-size:${titleSize}; font-weight:800; color:${textColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1;">${title || 'Jonatas Randal'}</div>
+                            <div style="font-size:${subSize}; color:${subColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.1;">${subtitle || 'Perfil de Autoridade'}</div>
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1px; margin-top:1px;">
+                                ${conqs.slice(0, 4).map(c => `<span style="font-size:2.1px; background:#f8fafc; border-left:1px solid #0052ff; padding:0.8px 1px; color:#0f172a; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(c)}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    ${odsBadge}
+                    ${qrBadge}
+                </div>
+            `;
+        }
+
         if (tpl === 'encerramento') {
             const logoHtml = buildLogosHtml(slide, true);
             const defaultTextColor = hasBgImg ? '#ffffff' : '#0f172a';
@@ -606,6 +679,18 @@ document.addEventListener("DOMContentLoaded", function() {
         updatePreviewMedia();
         if(slide.template === "grafico") renderChart(slide);
         if(slide.template === "indicadores") renderIndicadores(slide);
+        if(slide.template === "apresentador") {
+            if (!slide.titulo || slide.titulo === "Capa" || slide.titulo === "Novo Slide" || slide.titulo === "Obrigado!") {
+                slide.titulo = "Jonatas Randal";
+                inputTitulo.value = slide.titulo;
+            }
+            if (!slide.subtitulo || slide.subtitulo.startsWith("Apresentação Executiva") || slide.subtitulo === "Subtítulo do novo slide" || slide.subtitulo.startsWith("Juntos construindo")) {
+                slide.subtitulo = "Secretário Municipal de Inovação e Tecnologia de Barueri, liderando projetos de transformação digital, governo sem papel e modernização do atendimento ao cidadão.";
+                inputSubtitulo.value = slide.subtitulo;
+            }
+            updatePreviewTexts();
+            syncApresentadorSlide(slide);
+        }
         if(slide.template === "encerramento") {
             if (!slide.titulo || slide.titulo === "Capa" || slide.titulo === "Novo Slide") {
                 slide.titulo = "Obrigado!";
@@ -851,7 +936,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const oldInd = document.getElementById('dyn-ind-slots');
         if(oldInd) oldInd.remove();
 
-        if (tpl === "capa" || tpl === "grafico" || tpl === "encerramento") {
+        if (tpl === "capa" || tpl === "grafico" || tpl === "encerramento" || tpl === "apresentador") {
             if(globalContainer) globalContainer.innerHTML = combinedHtml;
         } else if (tpl === "imagem_texto") {
             // itOdsSlot is no longer used for ODS, but we can leave it empty
@@ -1000,6 +1085,7 @@ document.addEventListener("DOMContentLoaded", function() {
         if (layoutGrafico) layoutGrafico.style.display = "none";
         if (layoutMapa) layoutMapa.style.display = "none";
         if (layoutEncerramento) layoutEncerramento.style.display = "none";
+        if (layoutApresentador) layoutApresentador.style.display = "none";
 
         tplCapa.forEach(el => el.style.display = "none");
         tplImgTexto.forEach(el => el.style.display = "none");
@@ -1007,6 +1093,7 @@ document.addEventListener("DOMContentLoaded", function() {
         tplGrafico.forEach(el => el.style.display = "none");
         tplMapa.forEach(el => el.style.display = "none");
         tplEncerramento.forEach(el => el.style.display = "none");
+        tplApresentador.forEach(el => el.style.display = "none");
 
         document.getElementById("activeSlideSurface").className = "slide-surface template-" + val;
 
@@ -1034,6 +1121,12 @@ document.addEventListener("DOMContentLoaded", function() {
             labelTitulo.textContent = "Título";
             labelSubtitulo.textContent = "Texto Introdutório";
             fgSubtitulo.style.display = "flex";
+        } else if(val === "apresentador") {
+            if (layoutApresentador) layoutApresentador.style.display = "flex";
+            tplApresentador.forEach(el => el.style.display = "block");
+            labelTitulo.textContent = "Nome Completo da Autoridade";
+            labelSubtitulo.textContent = "Minibiografia Profissional Oficial";
+            fgSubtitulo.style.display = "flex";
         } else if(val === "encerramento") {
             if (layoutEncerramento) layoutEncerramento.style.display = "flex";
             tplEncerramento.forEach(el => el.style.display = "block");
@@ -1050,6 +1143,175 @@ document.addEventListener("DOMContentLoaded", function() {
 
         updateSlotsVisibility();
     }
+
+    function syncApresentadorSlide(slide) {
+        if (!slide) return;
+        slide.apresCargo = slide.apresCargo || "Secretário Municipal";
+        slide.apresSecretaria = slide.apresSecretaria || "Secretaria de Inovação e Tecnologia (SIT)";
+        slide.apresFoto = slide.apresFoto || DEFAULT_APRES_FOTO;
+        if (!Array.isArray(slide.apresConquistas) || slide.apresConquistas.length === 0) {
+            slide.apresConquistas = [
+                "+27 anos na política",
+                "Criador do Barueri sem Papel",
+                "+20 prêmios",
+                "1º Secretário do Metaverso"
+            ];
+        }
+        while (slide.apresConquistas.length < 4) {
+            slide.apresConquistas.push("");
+        }
+
+        if (inputApresCargo) inputApresCargo.value = slide.apresCargo;
+        if (inputApresSecretaria) inputApresSecretaria.value = slide.apresSecretaria;
+        if (apresFotoThumbPreview) apresFotoThumbPreview.src = slide.apresFoto;
+        if (previewApresFoto) previewApresFoto.src = slide.apresFoto;
+        if (previewApresCargoBadge) previewApresCargoBadge.textContent = slide.apresCargo;
+        if (previewApresSecretariaBadge) previewApresSecretariaBadge.textContent = slide.apresSecretaria;
+
+        if (inputApresConq1) inputApresConq1.value = slide.apresConquistas[0] || "";
+        if (inputApresConq2) inputApresConq2.value = slide.apresConquistas[1] || "";
+        if (inputApresConq3) inputApresConq3.value = slide.apresConquistas[2] || "";
+        if (inputApresConq4) inputApresConq4.value = slide.apresConquistas[3] || "";
+
+        if (previewApresConq1) previewApresConq1.textContent = slide.apresConquistas[0] || "Destaque 1";
+        if (previewApresConq2) previewApresConq2.textContent = slide.apresConquistas[1] || "Destaque 2";
+        if (previewApresConq3) previewApresConq3.textContent = slide.apresConquistas[2] || "Destaque 3";
+        if (previewApresConq4) previewApresConq4.textContent = slide.apresConquistas[3] || "Destaque 4";
+    }
+
+    function popularSelectAutoridades() {
+        if (!selectImportarAutoridade) return;
+        selectImportarAutoridade.innerHTML =
+            `<option value="">-- Selecionar autoridade cadastrada (1 clique) --</option>` +
+            catalogoAutoridades.map((a, idx) => `<option value="${idx}">${escapeHtml(a.nome)} — ${escapeHtml(a.cargo || '')}</option>`).join("");
+    }
+
+    async function carregarCatalogoAutoridadesBanco() {
+        popularSelectAutoridades();
+        try {
+            const resp = await fetch("/apresentacao/api/apresentadores");
+            if (resp.ok) {
+                const dados = await resp.json();
+                if (dados.status === "sucesso" && Array.isArray(dados.apresentadores) && dados.apresentadores.length > 0) {
+                    catalogoAutoridades = dados.apresentadores;
+                    popularSelectAutoridades();
+                }
+            }
+        } catch (err) {
+            console.warn("Usando catálogo local de autoridades:", err);
+        }
+    }
+    carregarCatalogoAutoridadesBanco();
+
+    if (selectImportarAutoridade) {
+        selectImportarAutoridade.addEventListener("change", (e) => {
+            const idx = e.target.value;
+            if (idx === "") return;
+            const aut = catalogoAutoridades[Number(idx)];
+            const s = slides.find(item => item.id === activeSlideId);
+            if (!aut || !s) return;
+
+            s.titulo = aut.nome || "Jonatas Randal";
+            s.subtitulo = aut.biografia || "";
+            s.apresCargo = aut.cargo || "Secretário Municipal";
+            s.apresSecretaria = aut.secretaria || "Secretaria Municipal de Barueri";
+            s.apresFoto = aut.foto_url || DEFAULT_APRES_FOTO;
+            const topicos = Array.isArray(aut.conquistas) && aut.conquistas.length
+                ? [...aut.conquistas]
+                : ["+27 anos na política", "Criador do Barueri sem Papel", "+20 prêmios", "1º Secretário do Metaverso"];
+            while (topicos.length < 4) topicos.push("");
+            s.apresConquistas = topicos.slice(0, 4);
+
+            inputTitulo.value = s.titulo;
+            inputSubtitulo.value = s.subtitulo;
+            updatePreviewTexts();
+            syncApresentadorSlide(s);
+            updateActiveThumbnail();
+        });
+    }
+
+    if (btnSalvarAutoridadeCatalogo) {
+        btnSalvarAutoridadeCatalogo.addEventListener("click", async () => {
+            const s = slides.find(item => item.id === activeSlideId);
+            if (!s) return;
+            const payload = {
+                nome: (s.titulo || "").trim(),
+                cargo: (s.apresCargo || "").trim(),
+                secretaria: (s.apresSecretaria || "").trim(),
+                biografia: (s.subtitulo || "").trim(),
+                foto_url: s.apresFoto || DEFAULT_APRES_FOTO,
+                conquistas: Array.isArray(s.apresConquistas) ? s.apresConquistas : []
+            };
+            try {
+                const resp = await fetch("/apresentacao/api/apresentadores", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                const dados = await resp.json();
+                if (resp.ok && dados.status === "sucesso") {
+                    await carregarCatalogoAutoridadesBanco();
+                    alert(dados.mensagem || "Autoridade salva no catálogo com sucesso!");
+                } else {
+                    alert(dados.mensagem || "Não foi possível salvar no catálogo.");
+                }
+            } catch (err) {
+                console.error("Erro ao salvar autoridade no catálogo:", err);
+            }
+        });
+    }
+
+    if (inputApresCargo) {
+        inputApresCargo.addEventListener("input", (e) => {
+            const s = slides.find(item => item.id === activeSlideId);
+            if (s) s.apresCargo = e.target.value;
+            if (previewApresCargoBadge) previewApresCargoBadge.textContent = e.target.value || "Cargo";
+            updateActiveThumbnail();
+        });
+    }
+
+    if (inputApresSecretaria) {
+        inputApresSecretaria.addEventListener("input", (e) => {
+            const s = slides.find(item => item.id === activeSlideId);
+            if (s) s.apresSecretaria = e.target.value;
+            if (previewApresSecretariaBadge) previewApresSecretariaBadge.textContent = e.target.value || "Secretaria";
+            updateActiveThumbnail();
+        });
+    }
+
+    if (btnUploadApresFoto && inputUploadApresFoto) {
+        btnUploadApresFoto.addEventListener("click", () => inputUploadApresFoto.click());
+        inputUploadApresFoto.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (ev) {
+                    const s = slides.find(item => item.id === activeSlideId);
+                    if (s) {
+                        s.apresFoto = ev.target.result;
+                        syncApresentadorSlide(s);
+                        updateActiveThumbnail();
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    [inputApresConq1, inputApresConq2, inputApresConq3, inputApresConq4].forEach((inp, idx) => {
+        if (!inp) return;
+        inp.addEventListener("input", (e) => {
+            const s = slides.find(item => item.id === activeSlideId);
+            if (!s) return;
+            if (!Array.isArray(s.apresConquistas)) {
+                s.apresConquistas = ["+27 anos na política", "Criador do Barueri sem Papel", "+20 prêmios", "1º Secretário do Metaverso"];
+            }
+            s.apresConquistas[idx] = e.target.value;
+            const previews = [previewApresConq1, previewApresConq2, previewApresConq3, previewApresConq4];
+            if (previews[idx]) previews[idx].textContent = e.target.value || `Destaque ${idx + 1}`;
+            updateActiveThumbnail();
+        });
+    });
 
     if (inputEncEmail) {
         inputEncEmail.addEventListener("input", (e) => {
@@ -1134,6 +1396,18 @@ document.addEventListener("DOMContentLoaded", function() {
             updatePreviewMedia();
             if(slide.template === "grafico") renderChart(slide);
             if(slide.template === "indicadores") renderIndicadores(slide);
+        if(slide.template === "apresentador") {
+            if (!slide.titulo || slide.titulo === "Capa" || slide.titulo === "Novo Slide" || slide.titulo === "Obrigado!") {
+                slide.titulo = "Jonatas Randal";
+                inputTitulo.value = slide.titulo;
+            }
+            if (!slide.subtitulo || slide.subtitulo.startsWith("Apresentação Executiva") || slide.subtitulo === "Subtítulo do novo slide" || slide.subtitulo.startsWith("Juntos construindo")) {
+                slide.subtitulo = "Secretário Municipal de Inovação e Tecnologia de Barueri, liderando projetos de transformação digital, governo sem papel e modernização do atendimento ao cidadão.";
+                inputSubtitulo.value = slide.subtitulo;
+            }
+            updatePreviewTexts();
+            syncApresentadorSlide(slide);
+        }
         if(slide.template === "encerramento") {
             if (!slide.titulo || slide.titulo === "Capa" || slide.titulo === "Novo Slide") {
                 slide.titulo = "Obrigado!";

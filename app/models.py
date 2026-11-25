@@ -312,7 +312,7 @@ class Apresentador(db.Model):
 
     # Estruturas dinâmicas em JSON
     topicos = db.Column(db.JSON, default=list)
-    midias_extras = db.Column(db.JSON, default=list)
+    midias_extras = db.Column('midias_extra', db.JSON, default=list)
 
 
 class Indicador(db.Model):

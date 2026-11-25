@@ -221,6 +221,69 @@
                         </div>
                     </div>
 
+                    <!-- APRESENTADOR / PERFIL DE AUTORIDADE LAYOUT (Template 7) -->
+                    <div class="layout-apresentador" style="display: none; flex: 1; min-height: 0; flex-direction: column; justify-content: space-between; width: 100%; height: 100%; position: relative; z-index: 2;">
+                        <div class="slide-top-brand">
+                            <img src="{{ url_for('static', filename='img/logo-barueri.jpeg') }}" alt="Logo Barueri" class="slide-logo">
+                            <div class="slide-brand-text">
+                                <span>Prefeitura de</span>
+                                <strong>Barueri</strong>
+                            </div>
+                        </div>
+
+                        <div class="apres-content-wrapper" style="flex: 1; min-height: 0; display: grid; grid-template-columns: 35% 62%; gap: 3%; align-items: center; padding: 0.6cqw 0;">
+                            <!-- COLUNA ESQUERDA: Card da Foto Oficial com Moldura + Badge de Cargo/Secretaria -->
+                            <div class="apres-left-col" style="height: 100%; max-height: 36cqw; display: flex; flex-direction: column;">
+                                <div style="position: relative; width: 100%; height: 100%; min-height: 27cqw; border-radius: 1.6cqw; padding: 0.6cqw; background: linear-gradient(145deg, #0052ff 0%, #38bdf8 100%); box-shadow: 0 1cqw 2.4cqw rgba(0, 82, 255, 0.18); display: flex; flex-direction: column;">
+                                    <div style="flex: 1; width: 100%; border-radius: 1.2cqw; overflow: hidden; background: #0f172a; position: relative;">
+                                        <img id="previewApresFoto" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=800&q=80" alt="Foto da Autoridade" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                                        <div style="position: absolute; inset: auto 0 0 0; background: linear-gradient(to top, rgba(7, 25, 79, 0.96) 0%, rgba(7, 25, 79, 0.78) 65%, transparent 100%); padding: 2.2cqw 1.2cqw 1.1cqw;">
+                                            <span id="previewApresCargoBadge" style="display: inline-block; background: #0052ff; color: #ffffff; font-size: 0.92cqw; font-weight: 800; padding: 0.28cqw 0.85cqw; border-radius: 999px; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 0.35cqw; box-shadow: 0 2px 8px rgba(0,0,0,0.25);">Secretário Municipal</span>
+                                            <div id="previewApresSecretariaBadge" style="color: #e2e8f0; font-size: 1.05cqw; font-weight: 700; line-height: 1.25;">Secretaria de Inovação e Tecnologia (SIT)</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- COLUNA DIREITA: Nome Completo + Minibiografia + Grid de 4 Badges de Conquistas -->
+                            <div class="apres-right-col" style="display: flex; flex-direction: column; justify-content: center; gap: 1.2cqw; min-width: 0;">
+                                <div>
+                                    <div style="display: inline-flex; align-items: center; gap: 0.5cqw; background: #eff6ff; color: #0052ff; border: 1px solid #bfdbfe; border-radius: 999px; padding: 0.35cqw 1.1cqw; font-size: 0.95cqw; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.8cqw;">
+                                        <i class="bi bi-person-Vcard-fill"></i>
+                                        <span id="previewApresTagKicker">Perfil de Autoridade • Conheça</span>
+                                    </div>
+                                    <h1 class="slide-title-preview preview-titulo" style="margin: 0 0 0.7cqw 0; font-size: 3.6cqw; font-weight: 800; color: #0f172a; line-height: 1.12;">Jonatas Randal</h1>
+                                    <p class="slide-subtitle-preview preview-subtitulo" style="margin: 0; font-size: 1.45cqw; color: #475569; line-height: 1.5;">Secretário Municipal de Inovação e Tecnologia de Barueri, liderando projetos de transformação digital, governo sem papel e modernização do atendimento ao cidadão.</p>
+                                </div>
+
+                                <!-- Grid de 4 Badges de Conquistas Históricas -->
+                                <div style="margin-top: 0.4cqw;">
+                                    <div style="font-size: 0.9cqw; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.7cqw; display: flex; align-items: center; gap: 0.4cqw;">
+                                        <i class="bi bi-stars text-primary"></i> Destaques & Conquistas Históricas
+                                    </div>
+                                    <div id="previewApresConquistasGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.9cqw;">
+                                        <div style="display: flex; align-items: center; gap: 0.8cqw; background: rgba(248, 250, 252, 0.95); border: 1px solid #cbd5e1; border-left: 0.35cqw solid #0052ff; border-radius: 0.9cqw; padding: 0.85cqw 1.1cqw; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);">
+                                            <div style="width: 2.5cqw; height: 2.5cqw; border-radius: 0.6cqw; background: #eff6ff; color: #0052ff; display: flex; align-items: center; justify-content: center; font-size: 1.25cqw; flex-shrink: 0;"><i class="bi bi-award-fill"></i></div>
+                                            <strong id="previewApresConq1" style="font-size: 1.12cqw; font-weight: 700; color: #0f172a; line-height: 1.2;">+27 anos na política</strong>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 0.8cqw; background: rgba(248, 250, 252, 0.95); border: 1px solid #cbd5e1; border-left: 0.35cqw solid #10b981; border-radius: 0.9cqw; padding: 0.85cqw 1.1cqw; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);">
+                                            <div style="width: 2.5cqw; height: 2.5cqw; border-radius: 0.6cqw; background: #ecfdf5; color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 1.25cqw; flex-shrink: 0;"><i class="bi bi-file-earmark-check-fill"></i></div>
+                                            <strong id="previewApresConq2" style="font-size: 1.12cqw; font-weight: 700; color: #0f172a; line-height: 1.2;">Criador do Barueri sem Papel</strong>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 0.8cqw; background: rgba(248, 250, 252, 0.95); border: 1px solid #cbd5e1; border-left: 0.35cqw solid #f59e0b; border-radius: 0.9cqw; padding: 0.85cqw 1.1cqw; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);">
+                                            <div style="width: 2.5cqw; height: 2.5cqw; border-radius: 0.6cqw; background: #fffbeb; color: #f59e0b; display: flex; align-items: center; justify-content: center; font-size: 1.25cqw; flex-shrink: 0;"><i class="bi bi-trophy-fill"></i></div>
+                                            <strong id="previewApresConq3" style="font-size: 1.12cqw; font-weight: 700; color: #0f172a; line-height: 1.2;">+20 prêmios</strong>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 0.8cqw; background: rgba(248, 250, 252, 0.95); border: 1px solid #cbd5e1; border-left: 0.35cqw solid #7c3aed; border-radius: 0.9cqw; padding: 0.85cqw 1.1cqw; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);">
+                                            <div style="width: 2.5cqw; height: 2.5cqw; border-radius: 0.6cqw; background: #f5f3ff; color: #7c3aed; display: flex; align-items: center; justify-content: center; font-size: 1.25cqw; flex-shrink: 0;"><i class="bi bi-cpu-fill"></i></div>
+                                            <strong id="previewApresConq4" style="font-size: 1.12cqw; font-weight: 700; color: #0f172a; line-height: 1.2;">1º Secretário do Metaverso</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- ENCERRAMENTO LAYOUT -->
                     <div class="layout-encerramento" style="display: none; flex: 1; min-height: 0; flex-direction: column; justify-content: space-between; width: 100%; height: 100%; position: relative; z-index: 2;">
                         <div class="slide-top-brand">
@@ -306,7 +369,8 @@
                             <option value="indicadores">Indicadores</option>
                             <option value="grafico">Gráfico</option>
                             <option value="mapa">Mapa Interativo</option>
-                            <option value="encerramento">Encerramento</option>
+                            <option value="apresentador">Apresentador / Perfil de Autoridade</option>
+                        <option value="encerramento">Encerramento</option>
                         </select>
                         <i class="bi bi-chevron-down select-chevron"></i>
                     </div>
@@ -518,6 +582,72 @@
                         <!-- Lista de Pins Adicionados -->
                         <div id="mapaPinsListEdit" style="display: flex; flex-direction: column; gap: 6px;">
                             <!-- Gerado dinamicamente via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Apresentador / Perfil de Autoridade específicos (Template 7) -->
+                <div class="form-group-ap tpl-apresentador" style="display: none;">
+                    <!-- 1. Select: Importar Autoridade Cadastrada (apresentacao.apresentador) -->
+                    <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <label for="selectImportarAutoridade" style="font-size: 0.82rem; font-weight: 700; color: #1e3a8a; margin: 0;">
+                                <i class="bi bi-person-check-fill me-1 text-primary"></i> Importar Autoridade Cadastrada
+                            </label>
+                            <button type="button" id="btnSalvarAutoridadeCatalogo" class="btn btn-sm btn-link p-0 text-decoration-none" style="font-size: 0.74rem; font-weight: 700; color: #0052ff;" title="Salvar o perfil atual no catálogo apresentacao.apresentador">
+                                <i class="bi bi-cloud-arrow-up-fill"></i> Salvar no Catálogo
+                            </button>
+                        </div>
+                        <select id="selectImportarAutoridade" class="form-control-ap" style="font-size: 0.82rem; padding: 7px 10px; background: #ffffff;">
+                            <option value="">-- Selecionar autoridade (1 clique) --</option>
+                        </select>
+                        <small style="color: #3b82f6; font-size: 0.71rem; display: block; margin-top: 4px;">
+                            Importa automaticamente da tabela <code>apresentacao.apresentador</code>.
+                        </small>
+                    </div>
+
+                    <!-- 2. Edição Manual: Cargo, Secretaria e Upload da Foto -->
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+                        <label style="font-size: 0.84rem; font-weight: 700; color: #1e293b; margin-bottom: 8px; display: block;">
+                            <i class="bi bi-person-badge me-1 text-primary"></i> Dados Institucionais & Foto
+                        </label>
+
+                        <div style="margin-bottom: 8px;">
+                            <label for="inputApresCargo" style="font-size: 0.74rem; font-weight: 600; color: #475569; display: block; margin-bottom: 3px;">Cargo da Autoridade</label>
+                            <input type="text" id="inputApresCargo" class="form-control-ap" value="Secretário Municipal" placeholder="Ex: Secretário Municipal" style="font-size: 0.82rem; padding: 6px 10px;">
+                        </div>
+
+                        <div style="margin-bottom: 10px;">
+                            <label for="inputApresSecretaria" style="font-size: 0.74rem; font-weight: 600; color: #475569; display: block; margin-bottom: 3px;">Secretaria / Órgão</label>
+                            <input type="text" id="inputApresSecretaria" class="form-control-ap" value="Secretaria de Inovação e Tecnologia (SIT)" placeholder="Ex: Secretaria de Inovação e Tecnologia" style="font-size: 0.82rem; padding: 6px 10px;">
+                        </div>
+
+                        <label style="font-size: 0.74rem; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Foto Oficial da Autoridade</label>
+                        <div class="media-upload-preview">
+                            <button type="button" class="btn-editor-visualizar" style="flex: 1; font-size: 0.8rem;" id="btnUploadApresFoto">
+                                <i class="bi bi-camera me-1"></i> Upload da Foto
+                            </button>
+                            <button type="button" class="btn-media-action btn-abrir-acervo-midia" data-target="apresFoto" style="background: #eff6ff; color: #0052ff; border: 1px solid #bfdbfe; font-size: 0.8rem;" title="Escolher foto do acervo da pasta">
+                                <i class="bi bi-folder-symlink"></i> Acervo
+                            </button>
+                            <input type="file" id="inputUploadApresFoto" accept="image/*" style="display: none;">
+                            <div class="media-thumb-box" style="width: 40px; flex: none;">
+                                <img id="apresFotoThumbPreview" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=800&q=80" alt="Foto">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Lista de Conquistas: 4 inputs para os tópicos de destaque -->
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
+                        <label style="font-size: 0.84rem; font-weight: 700; color: #1e293b; margin-bottom: 8px; display: block;">
+                            <i class="bi bi-trophy-fill me-1 text-warning"></i> Lista de Conquistas (4 Destaques)
+                        </label>
+
+                        <div style="display: flex; flex-direction: column; gap: 7px;">
+                            <input type="text" id="inputApresConq1" class="form-control-ap" value="+27 anos na política" placeholder="Conquista 1 (ex: +27 anos na política)" style="font-size: 0.8rem; padding: 6px 10px;">
+                            <input type="text" id="inputApresConq2" class="form-control-ap" value="Criador do Barueri sem Papel" placeholder="Conquista 2 (ex: Criador do Barueri sem Papel)" style="font-size: 0.8rem; padding: 6px 10px;">
+                            <input type="text" id="inputApresConq3" class="form-control-ap" value="+20 prêmios" placeholder="Conquista 3 (ex: +20 prêmios)" style="font-size: 0.8rem; padding: 6px 10px;">
+                            <input type="text" id="inputApresConq4" class="form-control-ap" value="1º Secretário do Metaverso" placeholder="Conquista 4 (ex: 1º Secretário do Metaverso)" style="font-size: 0.8rem; padding: 6px 10px;">
                         </div>
                     </div>
                 </div>
@@ -772,6 +902,7 @@
                         <option value="grafico">Gráfico</option>
                         <option value="indicadores">Indicadores</option>
                         <option value="mapa">Mapa Interativo</option>
+                        <option value="apresentador">Apresentador / Perfil de Autoridade</option>
                         <option value="encerramento">Encerramento</option>
                     </select>
                 </div>

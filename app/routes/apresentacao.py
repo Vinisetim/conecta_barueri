@@ -2,7 +2,7 @@ import json
 from flask import Blueprint, render_template, request, jsonify, abort, redirect, url_for, flash
 from flask_login import login_required, current_user
 from app import db
-from app.models import Apresentacao, Slide, CampoPreenchido, Templates, Projeto, Pasta
+from app.models import Apresentacao, Slide, CampoPreenchido, Templates, Projeto, Pasta, Apresentador
 from app.forms import CriarApresentacaoForm
 
 apresentacao_bp = Blueprint('apresentacao', __name__)
@@ -77,14 +77,14 @@ def criar_apresentacao():
             except (ValueError, TypeError):
                 pass
         tpl_arg = (request.args.get('template') or '').strip()
-        if tpl_arg in ('capa', 'indicadores', 'grafico', 'imagem_texto', 'mapa', 'encerramento'):
+        if tpl_arg in ('capa', 'indicadores', 'grafico', 'imagem_texto', 'mapa', 'encerramento', 'apresentador'):
             form.template_inicial.data = tpl_arg
 
     if form.validate_on_submit():
         nome_ap = form.nome.data.strip()
         proj_id = form.projeto_id.data
         tpl_escolhido = (form.template_inicial.data or request.args.get('template') or 'capa').strip()
-        if tpl_escolhido not in ('capa', 'indicadores', 'grafico', 'imagem_texto', 'mapa', 'encerramento'):
+        if tpl_escolhido not in ('capa', 'indicadores', 'grafico', 'imagem_texto', 'mapa', 'encerramento', 'apresentador'):
             tpl_escolhido = 'capa'
 
         # Criação da entidade Apresentacao apontando para a pasta (projeto_id) escolhida
@@ -230,8 +230,9 @@ def salvar_apresentacao():
         for idx, item in enumerate(slides_data, start=1):
             codigo_template = item.get('template') or 'capa'
             template = Templates.query.filter_by(codigo=codigo_template).first()
-            if not template and codigo_template in ('encerramento', 'mapa'):
-                template = Templates(nome='Encerramento' if codigo_template == 'encerramento' else 'Mapa Interativo', codigo=codigo_template, descricao='Template institucional')
+            if not template and codigo_template in ('encerramento', 'mapa', 'apresentador'):
+                nomes_tpl = {'encerramento': 'Encerramento', 'mapa': 'Mapa Interativo', 'apresentador': 'Apresentador / Perfil de Autoridade'}
+                template = Templates(nome=nomes_tpl.get(codigo_template, 'Template'), codigo=codigo_template, descricao='Template institucional')
                 db.session.add(template)
                 db.session.flush()
             if not template:
@@ -270,7 +271,11 @@ def salvar_apresentacao():
                 'mapaPins': json.dumps(item.get('mapaPins') or []) if item.get('mapaPins') is not None else None,
                 'encEmail': item.get('encEmail'),
                 'encTelefone': item.get('encTelefone'),
-                'encSite': item.get('encSite')
+                'encSite': item.get('encSite'),
+                'apresCargo': item.get('apresCargo'),
+                'apresSecretaria': item.get('apresSecretaria'),
+                'apresFoto': item.get('apresFoto'),
+                'apresConquistas': json.dumps(item.get('apresConquistas') or []) if item.get('apresConquistas') is not None else None
             }
 
             origens_campos = item.get('origens_campos') or {}
@@ -373,6 +378,10 @@ def editar_apresentacao(id):
             'encEmail': 'contato@barueri.sp.gov.br',
             'encTelefone': '(11) 4199-8000',
             'encSite': 'www.barueri.sp.gov.br',
+            'apresCargo': 'Secretário Municipal',
+            'apresSecretaria': 'Secretaria de Inovação e Tecnologia (SIT)',
+            'apresFoto': None,
+            'apresConquistas': ['+27 anos na política', 'Criador do Barueri sem Papel', '+20 prêmios', '1º Secretário do Metaverso'],
             'origens_campos': {}
         }
 
@@ -391,7 +400,7 @@ def editar_apresentacao(id):
                     slide_dict[campo.chave_campo] = float(val) if val else (4.0 if campo.chave_campo == 'tamanhoTitulo' else 1.8)
                 except (ValueError, TypeError):
                     slide_dict[campo.chave_campo] = 4.0 if campo.chave_campo == 'tamanhoTitulo' else 1.8
-            elif campo.chave_campo in ('logos', 'odsNums', 'indicadores', 'mapaPins'):
+            elif campo.chave_campo in ('logos', 'odsNums', 'indicadores', 'mapaPins', 'apresConquistas'):
                 try:
                     slide_dict[campo.chave_campo] = json.loads(val) if val else []
                 except Exception:
@@ -407,7 +416,7 @@ def editar_apresentacao(id):
         slides_iniciais.append(slide_dict)
 
     tpl_query = (request.args.get('template') or '').strip()
-    if tpl_query in ('capa', 'indicadores', 'grafico', 'imagem_texto', 'mapa', 'encerramento') and len(slides_iniciais) == 1:
+    if tpl_query in ('capa', 'indicadores', 'grafico', 'imagem_texto', 'mapa', 'encerramento', 'apresentador') and len(slides_iniciais) == 1:
         slides_iniciais[0]['template'] = tpl_query
 
     if not slides_iniciais:
@@ -449,3 +458,108 @@ def editar_apresentacao(id):
         projetos=pastas,
         pastas=pastas
     )
+
+
+@apresentacao_bp.route('/apresentacao/api/apresentadores', methods=['GET', 'POST'])
+@login_required
+def api_apresentadores():
+    """
+    Catálogo institucional da tabela apresentacao.apresentador:
+    - GET: Lista todas as autoridades cadastradas (semeando o perfil institucional padrão se vazia).
+    - POST: Salva ou atualiza uma autoridade no catálogo compartilhado do banco de dados.
+    """
+    if request.method == 'POST':
+        data = request.get_json(silent=True) or {}
+        nome = (data.get('nome') or '').strip()
+        cargo = (data.get('cargo') or '').strip()
+        secretaria = (data.get('secretaria') or '').strip()
+        biografia = (data.get('biografia') or '').strip()
+        foto_url = (data.get('foto_url') or '').strip()
+        conquistas = data.get('conquistas') or []
+
+        if not nome:
+            return jsonify({'status': 'erro', 'mensagem': 'Informe o nome da autoridade.'}), 400
+
+        try:
+            existente = Apresentador.query.filter(db.func.lower(Apresentador.nome) == nome.lower()).first()
+            if existente:
+                existente.cargo = cargo
+                existente.biografia = biografia
+                if foto_url:
+                    existente.foto_url = foto_url
+                existente.topicos = conquistas
+                existente.midias_extras = [{'secretaria': secretaria}]
+                ap_obj = existente
+            else:
+                ap_obj = Apresentador(
+                    criado_por_id=current_user.id if current_user.is_authenticated else None,
+                    nome=nome,
+                    cargo=cargo,
+                    biografia=biografia,
+                    foto_url=foto_url,
+                    topicos=conquistas,
+                    midias_extras=[{'secretaria': secretaria}]
+                )
+                db.session.add(ap_obj)
+
+            db.session.commit()
+            return jsonify({
+                'status': 'sucesso',
+                'mensagem': f'Autoridade "{nome}" salva na tabela apresentacao.apresentador!',
+                'apresentador': {
+                    'id': ap_obj.id,
+                    'nome': ap_obj.nome,
+                    'cargo': ap_obj.cargo or '',
+                    'secretaria': secretaria,
+                    'biografia': ap_obj.biografia or '',
+                    'foto_url': ap_obj.foto_url or '',
+                    'conquistas': ap_obj.topicos if isinstance(ap_obj.topicos, list) else []
+                }
+            })
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'status': 'erro', 'mensagem': f'Erro ao salvar autoridade: {str(e)}'}), 500
+
+    # GET: busca da tabela apresentacao.apresentador
+    try:
+        registros = Apresentador.query.order_by(Apresentador.id.asc()).all()
+        if not registros:
+            padrao = Apresentador(
+                criado_por_id=current_user.id if current_user.is_authenticated else None,
+                nome='Jonatas Randal',
+                cargo='Secretário Municipal',
+                biografia='Secretário Municipal de Inovação e Tecnologia de Barueri, liderando projetos de transformação digital, governo sem papel e modernização do atendimento ao cidadão.',
+                foto_url='https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=800&q=80',
+                topicos=[
+                    '+27 anos na política',
+                    'Criador do Barueri sem Papel',
+                    '+20 prêmios',
+                    '1º Secretário do Metaverso'
+                ],
+                midias_extras=[{'secretaria': 'Secretaria de Inovação e Tecnologia (SIT)'}]
+            )
+            db.session.add(padrao)
+            db.session.commit()
+            registros = [padrao]
+
+        lista = []
+        for r in registros:
+            sec = 'Secretaria Municipal de Barueri'
+            if isinstance(r.midias_extras, list) and r.midias_extras and isinstance(r.midias_extras[0], dict):
+                sec = r.midias_extras[0].get('secretaria') or sec
+            elif isinstance(r.midias_extras, dict):
+                sec = r.midias_extras.get('secretaria') or sec
+
+            lista.append({
+                'id': r.id,
+                'nome': r.nome,
+                'cargo': r.cargo or 'Secretário Municipal',
+                'secretaria': sec,
+                'biografia': r.biografia or '',
+                'foto_url': r.foto_url or 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=800&q=80',
+                'conquistas': r.topicos if isinstance(r.topicos, list) else []
+            })
+        return jsonify({'status': 'sucesso', 'apresentadores': lista})
+    except Exception:
+        db.session.rollback()
+        return jsonify({'status': 'sucesso', 'apresentadores': []})
