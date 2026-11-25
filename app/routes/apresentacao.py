@@ -230,6 +230,10 @@ def salvar_apresentacao():
         for idx, item in enumerate(slides_data, start=1):
             codigo_template = item.get('template') or 'capa'
             template = Templates.query.filter_by(codigo=codigo_template).first()
+            if not template and codigo_template in ('encerramento', 'mapa'):
+                template = Templates(nome='Encerramento' if codigo_template == 'encerramento' else 'Mapa Interativo', codigo=codigo_template, descricao='Template institucional')
+                db.session.add(template)
+                db.session.flush()
             if not template:
                 template = Templates.query.filter_by(codigo='capa').first()
 
@@ -263,7 +267,10 @@ def salvar_apresentacao():
                 'periodo': item.get('periodo', 'Últimos 12 meses'),
                 'indicadores': json.dumps(item.get('indicadores') or []) if item.get('indicadores') is not None else None,
                 'mapaTipo': item.get('mapaTipo', 'barueri'),
-                'mapaPins': json.dumps(item.get('mapaPins') or []) if item.get('mapaPins') is not None else None
+                'mapaPins': json.dumps(item.get('mapaPins') or []) if item.get('mapaPins') is not None else None,
+                'encEmail': item.get('encEmail'),
+                'encTelefone': item.get('encTelefone'),
+                'encSite': item.get('encSite')
             }
 
             origens_campos = item.get('origens_campos') or {}
@@ -363,6 +370,9 @@ def editar_apresentacao(id):
             'indicadores': [],
             'mapaTipo': 'barueri',
             'mapaPins': [],
+            'encEmail': 'contato@barueri.sp.gov.br',
+            'encTelefone': '(11) 4199-8000',
+            'encSite': 'www.barueri.sp.gov.br',
             'origens_campos': {}
         }
 

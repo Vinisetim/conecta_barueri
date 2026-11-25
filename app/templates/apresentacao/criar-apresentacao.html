@@ -221,6 +221,58 @@
                         </div>
                     </div>
 
+                    <!-- ENCERRAMENTO LAYOUT -->
+                    <div class="layout-encerramento" style="display: none; flex: 1; min-height: 0; flex-direction: column; justify-content: space-between; width: 100%; height: 100%; position: relative; z-index: 2;">
+                        <div class="slide-top-brand">
+                            <img src="{{ url_for('static', filename='img/logo-barueri.jpeg') }}" alt="Logo Barueri" class="slide-logo">
+                            <div class="slide-brand-text">
+                                <span>Prefeitura de</span>
+                                <strong>Barueri</strong>
+                            </div>
+                        </div>
+
+                        <div class="enc-center-hero" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 1cqw 5cqw;">
+                            <div style="display: inline-flex; align-items: center; gap: 0.6cqw; background: #eff6ff; color: #0052ff; border: 1px solid #bfdbfe; border-radius: 999px; padding: 0.45cqw 1.4cqw; font-size: 1.05cqw; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 1.4cqw;">
+                                <i class="bi bi-check2-circle" style="font-size: 1.25cqw;"></i>
+                                <span>Encerramento Institucional</span>
+                            </div>
+                            <h1 class="slide-title-preview preview-titulo" style="margin: 0 0 1cqw 0; font-size: 4.5cqw; font-weight: 800; color: #0f172a; line-height: 1.15;">Obrigado!</h1>
+                            <p class="slide-subtitle-preview preview-subtitulo" style="margin: 0; max-width: 78%; font-size: 1.8cqw; color: #64748b; line-height: 1.45;">Juntos construindo uma cidade cada vez mais inteligente, humana e sustentável.</p>
+                        </div>
+
+                        <div class="enc-footer-contacts" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4cqw; padding-top: 1.4cqw; border-top: 1px solid rgba(226, 232, 240, 0.9);">
+                            <div style="display: flex; align-items: center; gap: 0.9cqw; background: rgba(248, 250, 252, 0.92); border: 1px solid #e2e8f0; border-radius: 1cqw; padding: 0.9cqw 1.2cqw;">
+                                <div style="width: 3cqw; height: 3cqw; border-radius: 0.7cqw; background: #eff6ff; color: #0052ff; display: flex; align-items: center; justify-content: center; font-size: 1.4cqw; flex-shrink: 0;">
+                                    <i class="bi bi-envelope-fill"></i>
+                                </div>
+                                <div style="min-width: 0; text-align: left;">
+                                    <small style="display: block; font-size: 0.85cqw; font-weight: 700; color: #64748b; text-transform: uppercase; line-height: 1.1;">E-mail / Contato</small>
+                                    <strong id="previewEncEmail" style="display: block; font-size: 1.1cqw; font-weight: 700; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">contato@barueri.sp.gov.br</strong>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; align-items: center; gap: 0.9cqw; background: rgba(248, 250, 252, 0.92); border: 1px solid #e2e8f0; border-radius: 1cqw; padding: 0.9cqw 1.2cqw;">
+                                <div style="width: 3cqw; height: 3cqw; border-radius: 0.7cqw; background: #ecfdf5; color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 1.4cqw; flex-shrink: 0;">
+                                    <i class="bi bi-telephone-fill"></i>
+                                </div>
+                                <div style="min-width: 0; text-align: left;">
+                                    <small style="display: block; font-size: 0.85cqw; font-weight: 700; color: #64748b; text-transform: uppercase; line-height: 1.1;">Telefone / Ouvidoria</small>
+                                    <strong id="previewEncTelefone" style="display: block; font-size: 1.1cqw; font-weight: 700; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">(11) 4199-8000</strong>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; align-items: center; gap: 0.9cqw; background: rgba(248, 250, 252, 0.92); border: 1px solid #e2e8f0; border-radius: 1cqw; padding: 0.9cqw 1.2cqw;">
+                                <div style="width: 3cqw; height: 3cqw; border-radius: 0.7cqw; background: #f5f3ff; color: #7c3aed; display: flex; align-items: center; justify-content: center; font-size: 1.4cqw; flex-shrink: 0;">
+                                    <i class="bi bi-globe2"></i>
+                                </div>
+                                <div style="min-width: 0; text-align: left;">
+                                    <small style="display: block; font-size: 0.85cqw; font-weight: 700; color: #64748b; text-transform: uppercase; line-height: 1.1;">Portal Oficial</small>
+                                    <strong id="previewEncSite" style="display: block; font-size: 1.1cqw; font-weight: 700; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">www.barueri.sp.gov.br</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
 <!-- SLOTS (Global posicionado absoluto ou no rodapé) -->
                     <div class="global-slots-container" style="z-index: 1000; position: absolute; bottom: 12px; right: 12px; display: flex; gap: 10px; align-items: flex-end;">
                         <div class="slide-slot-item" id="slotODS" style="display: none; flex-direction: row; gap: 3px; flex-wrap: nowrap; flex-shrink: 0;">
@@ -254,6 +306,7 @@
                             <option value="indicadores">Indicadores</option>
                             <option value="grafico">Gráfico</option>
                             <option value="mapa">Mapa Interativo</option>
+                            <option value="encerramento">Encerramento</option>
                         </select>
                         <i class="bi bi-chevron-down select-chevron"></i>
                     </div>
@@ -465,6 +518,30 @@
                         <!-- Lista de Pins Adicionados -->
                         <div id="mapaPinsListEdit" style="display: flex; flex-direction: column; gap: 6px;">
                             <!-- Gerado dinamicamente via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Encerramento específicos -->
+                <div class="form-group-ap tpl-encerramento" style="display: none;">
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
+                        <label style="font-size: 0.85rem; font-weight: 700; color: #1e293b; margin-bottom: 10px; display: block;">
+                            <i class="bi bi-person-lines-fill me-1 text-primary"></i> Canais de Contato no Rodapé
+                        </label>
+
+                        <div style="margin-bottom: 8px;">
+                            <label for="inputEncEmail" style="font-size: 0.74rem; font-weight: 600; color: #475569; display: block; margin-bottom: 3px;">E-mail / Contato</label>
+                            <input type="text" id="inputEncEmail" class="form-control-ap" value="contato@barueri.sp.gov.br" placeholder="Ex: contato@barueri.sp.gov.br" style="font-size: 0.82rem; padding: 6px 10px;">
+                        </div>
+
+                        <div style="margin-bottom: 8px;">
+                            <label for="inputEncTelefone" style="font-size: 0.74rem; font-weight: 600; color: #475569; display: block; margin-bottom: 3px;">Telefone / Ouvidoria</label>
+                            <input type="text" id="inputEncTelefone" class="form-control-ap" value="(11) 4199-8000" placeholder="Ex: (11) 4199-8000" style="font-size: 0.82rem; padding: 6px 10px;">
+                        </div>
+
+                        <div>
+                            <label for="inputEncSite" style="font-size: 0.74rem; font-weight: 600; color: #475569; display: block; margin-bottom: 3px;">Portal Oficial / Site</label>
+                            <input type="text" id="inputEncSite" class="form-control-ap" value="www.barueri.sp.gov.br" placeholder="Ex: www.barueri.sp.gov.br" style="font-size: 0.82rem; padding: 6px 10px;">
                         </div>
                     </div>
                 </div>
@@ -694,6 +771,8 @@
                         <option value="imagem_texto">Imagem + Texto</option>
                         <option value="grafico">Gráfico</option>
                         <option value="indicadores">Indicadores</option>
+                        <option value="mapa">Mapa Interativo</option>
+                        <option value="encerramento">Encerramento</option>
                     </select>
                 </div>
 

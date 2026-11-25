@@ -118,6 +118,14 @@ document.addEventListener("DOMContentLoaded", function() {
     const tplGrafico = document.querySelectorAll(".tpl-grafico");
     const layoutMapa = document.querySelector(".layout-mapa");
     const tplMapa = document.querySelectorAll(".tpl-mapa");
+    const layoutEncerramento = document.querySelector(".layout-encerramento");
+    const tplEncerramento = document.querySelectorAll(".tpl-encerramento");
+    const inputEncEmail = document.getElementById("inputEncEmail");
+    const inputEncTelefone = document.getElementById("inputEncTelefone");
+    const inputEncSite = document.getElementById("inputEncSite");
+    const previewEncEmail = document.getElementById("previewEncEmail");
+    const previewEncTelefone = document.getElementById("previewEncTelefone");
+    const previewEncSite = document.getElementById("previewEncSite");
     const slideMapContainer = document.getElementById("slideMapContainer");
     const mapaTipoRadios = document.querySelectorAll("input[name='mapaTipoRadio']");
     const mapaPinsBadge = document.getElementById("mapaPinsBadge");
@@ -437,6 +445,37 @@ document.addEventListener("DOMContentLoaded", function() {
             `;
         }
 
+        if (tpl === 'encerramento') {
+            const logoHtml = buildLogosHtml(slide, true);
+            const defaultTextColor = hasBgImg ? '#ffffff' : '#0f172a';
+            const defaultSubColor = hasBgImg ? 'rgba(255,255,255,0.85)' : '#64748b';
+            const textColor = slide.corTitulo || defaultTextColor;
+            const subColor = slide.corSubtitulo || defaultSubColor;
+            const titleSize = slide.tamanhoTitulo ? (slide.tamanhoTitulo * 1.5) + 'px' : '7px';
+            const subSize = slide.tamanhoSubtitulo ? (slide.tamanhoSubtitulo * 1.3) + 'px' : '4px';
+            const emailVal = escapeHtml(slide.encEmail || 'contato@barueri.sp.gov.br');
+            const telVal = escapeHtml(slide.encTelefone || '(11) 4199-8000');
+            const siteVal = escapeHtml(slide.encSite || 'www.barueri.sp.gov.br');
+
+            return `
+                <div style="width:100%; height:100%; position:relative; padding:3px 4px; display:flex; flex-direction:column; justify-content:space-between; ${globalBgStyle} box-sizing:border-box; overflow:hidden;">
+                    ${hasBgImg ? '<div style="position:absolute; inset:0; background:rgba(0,0,0,0.35); z-index:0;"></div>' : ''}
+                    <div style="position:relative; z-index:1;">${logoHtml}</div>
+                    <div style="position:relative; z-index:1; text-align:center; padding:0 4px;">
+                        <div style="font-size:${titleSize}; font-weight:800; color:${textColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.1;">${title || 'Obrigado!'}</div>
+                        <div style="font-size:${subSize}; color:${subColor}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.1; margin-top:1px;">${subtitle || 'Encerramento Institucional'}</div>
+                    </div>
+                    <div style="position:relative; z-index:1; display:grid; grid-template-columns:repeat(3,1fr); gap:1.5px; border-top:0.5px solid #e2e8f0; padding-top:1.5px;">
+                        <span style="font-size:2.4px; color:#334155; background:rgba(248,250,252,0.9); border-radius:1px; padding:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center;">${emailVal}</span>
+                        <span style="font-size:2.4px; color:#334155; background:rgba(248,250,252,0.9); border-radius:1px; padding:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center;">${telVal}</span>
+                        <span style="font-size:2.4px; color:#334155; background:rgba(248,250,252,0.9); border-radius:1px; padding:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center;">${siteVal}</span>
+                    </div>
+                    ${odsBadge}
+                    ${qrBadge}
+                </div>
+            `;
+        }
+
         if (tpl === 'mapa') {
             const logoHtml = buildLogosHtml(slide, true);
             const pinCount = (slide.mapaPins || []).length;
@@ -567,6 +606,26 @@ document.addEventListener("DOMContentLoaded", function() {
         updatePreviewMedia();
         if(slide.template === "grafico") renderChart(slide);
         if(slide.template === "indicadores") renderIndicadores(slide);
+        if(slide.template === "encerramento") {
+            if (!slide.titulo || slide.titulo === "Capa" || slide.titulo === "Novo Slide") {
+                slide.titulo = "Obrigado!";
+                inputTitulo.value = slide.titulo;
+            }
+            if (!slide.subtitulo || slide.subtitulo.startsWith("Apresentação Executiva") || slide.subtitulo === "Subtítulo do novo slide") {
+                slide.subtitulo = "Juntos construindo uma cidade cada vez mais inteligente, humana e sustentável.";
+                inputSubtitulo.value = slide.subtitulo;
+            }
+            updatePreviewTexts();
+            slide.encEmail = slide.encEmail || "contato@barueri.sp.gov.br";
+            slide.encTelefone = slide.encTelefone || "(11) 4199-8000";
+            slide.encSite = slide.encSite || "www.barueri.sp.gov.br";
+            if (inputEncEmail) inputEncEmail.value = slide.encEmail;
+            if (inputEncTelefone) inputEncTelefone.value = slide.encTelefone;
+            if (inputEncSite) inputEncSite.value = slide.encSite;
+            if (previewEncEmail) previewEncEmail.textContent = slide.encEmail;
+            if (previewEncTelefone) previewEncTelefone.textContent = slide.encTelefone;
+            if (previewEncSite) previewEncSite.textContent = slide.encSite;
+        }
         if(slide.template === "mapa") {
             slide.mapaTipo = slide.mapaTipo || "barueri";
             slide.mapaPins = slide.mapaPins || [];
@@ -792,7 +851,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const oldInd = document.getElementById('dyn-ind-slots');
         if(oldInd) oldInd.remove();
 
-        if (tpl === "capa" || tpl === "grafico") {
+        if (tpl === "capa" || tpl === "grafico" || tpl === "encerramento") {
             if(globalContainer) globalContainer.innerHTML = combinedHtml;
         } else if (tpl === "imagem_texto") {
             // itOdsSlot is no longer used for ODS, but we can leave it empty
@@ -940,12 +999,14 @@ document.addEventListener("DOMContentLoaded", function() {
         if (layoutIndicadores) layoutIndicadores.style.display = "none";
         if (layoutGrafico) layoutGrafico.style.display = "none";
         if (layoutMapa) layoutMapa.style.display = "none";
+        if (layoutEncerramento) layoutEncerramento.style.display = "none";
 
         tplCapa.forEach(el => el.style.display = "none");
         tplImgTexto.forEach(el => el.style.display = "none");
         tplIndicadores.forEach(el => el.style.display = "none");
         tplGrafico.forEach(el => el.style.display = "none");
         tplMapa.forEach(el => el.style.display = "none");
+        tplEncerramento.forEach(el => el.style.display = "none");
 
         document.getElementById("activeSlideSurface").className = "slide-surface template-" + val;
 
@@ -973,6 +1034,12 @@ document.addEventListener("DOMContentLoaded", function() {
             labelTitulo.textContent = "Título";
             labelSubtitulo.textContent = "Texto Introdutório";
             fgSubtitulo.style.display = "flex";
+        } else if(val === "encerramento") {
+            if (layoutEncerramento) layoutEncerramento.style.display = "flex";
+            tplEncerramento.forEach(el => el.style.display = "block");
+            labelTitulo.textContent = "Título de Encerramento";
+            labelSubtitulo.textContent = "Mensagem Final";
+            fgSubtitulo.style.display = "flex";
         } else if(val === "mapa") {
             if (layoutMapa) layoutMapa.style.display = "flex";
             tplMapa.forEach(el => el.style.display = "block");
@@ -982,6 +1049,31 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         updateSlotsVisibility();
+    }
+
+    if (inputEncEmail) {
+        inputEncEmail.addEventListener("input", (e) => {
+            const s = slides.find(item => item.id === activeSlideId);
+            if (s) s.encEmail = e.target.value;
+            if (previewEncEmail) previewEncEmail.textContent = e.target.value || "contato@barueri.sp.gov.br";
+            updateActiveThumbnail();
+        });
+    }
+    if (inputEncTelefone) {
+        inputEncTelefone.addEventListener("input", (e) => {
+            const s = slides.find(item => item.id === activeSlideId);
+            if (s) s.encTelefone = e.target.value;
+            if (previewEncTelefone) previewEncTelefone.textContent = e.target.value || "(11) 4199-8000";
+            updateActiveThumbnail();
+        });
+    }
+    if (inputEncSite) {
+        inputEncSite.addEventListener("input", (e) => {
+            const s = slides.find(item => item.id === activeSlideId);
+            if (s) s.encSite = e.target.value;
+            if (previewEncSite) previewEncSite.textContent = e.target.value || "www.barueri.sp.gov.br";
+            updateActiveThumbnail();
+        });
     }
 
     inputTitulo.addEventListener("input", (e) => {
@@ -1042,6 +1134,26 @@ document.addEventListener("DOMContentLoaded", function() {
             updatePreviewMedia();
             if(slide.template === "grafico") renderChart(slide);
             if(slide.template === "indicadores") renderIndicadores(slide);
+        if(slide.template === "encerramento") {
+            if (!slide.titulo || slide.titulo === "Capa" || slide.titulo === "Novo Slide") {
+                slide.titulo = "Obrigado!";
+                inputTitulo.value = slide.titulo;
+            }
+            if (!slide.subtitulo || slide.subtitulo.startsWith("Apresentação Executiva") || slide.subtitulo === "Subtítulo do novo slide") {
+                slide.subtitulo = "Juntos construindo uma cidade cada vez mais inteligente, humana e sustentável.";
+                inputSubtitulo.value = slide.subtitulo;
+            }
+            updatePreviewTexts();
+            slide.encEmail = slide.encEmail || "contato@barueri.sp.gov.br";
+            slide.encTelefone = slide.encTelefone || "(11) 4199-8000";
+            slide.encSite = slide.encSite || "www.barueri.sp.gov.br";
+            if (inputEncEmail) inputEncEmail.value = slide.encEmail;
+            if (inputEncTelefone) inputEncTelefone.value = slide.encTelefone;
+            if (inputEncSite) inputEncSite.value = slide.encSite;
+            if (previewEncEmail) previewEncEmail.textContent = slide.encEmail;
+            if (previewEncTelefone) previewEncTelefone.textContent = slide.encTelefone;
+            if (previewEncSite) previewEncSite.textContent = slide.encSite;
+        }
             if(slide.template === "mapa") {
                 slide.mapaTipo = slide.mapaTipo || "barueri";
                 slide.mapaPins = slide.mapaPins || [];
@@ -1053,6 +1165,33 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     function syncSlideLogos() {
+        if (inputEncEmail && !inputEncEmail.dataset.bound) {
+            inputEncEmail.dataset.bound = "1";
+            inputEncEmail.addEventListener("input", (e) => {
+                const s = slides.find(item => item.id === activeSlideId);
+                if (s) s.encEmail = e.target.value;
+                if (previewEncEmail) previewEncEmail.textContent = e.target.value || "contato@barueri.sp.gov.br";
+                updateActiveThumbnail();
+            });
+        }
+        if (inputEncTelefone && !inputEncTelefone.dataset.bound) {
+            inputEncTelefone.dataset.bound = "1";
+            inputEncTelefone.addEventListener("input", (e) => {
+                const s = slides.find(item => item.id === activeSlideId);
+                if (s) s.encTelefone = e.target.value;
+                if (previewEncTelefone) previewEncTelefone.textContent = e.target.value || "(11) 4199-8000";
+                updateActiveThumbnail();
+            });
+        }
+        if (inputEncSite && !inputEncSite.dataset.bound) {
+            inputEncSite.dataset.bound = "1";
+            inputEncSite.addEventListener("input", (e) => {
+                const s = slides.find(item => item.id === activeSlideId);
+                if (s) s.encSite = e.target.value;
+                if (previewEncSite) previewEncSite.textContent = e.target.value || "www.barueri.sp.gov.br";
+                updateActiveThumbnail();
+            });
+        }
         const slide = slides.find(s => s.id === activeSlideId);
         if (!slide) return;
         slide.logos = [];
