@@ -114,7 +114,7 @@ def criar_apresentacao():
                 'capa': 'Apresentação Executiva - Indicadores Municipais',
                 'indicadores': 'Plataforma integrada de dados da cidade.',
                 'grafico': 'Evolução no número de atendimentos e métricas setoriais.',
-                'imagem_texto': 'Resumo comparativo dos principais dados socioeconômicos.', 'mapa': 'Mapeamento territorial e indicadores por região.', 'encerramento': 'Juntos construindo uma cidade cada vez mais inteligente, humana e sustentável.'
+                'imagem_texto': 'Resumo comparativo dos principais dados socioeconômicos.', 'mapa': 'Mapeamento territorial e indicadores por região.', 'apresentador': 'Secretário Municipal de Inovação e Tecnologia de Barueri, liderando projetos de transformação digital, governo sem papel e modernização do atendimento ao cidadão.', 'encerramento': 'Juntos construindo uma cidade cada vez mais inteligente, humana e sustentável.'
             }
 
             campos_iniciais = [
