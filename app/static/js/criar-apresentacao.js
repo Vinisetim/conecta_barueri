@@ -120,6 +120,14 @@ document.addEventListener("DOMContentLoaded", function() {
     const tplMapa = document.querySelectorAll(".tpl-mapa");
     const layoutEncerramento = document.querySelector(".layout-encerramento");
     const tplEncerramento = document.querySelectorAll(".tpl-encerramento");
+    const layoutVideo = document.querySelector(".layout-video");
+    const tplVideo = document.querySelectorAll(".tpl-video");
+    const inputVideoUrl = document.getElementById("inputVideoUrl");
+    const btnLimparVideoUrl = document.getElementById("btnLimparVideoUrl");
+    const videoEmptyPlaceholder = document.getElementById("videoEmptyPlaceholder");
+    const videoPlayerWrapper = document.getElementById("videoPlayerWrapper");
+    const btnUploadVideoFile = document.getElementById("btnUploadVideoFile");
+    const inputUploadVideoFile = document.getElementById("inputUploadVideoFile");
     const inputEncEmail = document.getElementById("inputEncEmail");
     const inputEncTelefone = document.getElementById("inputEncTelefone");
     const inputEncSite = document.getElementById("inputEncSite");
@@ -187,6 +195,89 @@ document.addEventListener("DOMContentLoaded", function() {
     const imgTextoThumbPreview = document.getElementById("imgTextoThumbPreview");
     const activeSlideSurface = document.getElementById("activeSlideSurface");
     const imgTextoCanvasImg = document.querySelector(".it-img"); // a imagem no template Imagem+Texto
+
+    function parseVideoUrl(url) {
+        if (!url || typeof url !== 'string') return null;
+        url = url.trim();
+        if (!url) return null;
+
+        // YouTube: watch?v=, youtu.be/, embed/, shorts/
+        const ytRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/shorts\/)([^"&?\/\s]{11})/i;
+        const ytMatch = url.match(ytRegex);
+        if (ytMatch && ytMatch[1]) {
+            const id = ytMatch[1];
+            return {
+                type: 'youtube',
+                id: id,
+                embedUrl: `https://www.youtube.com/embed/${id}?autoplay=1&mute=0&controls=1&rel=0&modestbranding=1&enablejsapi=1`,
+                thumbUrl: `https://img.youtube.com/vi/${id}/hqdefault.jpg`
+            };
+        }
+
+        // Vimeo: vimeo.com/123456789
+        const vimeoRegex = /(?:vimeo\.com\/)(\d+)/i;
+        const vimeoMatch = url.match(vimeoRegex);
+        if (vimeoMatch && vimeoMatch[1]) {
+            const id = vimeoMatch[1];
+            return {
+                type: 'vimeo',
+                id: id,
+                embedUrl: `https://player.vimeo.com/video/${id}?autoplay=1&muted=0&title=0&byline=0&portrait=0`,
+                thumbUrl: null
+            };
+        }
+
+        // Direct video (mp4, webm, ogg, blob, data URL, etc.)
+        return {
+            type: 'direct',
+            url: url,
+            thumbUrl: null
+        };
+    }
+
+    function renderSlideVideo(slide) {
+        if (!layoutVideo || !videoPlayerWrapper || !videoEmptyPlaceholder) return;
+
+        const url = (slide.videoUrl || "").trim();
+        if (!url) {
+            videoEmptyPlaceholder.style.display = "flex";
+            videoPlayerWrapper.style.display = "none";
+            videoPlayerWrapper.innerHTML = "";
+            return;
+        }
+
+        const parsed = parseVideoUrl(url);
+        if (!parsed) {
+            videoEmptyPlaceholder.style.display = "flex";
+            videoPlayerWrapper.style.display = "none";
+            videoPlayerWrapper.innerHTML = "";
+            return;
+        }
+
+        videoEmptyPlaceholder.style.display = "none";
+        videoPlayerWrapper.style.display = "block";
+
+        if (parsed.type === 'youtube' || parsed.type === 'vimeo') {
+            videoPlayerWrapper.innerHTML = `
+                <iframe 
+                    src="${parsed.embedUrl}" 
+                    style="width: 100%; height: 100%; position: absolute; inset: 0; border: none; margin: 0; padding: 0; display: block;" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            `;
+        } else {
+            videoPlayerWrapper.innerHTML = `
+                <video 
+                    src="${parsed.url}" 
+                    controls 
+                    autoplay 
+                    playsinline 
+                    style="width: 100%; height: 100%; position: absolute; inset: 0; object-fit: cover; border: none; margin: 0; padding: 0; display: block;">
+                </video>
+            `;
+        }
+    }
 
     function escapeHtml(str) {
         if (!str) return '';
@@ -476,6 +567,27 @@ document.addEventListener("DOMContentLoaded", function() {
             `;
         }
 
+        if (tpl === 'video') {
+            const videoUrl = slide.videoUrl || '';
+            const parsed = parseVideoUrl(videoUrl);
+            let thumbImg = '';
+            if (parsed && parsed.type === 'youtube') {
+                thumbImg = `<img src="https://img.youtube.com/vi/${parsed.id}/hqdefault.jpg" style="width:100%; height:100%; object-fit:cover; position:absolute; inset:0; opacity:0.8;">`;
+            }
+            return `
+                <div style="width:100%; height:100%; position:relative; background:#0b0f19; box-sizing:border-box; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+                    ${thumbImg}
+                    <div style="position:relative; z-index:2; width:22px; height:22px; border-radius:50%; background:rgba(239, 68, 68, 0.95); color:#ffffff; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,0.6);">
+                        <i class="bi bi-play-fill" style="font-size:13px; margin-left:1px;"></i>
+                    </div>
+                    <div style="position:absolute; bottom:2px; left:4px; right:4px; z-index:2; display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:3px; background:rgba(0,0,0,0.75); color:#ffffff; padding:0.5px 2px; border-radius:1px; font-weight:700;">Vídeo</span>
+                        <span style="font-size:3px; background:rgba(239,68,68,0.85); color:#ffffff; padding:0.5px 2px; border-radius:1px; font-weight:700;">16:9</span>
+                    </div>
+                </div>
+            `;
+        }
+
         if (tpl === 'mapa') {
             const logoHtml = buildLogosHtml(slide, true);
             const pinCount = (slide.mapaPins || []).length;
@@ -633,6 +745,12 @@ document.addEventListener("DOMContentLoaded", function() {
             slide.mapaPins = slide.mapaPins || [];
             syncMapaSidebar(slide);
             renderSlideMap(slide);
+        }
+
+        if(slide.template === "video") {
+            slide.videoUrl = (slide.videoUrl !== undefined) ? slide.videoUrl : "https://www.youtube.com/watch?v=ScMzIvxBSi4";
+            if (inputVideoUrl) inputVideoUrl.value = slide.videoUrl || "";
+            renderSlideVideo(slide);
         }
     }
 
@@ -1024,12 +1142,16 @@ document.addEventListener("DOMContentLoaded", function() {
         if (layoutIndicadores) layoutIndicadores.style.display = "none";
         if (layoutGrafico) layoutGrafico.style.display = "none";
         if (layoutMapa) layoutMapa.style.display = "none";
+        if (layoutEncerramento) layoutEncerramento.style.display = "none";
+        if (layoutVideo) layoutVideo.style.display = "none";
 
         tplCapa.forEach(el => el.style.display = "none");
         tplImgTexto.forEach(el => el.style.display = "none");
         tplIndicadores.forEach(el => el.style.display = "none");
         tplGrafico.forEach(el => el.style.display = "none");
         tplMapa.forEach(el => el.style.display = "none");
+        tplEncerramento.forEach(el => el.style.display = "none");
+        tplVideo.forEach(el => el.style.display = "none");
 
         document.getElementById("activeSlideSurface").className = "slide-surface template-" + val;
 
@@ -1069,11 +1191,79 @@ document.addEventListener("DOMContentLoaded", function() {
             labelTitulo.textContent = "Título do Slide";
             labelSubtitulo.textContent = "Texto Introdutório";
             fgSubtitulo.style.display = "flex";
+        } else if(val === "video") {
+            if (layoutVideo) layoutVideo.style.display = "block";
+            tplVideo.forEach(el => el.style.display = "block");
+            labelTitulo.textContent = "Título do Slide (Referência)";
+            fgSubtitulo.style.display = "none";
+        } else if(val === "encerramento") {
+            if (layoutEncerramento) layoutEncerramento.style.display = "flex";
+            tplEncerramento.forEach(el => el.style.display = "block");
+            labelTitulo.textContent = "Título";
+            labelSubtitulo.textContent = "Mensagem de Encerramento";
+            fgSubtitulo.style.display = "flex";
         }
 
         updateSlotsVisibility();
     }
 
+
+    if (inputVideoUrl) {
+        inputVideoUrl.addEventListener("input", (e) => {
+            const s = slides.find(item => item.id === activeSlideId);
+            if (s) {
+                s.videoUrl = e.target.value.trim();
+                renderSlideVideo(s);
+                updateActiveThumbnail();
+            }
+        });
+    }
+
+    if (btnLimparVideoUrl) {
+        btnLimparVideoUrl.addEventListener("click", () => {
+            const s = slides.find(item => item.id === activeSlideId);
+            if (s) {
+                s.videoUrl = "";
+                if (inputVideoUrl) inputVideoUrl.value = "";
+                renderSlideVideo(s);
+                updateActiveThumbnail();
+            }
+        });
+    }
+
+    document.querySelectorAll(".btn-exemplo-video").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const url = btn.getAttribute("data-url");
+            if (url) {
+                const s = slides.find(item => item.id === activeSlideId);
+                if (s) {
+                    s.videoUrl = url;
+                    if (inputVideoUrl) inputVideoUrl.value = url;
+                    renderSlideVideo(s);
+                    updateActiveThumbnail();
+                }
+            }
+        });
+    });
+
+    if (btnUploadVideoFile && inputUploadVideoFile) {
+        btnUploadVideoFile.addEventListener("click", () => {
+            inputUploadVideoFile.click();
+        });
+        inputUploadVideoFile.addEventListener("change", (e) => {
+            const file = e.target.files && e.target.files[0];
+            if (file) {
+                const fileUrl = URL.createObjectURL(file);
+                const s = slides.find(item => item.id === activeSlideId);
+                if (s) {
+                    s.videoUrl = fileUrl;
+                    if (inputVideoUrl) inputVideoUrl.value = fileUrl;
+                    renderSlideVideo(s);
+                    updateActiveThumbnail();
+                }
+            }
+        });
+    }
 
     if (inputEncEmail) {
         inputEncEmail.addEventListener("input", (e) => {
@@ -1163,6 +1353,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 slide.mapaPins = slide.mapaPins || [];
                 syncMapaSidebar(slide);
                 renderSlideMap(slide);
+            }
+            if(slide.template === "video") {
+                slide.videoUrl = (slide.videoUrl !== undefined) ? slide.videoUrl : "https://www.youtube.com/watch?v=ScMzIvxBSi4";
+                if (inputVideoUrl) inputVideoUrl.value = slide.videoUrl || "";
+                renderSlideVideo(slide);
             }
             renderThumbnails();
         }
@@ -1489,6 +1684,7 @@ document.addEventListener("DOMContentLoaded", function() {
             indicadores: [],
             mapaTipo: "barueri",
             mapaPins: [],
+            videoUrl: "",
             encEmail: "contato@barueri.sp.gov.br",
             encTelefone: "(11) 4199-8000",
             encSite: "www.barueri.sp.gov.br" ,
@@ -2101,6 +2297,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     indicadores: Array.isArray(sMestre.indicadores) ? JSON.parse(JSON.stringify(sMestre.indicadores)) : [],
                     mapaTipo: sMestre.mapaTipo || 'barueri',
                     mapaPins: Array.isArray(sMestre.mapaPins) ? JSON.parse(JSON.stringify(sMestre.mapaPins)) : [],
+                    videoUrl: sMestre.videoUrl || '',
                     pilar_1_titulo: sMestre.pilar_1_titulo || '',
                     pilar_1_texto: sMestre.pilar_1_texto || '',
                     pilar_2_titulo: sMestre.pilar_2_titulo || '',
@@ -2278,6 +2475,7 @@ document.addEventListener("DOMContentLoaded", function() {
             indicadores: Array.isArray(sOrigem.indicadores) ? JSON.parse(JSON.stringify(sOrigem.indicadores)) : [],
             mapaTipo: sOrigem.mapaTipo || 'barueri',
             mapaPins: Array.isArray(sOrigem.mapaPins) ? JSON.parse(JSON.stringify(sOrigem.mapaPins)) : [],
+            videoUrl: sOrigem.videoUrl || '',
             pilar_1_titulo: sOrigem.pilar_1_titulo || '',
             pilar_1_texto: sOrigem.pilar_1_texto || '',
             pilar_2_titulo: sOrigem.pilar_2_titulo || '',

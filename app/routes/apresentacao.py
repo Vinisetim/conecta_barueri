@@ -77,14 +77,14 @@ def criar_apresentacao():
             except (ValueError, TypeError):
                 pass
         tpl_arg = (request.args.get('template') or '').strip()
-        if tpl_arg in ('capa', 'indicadores', 'grafico', 'imagem_texto', 'mapa', 'encerramento'):
+        if tpl_arg in ('capa', 'indicadores', 'grafico', 'imagem_texto', 'mapa', 'encerramento', 'video'):
             form.template_inicial.data = tpl_arg
 
     if form.validate_on_submit():
         nome_ap = form.nome.data.strip()
         proj_id = form.projeto_id.data
         tpl_escolhido = (form.template_inicial.data or request.args.get('template') or 'capa').strip()
-        if tpl_escolhido not in ('capa', 'indicadores', 'grafico', 'imagem_texto', 'mapa', 'encerramento'):
+        if tpl_escolhido not in ('capa', 'indicadores', 'grafico', 'imagem_texto', 'mapa', 'encerramento', 'video'):
             tpl_escolhido = 'capa'
 
         # Criação da entidade Apresentacao apontando para a pasta (projeto_id) escolhida
@@ -114,7 +114,7 @@ def criar_apresentacao():
                 'capa': 'Apresentação Executiva - Indicadores Municipais',
                 'indicadores': 'Plataforma integrada de dados da cidade.',
                 'grafico': 'Evolução no número de atendimentos e métricas setoriais.',
-                'imagem_texto': 'Resumo comparativo dos principais dados socioeconômicos.', 'mapa': 'Mapeamento territorial e indicadores por região.', 'encerramento': 'Juntos construindo uma cidade cada vez mais inteligente, humana e sustentável.'
+                'imagem_texto': 'Resumo comparativo dos principais dados socioeconômicos.', 'mapa': 'Mapeamento territorial e indicadores por região.', 'encerramento': 'Juntos construindo uma cidade cada vez mais inteligente, humana e sustentável.', 'video': 'Exibição de vídeo institucional em tela cheia.'
             }
 
             campos_iniciais = [
@@ -197,6 +197,10 @@ def criar_apresentacao():
                     CampoPreenchido(slide_id=slide_inicial.id, chave_campo='encTelefone', valor_manual='(11) 4199-8000'),
                     CampoPreenchido(slide_id=slide_inicial.id, chave_campo='encSite', valor_manual='www.barueri.sp.gov.br')
                 ])
+            elif tpl_escolhido == 'video':
+                campos_iniciais.append(
+                    CampoPreenchido(slide_id=slide_inicial.id, chave_campo='videoUrl', valor_manual='https://www.youtube.com/watch?v=ScMzIvxBSi4')
+                )
 
             db.session.add_all(campos_iniciais)
 
@@ -266,8 +270,9 @@ def salvar_apresentacao():
         for idx, item in enumerate(slides_data, start=1):
             codigo_template = item.get('template') or 'capa'
             template = Templates.query.filter_by(codigo=codigo_template).first()
-            if not template and codigo_template in ('encerramento', 'mapa'):
-                template = Templates(nome='Encerramento' if codigo_template == 'encerramento' else 'Mapa Interativo', codigo=codigo_template, descricao='Template institucional')
+            if not template and codigo_template in ('encerramento', 'mapa', 'video'):
+                nome_tpl = 'Vídeo Institucional' if codigo_template == 'video' else ('Encerramento' if codigo_template == 'encerramento' else 'Mapa Interativo')
+                template = Templates(nome=nome_tpl, codigo=codigo_template, descricao='Template institucional')
                 db.session.add(template)
                 db.session.flush()
             if not template:
@@ -312,7 +317,8 @@ def salvar_apresentacao():
                 'pilar_3_texto': item.get('pilar_3_texto'),
                 'encEmail': item.get('encEmail'),
                 'encTelefone': item.get('encTelefone'),
-                'encSite': item.get('encSite')
+                'encSite': item.get('encSite'),
+                'videoUrl': item.get('videoUrl')
             }
 
             origens_campos = item.get('origens_campos') or {}
@@ -421,6 +427,7 @@ def editar_apresentacao(id):
             'encEmail': 'contato@barueri.sp.gov.br',
             'encTelefone': '(11) 4199-8000',
             'encSite': 'www.barueri.sp.gov.br',
+            'videoUrl': '',
             'origens_campos': {}
         }
 
@@ -455,7 +462,7 @@ def editar_apresentacao(id):
         slides_iniciais.append(slide_dict)
 
     tpl_query = (request.args.get('template') or '').strip()
-    if tpl_query in ('capa', 'indicadores', 'grafico', 'imagem_texto', 'mapa', 'encerramento') and len(slides_iniciais) == 1:
+    if tpl_query in ('capa', 'indicadores', 'grafico', 'imagem_texto', 'mapa', 'encerramento', 'video') and len(slides_iniciais) == 1:
         slides_iniciais[0]['template'] = tpl_query
 
     if not slides_iniciais:
